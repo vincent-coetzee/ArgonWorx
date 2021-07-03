@@ -1,0 +1,613 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BF91977A2690FA6A00E348F6 /* ArgonWorxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9197792690FA6A00E348F6 /* ArgonWorxApp.swift */; };
+		BF91977C2690FA6A00E348F6 /* ArgonWorxDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF91977B2690FA6A00E348F6 /* ArgonWorxDocument.swift */; };
+		BF91977E2690FA6A00E348F6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF91977D2690FA6A00E348F6 /* ContentView.swift */; };
+		BF9197802690FA6B00E348F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF91977F2690FA6B00E348F6 /* Assets.xcassets */; };
+		BF9197832690FA6B00E348F6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF9197822690FA6B00E348F6 /* Preview Assets.xcassets */; };
+		BF91978E2690FA6B00E348F6 /* ArgonWorxTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF91978D2690FA6B00E348F6 /* ArgonWorxTests.swift */; };
+		BF9197982690FA6B00E348F6 /* ArgonWorxUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9197972690FA6B00E348F6 /* ArgonWorxUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BF91978A2690FA6B00E348F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF91976E2690FA6A00E348F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF9197752690FA6A00E348F6;
+			remoteInfo = ArgonWorx;
+		};
+		BF9197942690FA6B00E348F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF91976E2690FA6A00E348F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF9197752690FA6A00E348F6;
+			remoteInfo = ArgonWorx;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		BF9197762690FA6A00E348F6 /* ArgonWorx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArgonWorx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF9197792690FA6A00E348F6 /* ArgonWorxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgonWorxApp.swift; sourceTree = "<group>"; };
+		BF91977B2690FA6A00E348F6 /* ArgonWorxDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgonWorxDocument.swift; sourceTree = "<group>"; };
+		BF91977D2690FA6A00E348F6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BF91977F2690FA6B00E348F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BF9197822690FA6B00E348F6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BF9197842690FA6B00E348F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BF9197892690FA6B00E348F6 /* ArgonWorxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgonWorxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF91978D2690FA6B00E348F6 /* ArgonWorxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgonWorxTests.swift; sourceTree = "<group>"; };
+		BF9197932690FA6B00E348F6 /* ArgonWorxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArgonWorxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF9197972690FA6B00E348F6 /* ArgonWorxUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArgonWorxUITests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BF9197732690FA6A00E348F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF9197862690FA6B00E348F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF9197902690FA6B00E348F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BF91976D2690FA6A00E348F6 = {
+			isa = PBXGroup;
+			children = (
+				BF9197782690FA6A00E348F6 /* ArgonWorx */,
+				BF91978C2690FA6B00E348F6 /* ArgonWorxTests */,
+				BF9197962690FA6B00E348F6 /* ArgonWorxUITests */,
+				BF9197772690FA6A00E348F6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BF9197772690FA6A00E348F6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF9197762690FA6A00E348F6 /* ArgonWorx.app */,
+				BF9197892690FA6B00E348F6 /* ArgonWorxTests.xctest */,
+				BF9197932690FA6B00E348F6 /* ArgonWorxUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BF9197782690FA6A00E348F6 /* ArgonWorx */ = {
+			isa = PBXGroup;
+			children = (
+				BF9197792690FA6A00E348F6 /* ArgonWorxApp.swift */,
+				BF91977B2690FA6A00E348F6 /* ArgonWorxDocument.swift */,
+				BF91977D2690FA6A00E348F6 /* ContentView.swift */,
+				BF91977F2690FA6B00E348F6 /* Assets.xcassets */,
+				BF9197842690FA6B00E348F6 /* Info.plist */,
+				BF9197812690FA6B00E348F6 /* Preview Content */,
+			);
+			path = ArgonWorx;
+			sourceTree = "<group>";
+		};
+		BF9197812690FA6B00E348F6 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BF9197822690FA6B00E348F6 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BF91978C2690FA6B00E348F6 /* ArgonWorxTests */ = {
+			isa = PBXGroup;
+			children = (
+				BF91978D2690FA6B00E348F6 /* ArgonWorxTests.swift */,
+			);
+			path = ArgonWorxTests;
+			sourceTree = "<group>";
+		};
+		BF9197962690FA6B00E348F6 /* ArgonWorxUITests */ = {
+			isa = PBXGroup;
+			children = (
+				BF9197972690FA6B00E348F6 /* ArgonWorxUITests.swift */,
+			);
+			path = ArgonWorxUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BF9197752690FA6A00E348F6 /* ArgonWorx */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF91979B2690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorx" */;
+			buildPhases = (
+				BF9197722690FA6A00E348F6 /* Sources */,
+				BF9197732690FA6A00E348F6 /* Frameworks */,
+				BF9197742690FA6A00E348F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ArgonWorx;
+			productName = ArgonWorx;
+			productReference = BF9197762690FA6A00E348F6 /* ArgonWorx.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BF9197882690FA6B00E348F6 /* ArgonWorxTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF91979E2690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorxTests" */;
+			buildPhases = (
+				BF9197852690FA6B00E348F6 /* Sources */,
+				BF9197862690FA6B00E348F6 /* Frameworks */,
+				BF9197872690FA6B00E348F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BF91978B2690FA6B00E348F6 /* PBXTargetDependency */,
+			);
+			name = ArgonWorxTests;
+			productName = ArgonWorxTests;
+			productReference = BF9197892690FA6B00E348F6 /* ArgonWorxTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		BF9197922690FA6B00E348F6 /* ArgonWorxUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF9197A12690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorxUITests" */;
+			buildPhases = (
+				BF91978F2690FA6B00E348F6 /* Sources */,
+				BF9197902690FA6B00E348F6 /* Frameworks */,
+				BF9197912690FA6B00E348F6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BF9197952690FA6B00E348F6 /* PBXTargetDependency */,
+			);
+			name = ArgonWorxUITests;
+			productName = ArgonWorxUITests;
+			productReference = BF9197932690FA6B00E348F6 /* ArgonWorxUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BF91976E2690FA6A00E348F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1300;
+				LastUpgradeCheck = 1300;
+				TargetAttributes = {
+					BF9197752690FA6A00E348F6 = {
+						CreatedOnToolsVersion = 13.0;
+					};
+					BF9197882690FA6B00E348F6 = {
+						CreatedOnToolsVersion = 13.0;
+						TestTargetID = BF9197752690FA6A00E348F6;
+					};
+					BF9197922690FA6B00E348F6 = {
+						CreatedOnToolsVersion = 13.0;
+						TestTargetID = BF9197752690FA6A00E348F6;
+					};
+				};
+			};
+			buildConfigurationList = BF9197712690FA6A00E348F6 /* Build configuration list for PBXProject "ArgonWorx" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BF91976D2690FA6A00E348F6;
+			productRefGroup = BF9197772690FA6A00E348F6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BF9197752690FA6A00E348F6 /* ArgonWorx */,
+				BF9197882690FA6B00E348F6 /* ArgonWorxTests */,
+				BF9197922690FA6B00E348F6 /* ArgonWorxUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BF9197742690FA6A00E348F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF9197832690FA6B00E348F6 /* Preview Assets.xcassets in Resources */,
+				BF9197802690FA6B00E348F6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF9197872690FA6B00E348F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF9197912690FA6B00E348F6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BF9197722690FA6A00E348F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF91977C2690FA6A00E348F6 /* ArgonWorxDocument.swift in Sources */,
+				BF91977A2690FA6A00E348F6 /* ArgonWorxApp.swift in Sources */,
+				BF91977E2690FA6A00E348F6 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF9197852690FA6B00E348F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF91978E2690FA6B00E348F6 /* ArgonWorxTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF91978F2690FA6B00E348F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF9197982690FA6B00E348F6 /* ArgonWorxUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BF91978B2690FA6B00E348F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF9197752690FA6A00E348F6 /* ArgonWorx */;
+			targetProxy = BF91978A2690FA6B00E348F6 /* PBXContainerItemProxy */;
+		};
+		BF9197952690FA6B00E348F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF9197752690FA6A00E348F6 /* ArgonWorx */;
+			targetProxy = BF9197942690FA6B00E348F6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		BF9197992690FA6B00E348F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BF91979A2690FA6B00E348F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		BF91979C2690FA6B00E348F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ArgonWorx/Preview Content\"";
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ArgonWorx/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BF91979D2690FA6B00E348F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ArgonWorx/Preview Content\"";
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ArgonWorx/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorx;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		BF91979F2690FA6B00E348F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ArgonWorx.app/Contents/MacOS/ArgonWorx";
+			};
+			name = Debug;
+		};
+		BF9197A02690FA6B00E348F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorxTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ArgonWorx.app/Contents/MacOS/ArgonWorx";
+			};
+			name = Release;
+		};
+		BF9197A22690FA6B00E348F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = ArgonWorx;
+			};
+			name = Debug;
+		};
+		BF9197A32690FA6B00E348F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DLH9UBQV34;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorxUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = ArgonWorx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BF9197712690FA6A00E348F6 /* Build configuration list for PBXProject "ArgonWorx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF9197992690FA6B00E348F6 /* Debug */,
+				BF91979A2690FA6B00E348F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF91979B2690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF91979C2690FA6B00E348F6 /* Debug */,
+				BF91979D2690FA6B00E348F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF91979E2690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorxTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF91979F2690FA6B00E348F6 /* Debug */,
+				BF9197A02690FA6B00E348F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF9197A12690FA6B00E348F6 /* Build configuration list for PBXNativeTarget "ArgonWorxUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF9197A22690FA6B00E348F6 /* Debug */,
+				BF9197A32690FA6B00E348F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BF91976E2690FA6A00E348F6 /* Project object */;
+}
