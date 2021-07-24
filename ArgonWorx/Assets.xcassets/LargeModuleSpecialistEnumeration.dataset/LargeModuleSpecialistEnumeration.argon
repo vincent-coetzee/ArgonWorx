@@ -1,0 +1,26 @@
+MODULE large-module
+    {
+    EXPORTED ENUMERATION <specialist>::<integer>
+        {
+        #cardiologist = 1
+        #oncologist = 2
+        #surgeon(SurgeonKind) = 3
+        #internist = 4
+        #pulmonologist
+        #nephrologist
+        #haemotologist
+        #neurologist
+        #urologist
+        #gynecologist
+        #pathologist = 10
+        #radiologist
+        #dermatologist
+        #opthalmologist
+        #psychiatrist
+        #gastroenterologist
+        #anaesthetist = 19
+        #rheumatologist
+        #epidemiologist
+        #tropicalDiseaseSpecialist = 11
+        }
+    }

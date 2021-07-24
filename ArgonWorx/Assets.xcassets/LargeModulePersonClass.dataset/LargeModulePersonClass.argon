@@ -1,0 +1,54 @@
+MODULE large-module
+    {
+    CLASS <person>::<entity>,<identifiable>
+        {
+        CLASS <hidden-class>
+            {
+            SLOT hiddenSlot::<integer> = 0
+            }
+            
+        CLASS SLOT people::<array[person]> = []
+        
+//        DELEGATE marriage::Marriage(marriageDate=dateEntered,marriageHasIssue=hasIssue,childrenInWedlock=children)
+        
+        SLOT age::<integer>
+            {
+            RETURN(year(dateOfBirth(me)) - year(current(<date>)))
+            }
+            
+        SLOT name::<string>
+            {
+            CHANGE
+                {
+                }
+            READ
+                {
+                }
+            WRITE(newValue)
+                {
+                }
+            }
+            
+        SUBSCRIPT(=index::<integer>) -> <string>
+            {
+            READ
+                {
+                }
+            WRITE
+                {
+                }
+            }
+            
+//        ALIAS monthNameFirstLetter = me->dateOfBirth->monthName->firstLetter
+        
+        Person(dateOfBirth::Date,firstName::<string>,spouse::<person> = nil)
+            {
+            me->dateOfBirth = dateOfBirth
+            firstName(me) = firstName
+            IF spouse->isNotNil
+                {
+                me->marriage = Marriage(spouse1::me,spouse2::spouse)
+                }
+            }
+        }
+    }

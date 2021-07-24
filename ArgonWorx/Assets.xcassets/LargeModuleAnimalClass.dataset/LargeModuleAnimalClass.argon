@@ -1,0 +1,17 @@
+MODULE large-module
+    {
+    CLASS <animal>::/argon/<object>
+        {
+        SLOT name::<string>
+        SLOT species::<string>
+        SLOT isExtinct::<boolean>
+        SLOT isEndangered::<boolean>
+        SLOT redBookNumber::<integer>
+        SLOT habitats::<array[<country>]>
+    
+        RECLAIMED
+            {
+            print("AN OBJECT OF CLASS Animal WAS RECLAIMED")
+            }
+        }
+    }

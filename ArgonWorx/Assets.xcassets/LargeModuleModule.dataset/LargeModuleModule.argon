@@ -1,0 +1,51 @@
+//
+//
+// First argon sample file for testing the compiler.
+// Not guaranteed to test everything or thoroughly just to
+// exercise most parts of the parser
+//
+//
+
+EXPORTED UNSEALED MODULE large-module
+    {
+	!*
+	This is a Sample module designed to exercise the compiler and to test
+	various parts of it to see if it is working correctly. Because this is
+    still a very early version of the compiler there are plenty of edge cases
+    in the compiler that malfunction or let things through that should be
+    flagged as errors.
+	*!
+    VERSION(1,1,0)
+    
+    IMPORT Infinities(/Argon/Numbers/Infinities) WITH VERSION(>5,>=0,0)
+    IMPORT BiologyBasics WITH VERSION(<9)
+    IMPORT Thunks(/Users/vincent/Desktop/Thunks)
+    IMPORT SomeCFunctions(/Users/vincent/Desktop/SomeC) WITH VERSION(*)
+    
+    LOADED
+        {
+        print("MODULE Sample WAS LOADED")
+        }
+        
+    UNLOADED
+        {
+        print("MODULE Sample IS ABOUT TO BE UNLOADED")
+        }
+        
+    MODULE Constants
+        {
+        CONSTANT $MaximumAllowedDepth::/argon/<integer> = 4024
+        }
+        
+    MAIN
+        {
+        print("RUNNING MODULE Sample.MAIN")
+        LET name = "Name of module"
+        LET color = #green
+        LET kind::<surgeonKind> = #orthopedic
+        LET animal = make(<dog>)
+        LET example = make(<parameteric-class[<string>,<class>]>)
+        cFunction(make(<object>),23)
+        testStrings()
+        }
+    }

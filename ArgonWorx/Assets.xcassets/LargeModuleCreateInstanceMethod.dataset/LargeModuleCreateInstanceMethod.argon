@@ -1,0 +1,23 @@
+MODULE large-module
+    {
+    METHOD createNewInstance<SOME-CLASS>(ofClass::SOME-CLASS) -> SOME-CLASS WHEN SOME-CLASS::<array>
+        {
+        LET instance = MAKE(SOME-CLASS)
+        LOOP(index=0,index< 20,index+=1)
+            {
+            print(index)
+            }
+        instance->entity->individual->person->age = 29
+        age(instance->personObject) = 56
+        LET deepestTraversal = 47
+        LET closure =
+            {
+            WITH(start::<integer>,end::Array<<string>>) -> Void
+            print(start)
+            end[12] = "Hello"
+            }
+        FORK(closure)
+        instance->rewrite(argument1::0)
+        RETURN(instance)
+        }
+    }

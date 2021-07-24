@@ -1,0 +1,9 @@
+MODULE large-module
+    {
+    PRIVATE ENUMERATION Color
+        {
+        #red
+        #green
+        #blue
+        }
+    }
