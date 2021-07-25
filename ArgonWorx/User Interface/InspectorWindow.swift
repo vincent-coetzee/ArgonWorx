@@ -31,15 +31,17 @@ struct InspectorWindow: View
                 block in
                     VStack
                         {
-                        Text("\(block.address.addressString)").font(Font.custom("Menlo",size: 11)).frame(alignment:.top)
+                        Text("0x\(block.address.addressString)".aligned(.left,in:20)).inspectorFont().frame(alignment:.top).frame(alignment:.trailing)
+                        Text(block.className.aligned(.left,in:20)).inspectorFont().frame(alignment:.trailing).frame(alignment:.top)
                         Spacer()
                         }
                     VStack
                         {
-                        ForEach(block.words)
+                        HeaderRowView(atIndex: 0,inBlock: block)
+                        ForEach(block.indices.dropFirst())
                             {
-                            slotWord in
-                            Text("\(slotWord.bitString)").font(Font.custom("Menlo",size: 11))
+                            index in
+                            SlotRowView(atIndex: index.index,inBlock:block)
                             }
                         }
                 }
@@ -56,6 +58,7 @@ struct InspectorWindow: View
         while offset < end
             {
             print("STARTING OBJECT AT \(offset.addressString)")
+            let startOffset = offset
             var words = Array<Word>()
             let header = segment.word(atOffset: offset)
             words.append(header)
@@ -68,7 +71,7 @@ struct InspectorWindow: View
                 words.append(segment.word(atOffset: offset))
                 offset += Word(MemoryLayout<Word>.size)
                 }
-            objects.append(WordBlock(address:offset,words:words))
+            objects.append(WordBlock(address:startOffset,words:words))
             }
         return(objects)
         }
@@ -106,21 +109,96 @@ struct HeaderView: View
         }
     }
 
-struct SlotView: View
+struct SlotIndex:Identifiable
     {
-    var word:Word
+    var id:Int
+        {
+        return(self.index)
+        }
+        
+    let index:Int
     
+    init(index:Int)
+        {
+        self.index = index
+        }
+    }
+    
+struct SlotRowView: View
+    {
+    var atIndex:Int
+    var inBlock:WordBlock
+    let slotValue:Word
+    let slotName:String
+//    let slotPointer:InnerSlotPointer
+//    let slotName:String
+    
+    init(atIndex:Int,inBlock:WordBlock)
+        {
+        self.atIndex = atIndex
+        self.inBlock = inBlock
+        self.slotValue = inBlock.words[atIndex]
+        if atIndex < self.inBlock.classPointer.slotCount
+            {
+            self.slotName = inBlock.classPointer.slot(atIndex: atIndex - 1).name
+            }
+        else
+            {
+            self.slotName = ""
+            }
+//        self.slotPointer = self.inBlock.classPointer().slot(atIndex: atIndex)
+//        self.slotName = self.slotPointer.name.aligned(.left, in: 30)
+        }
+        
     var body: some View
         {
-        Text("SLOT:   \(word.bitString)")
+        HStack
+            {
+//            Text(self.slotName)
+            Text("\(slotValue.bitString)").font(Font.custom("Menlo",size: 11))
+            Text(" ")
+            Text(self.slotName)
+            }
         }
     }
 
+struct HeaderRowView: View
+    {
+    var atIndex:Int
+    var inBlock:WordBlock
+    let slotValue:Word
+//    let slotPointer:InnerSlotPointer
+//    let slotName:String
+    
+    init(atIndex:Int,inBlock:WordBlock)
+        {
+        self.atIndex = atIndex
+        self.inBlock = inBlock
+        self.slotValue = inBlock.words[atIndex]
+//        self.slotPointer = self.inBlock.classPointer().slot(atIndex: atIndex)
+//        self.slotName = self.slotPointer.name.aligned(.left, in: 30)
+        }
+        
+    var body: some View
+        {
+        HStack
+            {
+//            Text(self.slotName)
+            Text("\(slotValue.bitString)").font(Font.custom("Menlo",size: 11))
+            }
+        }
+    }
+    
 struct WordBlock:Identifiable
     {
-    public var bitString:String
+    public var indices: Array<SlotIndex>
         {
-        self.words[0].bitString
+        var set = Array<SlotIndex>()
+        for index in 0..<self.words.count
+            {
+            set.append(SlotIndex(index: index))
+            }
+        return(set)
         }
         
     public var addressString:String
@@ -133,6 +211,16 @@ struct WordBlock:Identifiable
         "OBJECT"
         }
         
+    public var className: String
+        {
+        self.classPointer.name
+        }
+        
+    public var classPointer: InnerClassPointer
+        {
+        InnerPointer(address: self.address).classPointer
+        }
+        
     public var id:Word
         {
         self.address
@@ -140,6 +228,7 @@ struct WordBlock:Identifiable
         
     public let address:Word
     public let words:Words
+    public var _classPointer:InnerClassPointer?
     
     public var children: Array<SlotWord>?
         {
@@ -162,4 +251,20 @@ struct SlotWord:Identifiable,Hashable
         
     public let id = UUID()
     public let word:Word
+    }
+
+struct InspectorFont: ViewModifier
+    {
+    func body(content: Content) -> some View
+        {
+        content.font(Font.custom("Menlo",size: 11))
+        }
+    }
+
+extension View
+    {
+    func inspectorFont() -> some View
+        {
+        self.modifier(InspectorFont())
+        }
     }

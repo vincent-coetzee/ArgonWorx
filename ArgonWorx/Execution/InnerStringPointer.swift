@@ -10,27 +10,6 @@ import Foundation
 public class InnerStringPointer:InnerPointer
     {
     private static let kBitsByte = UInt8(Argon.Tag.bits.rawValue) << 4
-    
-    struct Key
-        {
-        let name:String
-        let offset:Int
-        }
-        
-    private static let keyNames = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","count"]
-    private static let keys =
-        {
-        () -> Dictionary<String,Key> in
-        var dict = Dictionary<String,Key>()
-        var offset = 0
-        for name in InnerStringPointer.keyNames
-            {
-            dict[name] = Key(name:name,offset:offset)
-            offset += 8
-            }
-        return(dict)
-        }()
-    private static let sizeInBytes = 64
         
     public var string:String
         {
@@ -40,7 +19,7 @@ public class InnerStringPointer:InnerPointer
                 {
                 return("nil")
                 }
-            let offset = UInt(address) + UInt(Self.sizeInBytes)
+            let offset = UInt(address) + UInt(self.sizeInBytes)
             let bytePointer = UnsafeMutablePointer<UInt8>(bitPattern: offset)!
             let count = self.count
             var string = ""
@@ -69,7 +48,7 @@ public class InnerStringPointer:InnerPointer
                 {
                 return
                 }
-            let offset = UInt(address) + UInt(Self.sizeInBytes)
+            let offset = UInt(address) + UInt(self.sizeInBytes)
             let bytePointer = UnsafeMutablePointer<UInt8>(bitPattern: offset)!
             self.count = newValue.utf8.count
             let string = newValue.utf8
@@ -116,26 +95,28 @@ public class InnerStringPointer:InnerPointer
         return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
         }
         
+    private static let kStringSizeInBytes = 64
+    
     override init(address:Word)
         {
         super.init(address:address)
-        self.classPointer = InnerClassPointer(address: ArgonModule.argonModule.slot.memoryAddress)
+        self._classPointer = nil
+        }
+        
+    internal override func initKeys()
+        {
+        self.sizeInBytes = Self.kStringSizeInBytes
+        let names = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","count"]
+        var offset = 0
+        for name in names
+            {
+            self.keys[name] = Key(name:name,offset:offset)
+            offset += 8
+            }
         }
         
     public func slot(atName:String) -> InnerSlotPointer
         {
         return(InnerSlotPointer(address:0))
-        }
-        
-    private func slotValue(atKey:String) -> Word
-        {
-        let offset = Self.keys[atKey]!.offset
-        return(self.wordPointer![offset/8])
-        }
-        
-    private func setSlotValue(_ value:Word,atKey:String)
-        {
-        let offset = Self.keys[atKey]!.offset
-        self.wordPointer![offset/8] = value
         }
     }

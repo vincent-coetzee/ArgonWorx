@@ -153,6 +153,34 @@ public class Class:ContainerSymbol,ObservableObject
         return(self)
         }
         
+    public func updateSystemSlots()
+        {
+        assert(self.memoryAddress != 0,"memeryAddress == 0 for class \(self.label) and it should not be")
+        let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.class)
+        pointer.setWord(self.memoryAddress,atSlot:"_classPointer")
+        for slot in self.layoutSlots
+            {
+//            if slot.isStringSlot
+//                {
+//                let stringAddress = pointer.word(atSlot: slot.label)
+//                if stringAddress != 0
+//                    {
+//                    let stringPointer = ObjectPointer(address: stringAddress)
+//                    stringPointer.setWord(ArgonModule.argonModule.string.memoryAddress,atSlot:"_classPointer")
+//                    }
+//                }
+//            else if slot.isArraySlot
+//                {
+//                let arrayAddress = pointer.word(atSlot: slot.label)
+//                if arrayAddress != 0
+//                    {
+//                    let arrayPointer = ObjectPointer(address: arrayAddress)
+//                    arrayPointer.setWord(ArgonModule.argonModule.array.memoryAddress,atSlot:"_classPointer")
+//                    }
+//                }
+            }
+        }
+        
     public override func layoutInMemory(segment:ManagedSegment)
         {
         guard !self.isMemoryLayoutDone else
@@ -174,6 +202,7 @@ public class Class:ContainerSymbol,ObservableObject
             {
             fatalError("Memory was preallocated but is nil")
             }
+        segment.allocatedClasses.insert(self.memoryAddress)
         let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.class)
         pointer.name = segment.allocateString(self.label)
         pointer.slots = segment.allocateArray(maximumCount: self.layoutSlots.count)
@@ -197,6 +226,8 @@ public class Class:ContainerSymbol,ObservableObject
         {
         self.isMemoryPreallocated = true
         self.memoryAddress = segment.allocateObject(sizeInBytes: 512)
+        segment.allocatedClasses.insert(self.memoryAddress)
+        ObjectPointer(address: self.memoryAddress).setWord(ArgonModule.argonModule.class.memoryAddress,atSlot:"_classPointer")
         let header = Header(WordPointer(address:self.memoryAddress)!.word(atByteOffset: 0))
         assert(header.sizeInWords == 512 / 8,"ALLOCATED SIZE DOES NOT EQUAL 512")
         }

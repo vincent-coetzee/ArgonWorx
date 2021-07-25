@@ -11,26 +11,6 @@ import Foundation
     
 public class InnerSlotPointer:InnerPointer
     {
-    struct Key
-        {
-        let name:String
-        let offset:Int
-        }
-        
-    private static let keyNames = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","name","offset","slotClass"]
-    private static let keys =
-        {
-        () -> Dictionary<String,Key> in
-        var dict = Dictionary<String,Key>()
-        var offset = 0
-        for name in InnerSlotPointer.keyNames
-            {
-            dict[name] = Key(name:name,offset:offset)
-            offset += 8
-            }
-        return(dict)
-        }()
-        
     public var offset:Int
         {
         return(Int(bitPattern: UInt(self.slotValue(atKey:"offset"))))
@@ -46,20 +26,23 @@ public class InnerSlotPointer:InnerPointer
         return(InnerClassPointer(address: self.slotValue(atKey:"slotClass")))
         }
         
+    private static let kSlotSizeInBytes = 80
+    
     override init(address:Word)
         {
         super.init(address:address)
-        self.classPointer = InnerClassPointer(address: ArgonModule.argonModule.slot.memoryAddress)
+        self._classPointer = nil
         }
         
-    public func slot(atName:String) -> InnerSlotPointer
+    internal override func initKeys()
         {
-        return(InnerSlotPointer(address:0))
-        }
-        
-    private func slotValue(atKey:String) -> Word
-        {
-        let offset = Self.keys[atKey]!.offset
-        return(self.wordPointer![offset/8])
+        self.sizeInBytes = Self.kSlotSizeInBytes
+        let names = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","name","offset","slotClass"]
+        var offset = 0
+        for name in names
+            {
+            self.keys[name] = Key(name:name,offset:offset)
+            offset += 8
+            }
         }
     }

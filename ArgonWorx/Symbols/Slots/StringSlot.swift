@@ -9,6 +9,11 @@ import Foundation
 
 public class StringSlot:Slot
     {
+    public override var isStringSlot:Bool
+        {
+        return(true)
+        }
+        
     public override var cloned: Slot
         {
         let newSlot = StringSlot(label: self.label,type:self.type)

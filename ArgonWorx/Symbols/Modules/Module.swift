@@ -114,13 +114,10 @@ public class Module:ContainerSymbol
         
     internal func layoutSlots()
         {
-        for aClass in self.symbols.values.compactMap({$0 as? Class})
+        print(self.classes)
+        for aClass in self.classes
             {
             aClass.layoutObjectSlots()
-            }
-        for module in self.symbols.values.compactMap({$0 as? Module})
-            {
-            module.layoutSlots()
             }
         }
     }

@@ -30,8 +30,8 @@
             filePath = "ArgonWorx/Symbols/Classes/Class.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "323"
-            endingLineNumber = "323"
+            startingLineNumber = "354"
+            endingLineNumber = "354"
             landmarkName = "layoutObjectSlots(in:offset:visitedClasses:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -39,15 +39,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7F9F070E-CBDD-4A7E-8F66-87DB82C4C922"
+            uuid = "B4C0E55B-36A8-4AF0-927C-48D1111B847C"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ArgonWorx/User Interface/ArgonWorxApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "49"
-            endingLineNumber = "49"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
             landmarkName = "init()"
             landmarkType = "7">
          </BreakpointContent>

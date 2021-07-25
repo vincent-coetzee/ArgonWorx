@@ -390,14 +390,15 @@ public class ArgonModule: SystemModule
         self.slot.layoutInMemory(segment: segment)
         self.typeClass.layoutInMemory(segment: segment)
         self.class.layoutInMemory(segment: segment)
-        for aClass in self.symbols.values.compactMap({$0 as? Class})
+        for aClass in self.classes
             {
             aClass.layoutInMemory(segment: ManagedSegment.shared)
             }
-        for module in self.symbols.values.compactMap({$0 as? Module})
+        for aClass in self.classes
             {
-            module.layoutInMemory(segment: ManagedSegment.shared)
+            aClass.updateSystemSlots()
             }
+        ManagedSegment.shared.backpatchAllocatedObjectClasses()
         print("LAID OUT MEMORY")
         }
     }

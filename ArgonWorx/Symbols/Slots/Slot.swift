@@ -45,12 +45,12 @@ public class Slot:Symbol
         
     public var isArraySlot:Bool
         {
-        return(self._type.isArrayType)
+        return(false)
         }
     
     public var isStringSlot:Bool
         {
-        return(self._type.isStringType)
+        return(false)
         }
         
     public var isHidden: Bool
@@ -107,10 +107,13 @@ public class Slot:Symbol
             return
             }
         self.memoryAddress = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.slot.sizeInBytes)
+        assert( ArgonModule.argonModule.slot.sizeInBytes == 80)
+        segment.allocatedSlots.insert(self.memoryAddress)
         let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.slot)
         pointer.name = segment.allocateString(self.label)
         pointer.type = 0
         pointer.offset = Word(self.offset)
+        self.isMemoryLayoutDone = true
         }
         
     public func layoutValue(in segment:ManagedSegment,at pointer:ObjectPointer)

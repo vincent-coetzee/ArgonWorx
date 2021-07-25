@@ -9,6 +9,11 @@ import Foundation
 
 public class ArraySlot:Slot
     {
+    public override var isArraySlot:Bool
+        {
+        return(true)
+        }
+        
     public override var cloned: Slot
         {
         let newSlot = ArraySlot(label: self.label,type:self.type)

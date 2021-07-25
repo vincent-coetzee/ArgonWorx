@@ -55,6 +55,9 @@ struct ArgonWorxApp: App {
             let slot = InnerSlotPointer(address: anArray[index])
             print("SLOT \(index) IS \(slot.name)")
             }
+        let classPointer = slot1.classPointer
+        let name1 = classPointer.name
+        print(name1)
         }
         
     var body: some Scene

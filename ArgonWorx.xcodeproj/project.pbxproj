@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BF1ED32026A8B517008CBB52 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED31F26A8B517008CBB52 /* Segment.swift */; };
-		BF1ED32226A8B569008CBB52 /* MemoryPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32126A8B569008CBB52 /* MemoryPointer.swift */; };
 		BF1ED32426A8B6AA008CBB52 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32326A8B6AA008CBB52 /* Header.swift */; };
 		BF1ED32826A8C24D008CBB52 /* ManagedSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32726A8C24D008CBB52 /* ManagedSegment.swift */; };
 		BF1ED32C26A8D8F4008CBB52 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32B26A8D8F4008CBB52 /* Word.swift */; };
@@ -131,7 +130,6 @@
 
 /* Begin PBXFileReference section */
 		BF1ED31F26A8B517008CBB52 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
-		BF1ED32126A8B569008CBB52 /* MemoryPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryPointer.swift; sourceTree = "<group>"; };
 		BF1ED32326A8B6AA008CBB52 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		BF1ED32726A8C24D008CBB52 /* ManagedSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedSegment.swift; sourceTree = "<group>"; };
 		BF1ED32B26A8D8F4008CBB52 /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
@@ -237,6 +235,7 @@
 		BFFAAD4926AB97180019B082 /* InnerClassPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerClassPointer.swift; sourceTree = "<group>"; };
 		BFFAAD4B26AB97710019B082 /* InnerSlotPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerSlotPointer.swift; sourceTree = "<group>"; };
 		BFFAAD4D26AB9BE80019B082 /* InnerArrayPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerArrayPointer.swift; sourceTree = "<group>"; };
+		BFFEBB0526AC7CFD0047B0B6 /* Tasks.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Tasks.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -276,7 +275,6 @@
 				BFFAAD4B26AB97710019B082 /* InnerSlotPointer.swift */,
 				BF38137426ABF50400EBCE6C /* InnerStringPointer.swift */,
 				BF1ED32726A8C24D008CBB52 /* ManagedSegment.swift */,
-				BF1ED32126A8B569008CBB52 /* MemoryPointer.swift */,
 				BFF8CF9226A8FF8D00785ABD /* ObjectPointer.swift */,
 				BF38137626AC058400EBCE6C /* RawPointer.swift */,
 				BF1ED31F26A8B517008CBB52 /* Segment.swift */,
@@ -349,6 +347,7 @@
 		BF91976D2690FA6A00E348F6 = {
 			isa = PBXGroup;
 			children = (
+				BFFEBB0526AC7CFD0047B0B6 /* Tasks.md */,
 				BF9197782690FA6A00E348F6 /* ArgonWorx */,
 				BF91978C2690FA6B00E348F6 /* ArgonWorxTests */,
 				BF9197962690FA6B00E348F6 /* ArgonWorxUITests */,
@@ -672,7 +671,6 @@
 				BF9198022690FB4100E348F6 /* ParameterizedClassInstance.swift in Sources */,
 				BF91981A2690FB6500E348F6 /* FunctionType.swift in Sources */,
 				BF9197F72690FB4100E348F6 /* ArrayClass.swift in Sources */,
-				BF1ED32226A8B569008CBB52 /* MemoryPointer.swift in Sources */,
 				BF9197CC2690FB2E00E348F6 /* Expression.swift in Sources */,
 				BFABC0BE26AAF45E00FEBB1B /* ObjectSlot.swift in Sources */,
 				BF9197CA2690FB2100E348F6 /* Location.swift in Sources */,

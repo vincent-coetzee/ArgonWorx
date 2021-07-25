@@ -9,29 +9,14 @@ import Foundation
 
 public class InnerClassPointer:InnerPointer
     {
-    struct Key
-        {
-        let name:String
-        let offset:Int
-        }
-        
-    private static let keyNames = ["_header","_magicNumber","_classPointer","_TypeHeader","_TypeMagicNumber","_TypeClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","name","typeCode","extraSizeInBytes","hasBytes","instanceSizeInBytes","isValue","magicNumber","slots","superclasses"]
-    private static let keys =
-        {
-        () -> Dictionary<String,Key> in
-        var dict = Dictionary<String,Key>()
-        var offset = 0
-        for name in InnerClassPointer.keyNames
-            {
-            dict[name] = Key(name:name,offset:offset)
-            offset += 8
-            }
-        return(dict)
-        }()
-        
     public var name:String
         {
         return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
+        }
+        
+    public var slotCount: Int
+        {
+        return(self.slots.count)
         }
         
     public var instanceSizeInBytes: Int
@@ -39,12 +24,26 @@ public class InnerClassPointer:InnerPointer
         return(Int(self.slotValue(atKey:"instanceSizeInBytes")))
         }
         
+    private static let kClassSizeInBytes = 152
+    
     override init(address:Word)
         {
         super.init(address: address)
-        self.classPointer = nil
+        self._classPointer = nil
         }
         
+    internal override func initKeys()
+        {
+        self.sizeInBytes = Self.kClassSizeInBytes
+        let names = ["_header","_magicNumber","_classPointer","_TypeHeader","_TypeMagicNumber","_TypeClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","name","typeCode","extraSizeInBytes","hasBytes","instanceSizeInBytes","isValue","magicNumber","slots","superclasses"]
+        var offset = 0
+        for name in names
+            {
+            self.keys[name] = Key(name:name,offset:offset)
+            offset += 8
+            }
+        }
+
     public var slots:InnerArrayPointer
         {
         return(InnerArrayPointer(address: self.slotValue(atKey:"slots")))
@@ -52,22 +51,18 @@ public class InnerClassPointer:InnerPointer
         
     public func slot(atName:String) -> InnerSlotPointer
         {
+        fatalError("Not implemented yet")
         return(InnerSlotPointer(address:0))
         }
         
-    private func slotValue(atKey:String) -> Word
+    public func slot(atIndex:Int) -> InnerSlotPointer
         {
-        let offset = Self.keys[atKey]!.offset
-        return(self.wordPointer![offset/8])
+        let slots = InnerArrayPointer(address: self.slotValue(atKey:"slots"))
+        return(InnerSlotPointer(address: slots[atIndex]))
         }
+
         
-    private func setSlotValue(_ word:Word,atKey:String)
-        {
-        let offset = Self.keys[atKey]!.offset
-        self.wordPointer![offset/8] = word
-        }
-        
-    public func new() -> InnerInstancePointer?
+    public func makeInstance() -> InnerInstancePointer?
         {
         return(InnerInstancePointer(address: ManagedSegment.shared.allocateInstance(ofClass: self)))
         }
