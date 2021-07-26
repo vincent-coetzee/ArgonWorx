@@ -103,8 +103,6 @@ public class InnerStringPointer:InnerPointer
         {
         return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
         }
-        
-    private static let kStringSizeInBytes = 64
     
     override init(address:Word)
         {

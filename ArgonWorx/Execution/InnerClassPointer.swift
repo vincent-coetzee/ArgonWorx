@@ -24,13 +24,16 @@ public class InnerClassPointer:InnerPointer
         return(Int(self.slotValue(atKey:"instanceSizeInBytes")))
         }
         
+    public var superclasses: InnerArrayPointer
+        {
+        return(InnerArrayPointer(address: self.slotValue(atKey:"instanceSizeInBytes")))
+        }
+        
     public var magicNumber: Int
         {
         return(Int(bitPattern: UInt(self.slotValue(atKey:"magicNumber"))))
         }
         
-    private static let kClassSizeInBytes = 152
-    
     override init(address:Word)
         {
         super.init(address: address)
@@ -54,6 +57,15 @@ public class InnerClassPointer:InnerPointer
         return(InnerArrayPointer(address: self.slotValue(atKey:"slots")))
         }
         
+    public func slot(atKey: String) -> InnerSlotPointer?
+        {
+        if self.keys[atKey].isNotNil
+            {
+            return(InnerSlotPointer(address: self.slotValue(atKey: atKey)))
+            }
+        return(nil)
+        }
+        
     public func slot(atName:String) -> InnerSlotPointer
         {
         fatalError("Not implemented yet")
@@ -67,11 +79,12 @@ public class InnerClassPointer:InnerPointer
         }
 
         
-    public func makeInstance(in segment:Segment) -> InnerInstancePointer?
+    public func allocateInstance(in segment:Segment) -> InnerInstancePointer?
         {
         let address = segment.allocateObject(sizeInBytes: self.sizeInBytes)
         let pointer = InnerInstancePointer(address: address)
         pointer.classPointer = self
+        pointer.magicNumber = self.magicNumber
         return(pointer)
         }
     }

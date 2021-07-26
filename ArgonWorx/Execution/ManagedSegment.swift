@@ -79,11 +79,10 @@ public class ManagedSegment:Segment
         let totalSizeInBytes = objectSizeInBytes + extraSizeInBytes
         let address = self.allocateObject(sizeInBytes: totalSizeInBytes)
         self.allocatedArrays.insert(address)
-        let pointer = ObjectPointer(address: address,class:ArgonModule.argonModule.array)
-        pointer.setWord(ArgonModule.argonModule.array.memoryAddress,atSlot:"_classPointer")
-        pointer.setWord(0,atSlot: "count")
-        pointer.setWord(Word(maximumCount),atSlot: "size")
-        pointer.setBoolean(true,atSlot: "hasBytes")
+        let pointer = InnerArrayPointer(address: address)
+        pointer.setSlotValue(ArgonModule.argonModule.array.memoryAddress,atKey:"_classPointer")
+        pointer.count = 0
+        pointer.size = maximumCount
         return(address)
         }
         

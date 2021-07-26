@@ -9,6 +9,11 @@ import Foundation
 
 public class InnerPointer
     {
+    public static let kClassSizeInBytes = 152
+    public static let kSlotSizeInBytes = 88
+    public static let kArraySizeInBytes = 136
+    public static let kStringSizeInBytes = 64
+    
     public var classPointer:InnerClassPointer
         {
         get
@@ -83,14 +88,21 @@ public class InnerPointer
         
     public func slotValue(atKey:String) -> Word
         {
-        let offset = self.keys[atKey]!.offset
-        return(self.wordPointer![offset/8])
+        if let offset = self.keys[atKey]?.offset
+            {
+            return(self.wordPointer![offset/8])
+            }
+        fatalError("Slot at key \(atKey) not found")
         }
         
     public func setSlotValue(_ value:Word,atKey:String)
         {
-        let offset = self.keys[atKey]!.offset
-        self.wordPointer![offset/8] = value
+        if let offset = self.keys[atKey]?.offset
+            {
+            self.wordPointer![offset/8] = value
+            return
+            }
+        fatalError("Slot at key \(atKey) not found")
         }
         
     public func setSlotValue(_ value:String,in segment:ManagedSegment,atKey:String)

@@ -7,21 +7,59 @@
 
 import Foundation
 
-public class InnerArrayPointer:InnerPointer
+public class InnerArrayPointer:InnerPointer,Collection
     {
+    public typealias Element = Word
+    public typealias Index = Int
+    
+    public static func allocate(arraySize:Int,in segment:ManagedSegment) -> InnerArrayPointer
+        {
+        let extra = arraySize * MemoryLayout<Word>.size
+        let totalSize = Self.kArraySizeInBytes + extra
+        let address = segment.allocateObject(sizeInBytes: totalSize)
+        let pointer = InnerArrayPointer(address: address)
+        Self.allocatedArrays.insert(address)
+        pointer.setSlotValue(ArgonModule.argonModule.array.memoryAddress,atKey:"_classPointer")
+        pointer.count = 0
+        pointer.size = arraySize
+        return(InnerArrayPointer(address: address))
+        }
+        
     private static var allocatedArrays = Set<Word>()
     
+    public var startIndex: Int
+        {
+        0
+        }
+        
+    public var endIndex: Int
+        {
+        self.count - 1
+        }
+        
     public var count:Int
         {
-        return(Int(self.slotValue(atKey:"count")))
+        get
+            {
+            return(Int(self.slotValue(atKey:"count")))
+            }
+        set
+            {
+            self.setSlotValue(Word(newValue),atKey:"count")
+            }
         }
         
     public var size:Int
         {
-        return(Int(self.slotValue(atKey:"size")))
+        get
+            {
+            return(Int(self.slotValue(atKey:"size")))
+            }
+        set
+            {
+            self.setSlotValue(Word(newValue),atKey:"size")
+            }
         }
-
-    private static let kArraySizeInBytes = 136
     
     private var basePointer: WordPointer
     
@@ -44,6 +82,11 @@ public class InnerArrayPointer:InnerPointer
             }
         }
         
+    public func index(after:Int) -> Int
+        {
+        return(after + 1)
+        }
+        
     public subscript(_ index:Int) -> Word
         {
         get
@@ -56,14 +99,9 @@ public class InnerArrayPointer:InnerPointer
             }
         }
         
-    public static func allocate(arraySize:Int,in segment:ManagedSegment) -> InnerArrayPointer
+    public func append(_ word:Word)
         {
-        let extra = arraySize * MemoryLayout<Word>.size
-        let totalSize = Self.kArraySizeInBytes + extra
-        let address = segment.allocateObject(sizeInBytes: totalSize)
-        let pointer = InnerArrayPointer(address: address)
-        Self.allocatedArrays.insert(address)
-        pointer.setSlotValue(ArgonModule.argonModule.array.memoryAddress,atKey:"_classPointer")
-        return(InnerArrayPointer(address: address))
+        self[self.count] = word
+        self.count += 1
         }
     }

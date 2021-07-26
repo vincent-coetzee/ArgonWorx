@@ -11,6 +11,8 @@ import Foundation
     
 public class InnerSlotPointer:InnerPointer
     {
+    private static var allocatedSlots = Set<Word>()
+        
     public var offset:Int
         {
         get
@@ -44,8 +46,6 @@ public class InnerSlotPointer:InnerPointer
         {
         return(Int(bitPattern: UInt(self.slotValue(atKey:"typeCode"))))
         }
-        
-    private static let kSlotSizeInBytes = 88
     
     override init(address:Word)
         {

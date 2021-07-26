@@ -70,12 +70,12 @@ public struct ArrayPointer
         get
             {
             let base = self.baseSize + index * MemoryLayout<Word>.size
-            return(self.wordPointer![base])
+            return(self.wordPointer![base / MemoryLayout<Word>.size])
             }
         set
             {
             let base = self.baseSize + index * MemoryLayout<Word>.size
-            self.wordPointer?[base] = newValue
+            self.wordPointer?[base / MemoryLayout<Word>.size] = newValue
             }
         }
     }

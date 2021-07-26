@@ -271,12 +271,12 @@ public class Class:ContainerSymbol,ObservableObject
         segment.allocatedClasses.insert(self.memoryAddress)
         let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.class)
         pointer.name = segment.allocateString(self.label)
-        pointer.slots = segment.allocateArray(maximumCount: self.layoutSlots.count)
-        var arrayPointer = ArrayPointer(address: pointer.slots)
+        let slotsArray = InnerArrayPointer.allocate(arraySize: self.layoutSlots.count, in: segment)
+        pointer.slots = slotsArray.address
         for slot in self.layoutSlots
             {
             slot.layoutSymbol(in: segment)
-            arrayPointer.append(slot.memoryAddress)
+            slotsArray.append(slot.memoryAddress)
             slot.layoutValue(in: segment,at: pointer)
             }
         pointer.extraSizeInBytes = 0
@@ -288,14 +288,14 @@ public class Class:ContainerSymbol,ObservableObject
         print("LAID OUT CLASS \(self.label) AT ADDRESS \(self.memoryAddress.addressString)")
         }
         
-    public func preallocateMemory(in segment:ManagedSegment)
+    public func preallocateMemory(size:Int,in segment:ManagedSegment)
         {
         self.isMemoryPreallocated = true
-        self.memoryAddress = segment.allocateObject(sizeInBytes: 512)
+        self.memoryAddress = segment.allocateObject(sizeInBytes: size)
         segment.allocatedClasses.insert(self.memoryAddress)
         ObjectPointer(address: self.memoryAddress).setWord(ArgonModule.argonModule.class.memoryAddress,atSlot:"_classPointer")
         let header = Header(WordPointer(address:self.memoryAddress)!.word(atByteOffset: 0))
-        assert(header.sizeInWords == 512 / 8,"ALLOCATED SIZE DOES NOT EQUAL 512")
+        assert(header.sizeInWords == size / 8,"ALLOCATED SIZE DOES NOT EQUAL 512")
         }
         
     private func layoutSlot(atOffset: Int) -> Slot?
