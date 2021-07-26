@@ -11,7 +11,10 @@ public class InnerClassPointer:InnerPointer
     {
     public var name:String
         {
-        return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
+        get
+            {
+            return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
+            }
         }
         
     public var slotCount: Int
@@ -21,17 +24,62 @@ public class InnerClassPointer:InnerPointer
         
     public var instanceSizeInBytes: Int
         {
-        return(Int(self.slotValue(atKey:"instanceSizeInBytes")))
-        }
-        
-    public var superclasses: InnerArrayPointer
-        {
-        return(InnerArrayPointer(address: self.slotValue(atKey:"instanceSizeInBytes")))
+        get
+            {
+            return(Int(self.slotValue(atKey:"instanceSizeInBytes")))
+            }
+        set
+            {
+            self.setSlotValue(Word(newValue),atKey:"instanceSizeInBytes")
+            }
         }
         
     public var magicNumber: Int
         {
-        return(Int(bitPattern: UInt(self.slotValue(atKey:"magicNumber"))))
+        get
+            {
+            return(Int(self.slotValue(atKey:"magicNumber")))
+            }
+        set
+            {
+            self.setSlotValue(Word(newValue),atKey:"magicNumber")
+            }
+        }
+        
+    public var extraSizeInBytes: Int
+        {
+        get
+            {
+            return(Int(self.slotValue(atKey:"extraSizeInBytes")))
+            }
+        set
+            {
+            self.setSlotValue(Word(newValue),atKey:"extraSizeInBytes")
+            }
+        }
+        
+    public var superclasses: InnerArrayPointer
+        {
+        get
+            {
+            return(InnerArrayPointer(address: self.slotValue(atKey:"superclasses")))
+            }
+        set
+            {
+            self.setSlotValue(newValue.address,atKey:"superclasses")
+            }
+        }
+        
+    public var slots: InnerArrayPointer
+        {
+        get
+            {
+            return(InnerArrayPointer(address: self.slotValue(atKey:"slots")))
+            }
+        set
+            {
+            self.setSlotValue(newValue.address,atKey:"slots")
+            }
         }
         
     override init(address:Word)
@@ -51,11 +99,6 @@ public class InnerClassPointer:InnerPointer
             offset += 8
             }
         }
-
-    public var slots:InnerArrayPointer
-        {
-        return(InnerArrayPointer(address: self.slotValue(atKey:"slots")))
-        }
         
     public func slot(atKey: String) -> InnerSlotPointer?
         {
@@ -64,6 +107,12 @@ public class InnerClassPointer:InnerPointer
             return(InnerSlotPointer(address: self.slotValue(atKey: atKey)))
             }
         return(nil)
+        }
+        
+    public func setName(_ string:String,in segment:Segment)
+        {
+        let stringPointer = InnerStringPointer.allocateString(string,in:segment)
+        self.setSlotValue(stringPointer.address,atKey:"name")
         }
         
     public func slot(atName:String) -> InnerSlotPointer

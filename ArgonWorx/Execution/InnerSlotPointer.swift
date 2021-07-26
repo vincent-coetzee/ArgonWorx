@@ -12,6 +12,16 @@ import Foundation
 public class InnerSlotPointer:InnerPointer
     {
     private static var allocatedSlots = Set<Word>()
+    
+    public static func allocate(in segment:ManagedSegment) -> InnerSlotPointer
+        {
+        let address = segment.allocateObject(sizeInBytes: Self.kSlotSizeInBytes)
+        let pointer = InnerSlotPointer(address: address)
+        Self.allocatedSlots.insert(address)
+        pointer.setSlotValue(ArgonModule.argonModule.slot.memoryAddress,atKey:"_classPointer")
+        pointer.assignSystemSlots(from: ArgonModule.argonModule.slot)
+        return(pointer)
+        }
         
     public var offset:Int
         {
@@ -81,7 +91,7 @@ public class InnerSlotPointer:InnerPointer
                 let arrayPointer = InnerArrayPointer(address: value)
                 let count = arrayPointer.count
                 let size = arrayPointer.size
-                return("Array @ \\x\(value.addressString) \(count)/\(size)")
+                return("Array @ 0x\(value.addressString) \(count)/\(size)")
             default:
                 return("\(value)")
             }

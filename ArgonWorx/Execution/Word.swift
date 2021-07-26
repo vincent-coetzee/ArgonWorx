@@ -33,6 +33,11 @@ extension Word
         return(String(string.reversed()))
         }
         
+    public var tagDropped: Word
+        {
+        return(self & ~(Header.kTagBits << Header.kTagShift))
+        }
+        
     public var isZero: Bool
         {
         return(self == 0)

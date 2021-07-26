@@ -86,7 +86,7 @@ public class ManagedSegment:Segment
         return(address)
         }
         
-    public func allocateString(_ string:String) -> Word
+    public override func allocateString(_ string:String) -> Word
         {
         let extraBytes = ((string.utf8.count / 7) + 1) * 8
         let totalBytes = ArgonModule.argonModule.string.sizeInBytes + extraBytes

@@ -29,7 +29,12 @@ public class Segment
         self.sizeInBytes = sizeInBytes
         }
         
-    public func allocateObject(sizeInBytes:Int) -> UInt64
+    public func allocateObject(sizeInBytes:Int) -> Word
+        {
+        fatalError("This has not been implemented")
+        }
+        
+    public func allocateString(_ string:String) -> Word
         {
         fatalError("This has not been implemented")
         }

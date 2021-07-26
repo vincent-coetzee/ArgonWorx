@@ -22,7 +22,8 @@ public class InnerArrayPointer:InnerPointer,Collection
         pointer.setSlotValue(ArgonModule.argonModule.array.memoryAddress,atKey:"_classPointer")
         pointer.count = 0
         pointer.size = arraySize
-        return(InnerArrayPointer(address: address))
+        pointer.assignSystemSlots(from: ArgonModule.argonModule.array)
+        return(pointer)
         }
         
     private static var allocatedArrays = Set<Word>()
@@ -103,5 +104,14 @@ public class InnerArrayPointer:InnerPointer,Collection
         {
         self[self.count] = word
         self.count += 1
+        }
+        
+    public func append(_ words:Array<Word>)
+        {
+        for word in words
+            {
+            self[self.count] = word
+            self.count += 1
+            }
         }
     }

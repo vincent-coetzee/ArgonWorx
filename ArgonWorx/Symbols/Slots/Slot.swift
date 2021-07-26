@@ -11,10 +11,10 @@ import AppKit
 public enum SlotValue
     {
     case none
-    case classPointer(Word)
-    case classMagicNumber(Int)
-    case array([Word])
-    case header(Header)
+//    case classPointer(Word)
+//    case classMagicNumber(Int)
+//    case array([Word])
+//    case header(Header)
     }
     
 public class Slot:Symbol
@@ -112,35 +112,14 @@ public class Slot:Symbol
             {
             return
             }
-        self.memoryAddress = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.slot.sizeInBytes)
+        let pointer = InnerSlotPointer.allocate(in: segment)
+        self.memoryAddress = pointer.address
         assert( ArgonModule.argonModule.slot.sizeInBytes == 88)
-        segment.allocatedSlots.insert(self.memoryAddress)
-        let pointer = InnerSlotPointer(address: self.memoryAddress)
         pointer.setSlotValue(segment.allocateString(self.label),atKey:"name")
         pointer.setSlotValue(self._type.typeClass.memoryAddress,atKey:"slotClass")
         pointer.setSlotValue(self.offset,atKey:"offset")
         pointer.setSlotValue(self._type.typeClass.typeCode.rawValue,atKey:"typeCode")
         self.isMemoryLayoutDone = true
-        }
-        
-    public func layoutValue(in segment:ManagedSegment,at pointer:ObjectPointer)
-        {
-        switch(self.value)
-            {
-            case .header(let header):
-                pointer[self.offset] = header
-            case .classPointer(let address):
-                pointer[self.offset] = address
-            case .classMagicNumber(let number):
-                pointer[self.offset] = Word(bitPattern: Int64(number))
-            case .array(let elements):
-                let array = segment.allocateArray(maximumCount: elements.count * 2)
-                var arrayPointer = ArrayPointer(address: array)
-                arrayPointer.append(elements)
-                pointer[self.offset] = array
-            default:
-                break
-            }
         }
     }
 

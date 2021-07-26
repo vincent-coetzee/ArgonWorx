@@ -383,27 +383,14 @@ public class ArgonModule: SystemModule
         ///
         print("LAYING OUT MEMORY")
         let segment = ManagedSegment.shared
-        self.object.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.string.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.array.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.slot.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.typeClass.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.class.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.enumeration.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
-        self.object.layoutInMemory(segment: segment)
-        self.array.layoutInMemory(segment: segment)
-        self.string.layoutInMemory(segment: segment)
-        self.slot.layoutInMemory(segment: segment)
-        self.typeClass.layoutInMemory(segment: segment)
-        self.class.layoutInMemory(segment: segment)
-        self.enumeration.layoutInMemory(segment: segment)
-        for aClass in self.classes
+        let classes = self.classes
+        for aClass in classes
+            {
+            aClass.preallocateMemory(size: InnerPointer.kClassSizeInBytes,in: segment)
+            }
+        for aClass in classes
             {
             aClass.layoutInMemory(segment: ManagedSegment.shared)
-            }
-        for aClass in self.classes
-            {
-            aClass.updateSystemSlots()
             }
         ManagedSegment.shared.backpatchAllocatedObjectClasses()
         print("LAID OUT MEMORY")

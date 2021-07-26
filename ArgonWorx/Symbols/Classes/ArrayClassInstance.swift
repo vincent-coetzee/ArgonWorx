@@ -9,6 +9,11 @@ import Foundation
 
 public class ArrayClassInstance: ParameterizedSystemClassInstance
     {
+    public override var typeCode:TypeCode
+        {
+        .array
+        }
+        
     public override var displayName: String
         {
         "Array<\(self.concreteTypes[0].displayName)>"

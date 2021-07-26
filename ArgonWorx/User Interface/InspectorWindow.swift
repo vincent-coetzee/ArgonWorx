@@ -138,7 +138,7 @@ struct SlotRowView: View
         {
         self.atIndex = atIndex
         self.inBlock = inBlock
-        self.slotValue = inBlock.words[atIndex]
+        self.slotValue = inBlock.words[atIndex].tagDropped
         if atIndex < self.inBlock.classPointer.slotCount
             {
             self.slotName = inBlock.classPointer.slot(atIndex: atIndex).name

@@ -64,9 +64,14 @@ public class InnerPointer
             }
         }
         
+    public func hasSlot(atKey:String) -> Bool
+        {
+        return(self.keys[atKey] != nil)
+        }
+        
     public func word(atOffset:Int) -> Word
         {
-        return(self.wordPointer?[atOffset/8] ?? 0)
+        return((self.wordPointer?[atOffset/8] ?? 0).tagDropped)
         }
         
     public func setWord(_ word:Word,atOffset:Int)
@@ -77,7 +82,7 @@ public class InnerPointer
     public func slotValue(atName:String) -> Word
         {
         let slot = self.classPointer.slot(atName:atName)
-        return(self.wordPointer?[slot.offset] ?? 0)
+        return((self.wordPointer?[slot.offset] ?? 0).tagDropped)
         }
         
     public func setSlotValue(_ value:Word,atName:String)
@@ -90,7 +95,7 @@ public class InnerPointer
         {
         if let offset = self.keys[atKey]?.offset
             {
-            return(self.wordPointer![offset/8])
+            return(self.wordPointer![offset/8].tagDropped)
             }
         fatalError("Slot at key \(atKey) not found")
         }
@@ -105,16 +110,59 @@ public class InnerPointer
         fatalError("Slot at key \(atKey) not found")
         }
         
+    public func setSlotValue(_ value:Bool,atKey:String)
+        {
+        if let offset = self.keys[atKey]?.offset
+            {
+            var word = Word(value ? 1 : 0)
+            word.tag = .boolean
+            self.wordPointer![offset/8] = word
+            return
+            }
+        fatalError("Slot at key \(atKey) not found")
+        }
+        
     public func setSlotValue(_ value:String,in segment:ManagedSegment,atKey:String)
         {
-        let stringPointer = InnerStringPointer.allocate(value,in:segment)
+        let stringPointer = InnerStringPointer.allocateString(value,in:segment)
         let offset = self.keys[atKey]!.offset
-        self.wordPointer![offset/8] = stringPointer.address
+        var word = stringPointer.address
+        word.tag = .pointer
+        self.wordPointer![offset/8] = word
         }
         
     public func setSlotValue(_ value:Int,atKey:String)
         {
         let offset = self.keys[atKey]!.offset
         self.wordPointer![offset/8] = Word(bitPattern: Int64(value))
+        }
+        
+    public func assignSystemSlots(from aClass:Class)
+        {
+        var aKey = "_\(aClass.label)Header"
+        if self.hasSlot(atKey: aKey)
+            {
+            var header = Header(0)
+            header.tag = .header
+            header.hasBytes = aClass.hasBytes
+            header.isForwarded = false
+            header.flipCount = 1
+            header.sizeInWords = aClass.sizeInBytes / 8
+            self.setSlotValue(header, atKey: aKey)
+            }
+        aKey = "_\(aClass.label)MagicNumber"
+        if self.hasSlot(atKey: aKey)
+            {
+            self.setSlotValue(aClass.magicNumber,atKey: aKey)
+            }
+        aKey = "_\(aClass.label)ClassPointer"
+        if self.hasSlot(atKey: aKey)
+            {
+            self.setSlotValue(aClass.memoryAddress,atKey: aKey)
+            }
+        for superclass in aClass.superclasses
+            {
+            self.assignSystemSlots(from: superclass)
+            }
         }
     }
