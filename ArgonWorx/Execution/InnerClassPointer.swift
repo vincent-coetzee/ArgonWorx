@@ -24,6 +24,11 @@ public class InnerClassPointer:InnerPointer
         return(Int(self.slotValue(atKey:"instanceSizeInBytes")))
         }
         
+    public var magicNumber: Int
+        {
+        return(Int(bitPattern: UInt(self.slotValue(atKey:"magicNumber"))))
+        }
+        
     private static let kClassSizeInBytes = 152
     
     override init(address:Word)
@@ -62,8 +67,11 @@ public class InnerClassPointer:InnerPointer
         }
 
         
-    public func makeInstance() -> InnerInstancePointer?
+    public func makeInstance(in segment:Segment) -> InnerInstancePointer?
         {
-        return(InnerInstancePointer(address: ManagedSegment.shared.allocateInstance(ofClass: self)))
+        let address = segment.allocateObject(sizeInBytes: self.sizeInBytes)
+        let pointer = InnerInstancePointer(address: address)
+        pointer.classPointer = self
+        return(pointer)
         }
     }

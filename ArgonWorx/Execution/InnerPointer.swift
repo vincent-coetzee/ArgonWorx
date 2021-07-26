@@ -23,6 +23,7 @@ public class InnerPointer
             {
             self._classPointer = newValue
             self.setSlotValue(newValue.address,atKey:"_classPointer")
+            self.setSlotValue(newValue.magicNumber,atKey:"_magicNumber")
             }
         }
         
@@ -90,6 +91,13 @@ public class InnerPointer
         {
         let offset = self.keys[atKey]!.offset
         self.wordPointer![offset/8] = value
+        }
+        
+    public func setSlotValue(_ value:String,in segment:ManagedSegment,atKey:String)
+        {
+        let stringPointer = InnerStringPointer.allocate(value,in:segment)
+        let offset = self.keys[atKey]!.offset
+        self.wordPointer![offset/8] = stringPointer.address
         }
         
     public func setSlotValue(_ value:Int,atKey:String)

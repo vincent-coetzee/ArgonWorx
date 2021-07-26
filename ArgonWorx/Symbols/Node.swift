@@ -29,7 +29,7 @@ public class Node:NSObject,NamingContext,ParseTreeNode,Identifiable
         
     public var type: Type
         {
-        return(Type(label:""))
+        fatalError("This should have been implemented in a class")
         }
         
     public var name: Name

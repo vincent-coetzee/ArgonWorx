@@ -11,6 +11,15 @@ public class InnerStringPointer:InnerPointer
     {
     private static let kBitsByte = UInt8(Argon.Tag.bits.rawValue) << 4
         
+    public class func allocate(_ string:String,in segment:ManagedSegment) -> InnerStringPointer
+        {
+        let newAddress = segment.allocateString(string)
+        let pointer = InnerStringPointer(address: newAddress)
+        pointer.setSlotValue(ArgonModule.argonModule.string.memoryAddress,atKey:"_classPointer")
+        pointer.setSlotValue(ArgonModule.argonModule.string.magicNumber,atKey:"_magicNumber")
+        return(pointer)
+        }
+        
     public var string:String
         {
         get

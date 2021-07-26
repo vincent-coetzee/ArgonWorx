@@ -29,21 +29,21 @@ struct InspectorWindow: View
             List(self.loadObjectWords())
                 {
                 block in
+                VStack
+                    {
+                    HStack
+                        {
+                        Text(("0x\(block.address.addressString) " + block.className).aligned(.right,in:24)).inspectorFont()
+                        }.frame(maxWidth: .infinity,alignment: .leading)
                     VStack
                         {
-                        Text("0x\(block.address.addressString)".aligned(.left,in:20)).inspectorFont().frame(alignment:.top).frame(alignment:.trailing)
-                        Text(block.className.aligned(.left,in:20)).inspectorFont().frame(alignment:.trailing).frame(alignment:.top)
-                        Spacer()
-                        }
-                    VStack
-                        {
-                        HeaderRowView(atIndex: 0,inBlock: block)
-                        ForEach(block.indices.dropFirst())
+                        ForEach(block.indices)
                             {
                             index in
                             SlotRowView(atIndex: index.index,inBlock:block)
                             }
                         }
+                    }
                 }
             }
         }
@@ -130,6 +130,7 @@ struct SlotRowView: View
     var inBlock:WordBlock
     let slotValue:Word
     let slotName:String
+    var offset:Int = 0
 //    let slotPointer:InnerSlotPointer
 //    let slotName:String
     
@@ -140,7 +141,7 @@ struct SlotRowView: View
         self.slotValue = inBlock.words[atIndex]
         if atIndex < self.inBlock.classPointer.slotCount
             {
-            self.slotName = inBlock.classPointer.slot(atIndex: atIndex - 1).name
+            self.slotName = inBlock.classPointer.slot(atIndex: atIndex).name
             }
         else
             {
@@ -155,9 +156,17 @@ struct SlotRowView: View
         HStack
             {
 //            Text(self.slotName)
-            Text("\(slotValue.bitString)").font(Font.custom("Menlo",size: 11))
-            Text(" ")
-            Text(self.slotName)
+            Text(self.slotName.aligned(.right,in:24)).inspectorFont()
+            Text(String(format: " %05d ",atIndex * 8)).inspectorFont()
+            Text("\(slotValue.bitString)").inspectorFont()
+            if atIndex < inBlock.classPointer.slots.count
+                {
+                Text(" \(inBlock.classPointer.slot(atIndex: atIndex).format(value: slotValue))".aligned(.left,in:25)).inspectorFont()
+                }
+            else
+                {
+                Text(" ".aligned(.left,in:25)).inspectorFont()
+                }
             }
         }
     }

@@ -38,6 +38,10 @@ extension String
         {
         let length = max(width - self.count,0)
         let padding = String(repeating: " ", count: length)
-        return(self + padding)
+        if alignment == .left
+            {
+            return(self + padding)
+            }
+        return(padding + self)
         }
     }

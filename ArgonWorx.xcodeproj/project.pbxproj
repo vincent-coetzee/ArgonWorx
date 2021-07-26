@@ -297,7 +297,6 @@
 				BF82BFC126A9EE7200A96C8F /* IntegerSlot.swift */,
 				BFABC0BD26AAF45E00FEBB1B /* ObjectSlot.swift */,
 				BF9197DB2690FB4000E348F6 /* Slot.swift */,
-				BF82BFC526A9EEB600A96C8F /* StringSlot.swift */,
 				BF38137826AC159800EBCE6C /* VirtualSlot.swift */,
 			);
 			path = Slots;
@@ -463,6 +462,7 @@
 				BF9197D92690FB4000E348F6 /* TypeAlias.swift */,
 				BF82BFBD26A9E7E400A96C8F /* TypeCode.swift */,
 				BF9197EB2690FB4100E348F6 /* TypeConstraint.swift */,
+				BF82BFC526A9EEB600A96C8F /* StringSlot.swift */,
 			);
 			path = Symbols;
 			sourceTree = "<group>";

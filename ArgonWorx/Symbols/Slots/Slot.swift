@@ -14,10 +14,16 @@ public enum SlotValue
     case classPointer(Word)
     case classMagicNumber(Int)
     case array([Word])
+    case header(Header)
     }
     
 public class Slot:Symbol
     {
+    public override var type:Type
+        {
+        return(self._type)
+        }
+        
     public var size:Int
         {
         return(MemoryLayout<Word>.size)
@@ -107,12 +113,13 @@ public class Slot:Symbol
             return
             }
         self.memoryAddress = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.slot.sizeInBytes)
-        assert( ArgonModule.argonModule.slot.sizeInBytes == 80)
+        assert( ArgonModule.argonModule.slot.sizeInBytes == 88)
         segment.allocatedSlots.insert(self.memoryAddress)
-        let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.slot)
-        pointer.name = segment.allocateString(self.label)
-        pointer.type = 0
-        pointer.offset = Word(self.offset)
+        let pointer = InnerSlotPointer(address: self.memoryAddress)
+        pointer.setSlotValue(segment.allocateString(self.label),atKey:"name")
+        pointer.setSlotValue(self._type.typeClass.memoryAddress,atKey:"slotClass")
+        pointer.setSlotValue(self.offset,atKey:"offset")
+        pointer.setSlotValue(self._type.typeClass.typeCode.rawValue,atKey:"typeCode")
         self.isMemoryLayoutDone = true
         }
         
@@ -120,6 +127,8 @@ public class Slot:Symbol
         {
         switch(self.value)
             {
+            case .header(let header):
+                pointer[self.offset] = header
             case .classPointer(let address):
                 pointer[self.offset] = address
             case .classMagicNumber(let number):

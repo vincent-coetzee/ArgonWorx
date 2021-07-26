@@ -9,6 +9,11 @@ import Foundation
 
 public class ClassType:Type
     {
+    public override var typeClass: Class
+        {
+        return(self.clazz)
+        }
+        
     public override var displayName: String
         {
         self.clazz.displayName

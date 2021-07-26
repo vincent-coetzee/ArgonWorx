@@ -9,6 +9,11 @@ import Foundation
 
 public class Type
     {
+    public var typeClass: Class
+        {
+        fatalError("Should have been overridden")
+        }
+        
     public var displayName: String
         {
         self.label

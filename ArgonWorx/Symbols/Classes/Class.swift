@@ -24,6 +24,43 @@ public class Class:ContainerSymbol,ObservableObject
         
     public static let number: Class = ArgonModule.argonModule.lookup(label:"Number") as! Class
     
+    public override var typeCode: TypeCode
+        {
+        switch(self.label)
+            {
+            case "Integer":
+                return(.integer)
+            case "UInteger":
+                return(.uInteger)
+            case "String":
+                return(.string)
+            case "Array":
+                return(.array)
+            case "Class":
+                return(.class)
+            case "Float":
+                return(.float)
+            case "Boolean":
+                return(.boolean)
+            case "Byte":
+                return(.byte)
+            case "Character":
+                return(.character)
+            case "Stream":
+                return(.stream)
+            case "Slot":
+                return(.slot)
+            case "Module":
+                return(.module)
+            case "Tuple":
+                return(.tuple)
+            case "Symbol":
+                return(.symbol)
+            default:
+                return(.other)
+            }
+        }
+        
     public override var type:Type
         {
         return(ClassType(class:self))
@@ -134,6 +171,8 @@ public class Class:ContainerSymbol,ObservableObject
     internal let magicNumber:Int
     internal var slotClassType:Slot.Type = Slot.self
     internal var isMemoryPreallocated = false
+    internal var header = Header(0)
+    internal var hasBytes = false
     
     public override init(label:Label)
         {
@@ -151,6 +190,11 @@ public class Class:ContainerSymbol,ObservableObject
         {
         self.slotClassType = aClass
         return(self)
+        }
+        
+    public func hasBytes(_ value:Bool)
+        {
+        self.hasBytes = value
         }
         
     public func updateSystemSlots()
@@ -181,19 +225,33 @@ public class Class:ContainerSymbol,ObservableObject
             }
         }
         
+    public func layoutInMemory(inClass: Class,segment: Segment)
+        {
+        if let slot = inClass.layoutSlot(atLabel: "_\(self.label)Header")
+            {
+//            self.header.tag = .header
+//            self.header.hasBytes = self.hasBytes
+//            self.header.isForwarded = false
+//            self.header.flipCount = 1
+//            self.header.sizeInWords = self.sizeInBytes / 8
+//            slot.value = .header(self.header)
+            }
+        if let slot = inClass.layoutSlot(atLabel: "_\(self.label)MagicNumber")
+            {
+//            slot.value = .classMagicNumber(self.magicNumber)
+            }
+        if let slot = inClass.layoutSlot(atLabel: "_\(self.label)ClassPointer")
+            {
+//            slot.value = .classPointer(self.memoryAddress)
+            }
+        }
+        
     public override func layoutInMemory(segment:ManagedSegment)
         {
         guard !self.isMemoryLayoutDone else
             {
             return
             }
-        var array = Words()
-        for superclass in self.superclasses
-            {
-            superclass.layoutInMemory(segment: segment)
-            array.append(superclass.memoryAddress)
-            }
-        self.layoutSlot(atLabel: "superclasses")?.value = .array(array)
         if !self.isMemoryPreallocated
             {
             self.memoryAddress = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.class.sizeInBytes)
@@ -202,6 +260,14 @@ public class Class:ContainerSymbol,ObservableObject
             {
             fatalError("Memory was preallocated but is nil")
             }
+        var array = Words()
+        for superclass in self.superclasses
+            {
+            superclass.layoutInMemory(segment: segment)
+            array.append(superclass.memoryAddress)
+            superclass.layoutInMemory(inClass: self,segment: segment)
+            }
+        self.layoutSlot(atLabel: "superclasses")?.value = .array(array)
         segment.allocatedClasses.insert(self.memoryAddress)
         let pointer = ObjectPointer(address: self.memoryAddress,class: ArgonModule.argonModule.class)
         pointer.name = segment.allocateString(self.label)
@@ -217,7 +283,7 @@ public class Class:ContainerSymbol,ObservableObject
         pointer.instanceSizeInBytes = Word(self.sizeInBytes)
         pointer.setBoolean(false,atSlot: "hasBytes")
         pointer.setBoolean(false,atSlot: "isValue")
-        pointer.magicNumber = Word(self.magicNumber)
+        pointer.magicNumber = Word(bitPattern: self.magicNumber)
         self.isMemoryLayoutDone = true
         print("LAID OUT CLASS \(self.label) AT ADDRESS \(self.memoryAddress.addressString)")
         }

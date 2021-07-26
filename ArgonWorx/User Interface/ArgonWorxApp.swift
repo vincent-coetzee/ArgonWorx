@@ -58,6 +58,13 @@ struct ArgonWorxApp: App {
         let classPointer = slot1.classPointer
         let name1 = classPointer.name
         print(name1)
+        let class1Pointer = InnerClassPointer(address: ArgonModule.argonModule.array.memoryAddress)
+        let slotsPointer = class1Pointer.slots
+        print(slotsPointer.count)
+        print(slotsPointer.size)
+        let slot1Pointer = InnerSlotPointer(address: slotsPointer[4])
+        print(slot1Pointer.name)
+        print(slot1Pointer.typeCode)
         }
         
     var body: some Scene

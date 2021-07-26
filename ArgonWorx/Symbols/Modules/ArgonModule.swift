@@ -157,6 +157,11 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "Module") as! Class)
         }
         
+    public var instructionArray: Class
+        {
+        return(self.lookup(label: "InstructionArray") as! Class)
+        }
+        
     public var enumerationCase: Class
         {
         return(self.lookup(label: "EnumerationCase") as! Class)
@@ -277,19 +282,20 @@ public class ArgonModule: SystemModule
         self.dateTime.virtual("date",self.date).virtual("time",self.time)
         self.collection.slot("count",self.integer)
         self.stream.slot("fileHandle",self.integer).slot("count",self.integer).virtual("isOpen",self.boolean).virtual("canRead",self.boolean).virtual("canWrite",self.boolean)
-        self.slot.slot("name",self.string).slot("type",self.typeClass).slot("offset",self.integer)
+        self.slot.slot("name",self.string).slot("type",self.typeClass).slot("offset",self.integer).slot("typeCode",self.integer)
         self.typeClass.slot("name",self.string).slot("typeCode",self.integer)
         self.class.slot("superclasses",self.array.of(self.class)).virtual("subclasses",self.array.of(self.class)).slot("slots",self.array.of(self.slot)).slot("extraSizeInBytes",self.integer).slot("instanceSizeInBytes",self.integer).slot("hasBytes",self.boolean).slot("isValue",self.boolean).slot("magicNumber",self.integer)
         self.method.slot("instances",self.array.of(self.methodInstance))
-        self.methodInstance.slot("name",self.string).slot("parameters",self.array.of(self.parameter)).slot("resultType",self.typeClass)
+        self.methodInstance.slot("name",self.string).slot("parameters",self.array.of(self.parameter)).slot("resultType",self.typeClass).slot("code",self.instructionArray)
         self.enumerationCase.slot("symbol",self.symbol).slot("associatedTypes",self.array.of(self.typeClass)).slot("enumeration",self.enumeration).slot("value",self.integer)
         self.enumeration.slot("valueType",self.typeClass).slot("cases",self.array.of(self.enumerationCase))
         self.block.slot("count",self.integer).slot("size",self.integer).slot("nextBlock",self.address)
         self.moduleClass.virtual("isSystemModule",self.boolean).slot("elements",self.typeClass).slot("isArgonModule",self.boolean).slot("isTopModule",self.boolean).slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
         self.tuple.slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
-        self.array.slot("elementType",self.typeClass).slot("size",self.integer).slot("firstBlock",self.block)
+        self.array.slot("elementType",self.typeClass).slot("size",self.integer).slot("firstBlock",self.block).hasBytes(true)
         self.instruction.virtual("opcode",self.integer).virtual("mode",self.integer).virtual("operand1",self.integer).virtual("operand2",self.integer).virtual("operand3",self.integer)
-        self.string.slot("count",self.integer).virtual("bytes",self.address)
+        self.string.slot("count",self.integer).virtual("bytes",self.address).hasBytes(true)
+        self.instructionArray.hasBytes(true)
         }
         
     private func initBaseMethods()

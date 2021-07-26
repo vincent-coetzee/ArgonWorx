@@ -31,6 +31,6 @@ public class Segment
         
     public func allocateObject(sizeInBytes:Int) -> UInt64
         {
-        return(0)
+        fatalError("This has not been implemented")
         }
     }
