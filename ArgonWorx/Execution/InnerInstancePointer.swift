@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Interpreter
 
 public class InnerInstancePointer:InnerPointer
     {

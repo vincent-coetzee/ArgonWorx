@@ -64,7 +64,7 @@ public struct Argon
         case integer =      0b0000  // PACK, COPY AND DON'T FOLLOW
         case float =        0b0001  // PACK, COPY AND DON'T FOLLOW
         case byte =         0b0010  // PACK, COPY AND DON'T FOLLOW
-        case character =    0b0011  // PACK, COPY AND DON'T FOLLOW
+        case `nil` =        0b0011  // PACK, COPY AND DON'T FOLLOW
         case boolean =      0b0100  // PACK, COPY AND DON'T FOLLOW
         case bits =         0b0101  // PACK, COPY AND DON'T FOLLOW
         case header =       0b0110  // HANDLE

@@ -26,7 +26,7 @@ struct InspectorWindow: View
             }
         VStack
             {
-            List(self.loadObjectWords())
+            List(self.loadBlocks())
                 {
                 block in
                 VStack
@@ -48,7 +48,7 @@ struct InspectorWindow: View
             }
         }
         
-    private func loadObjectWords() -> Array<WordBlock>
+    private func loadBlocks() -> Array<WordBlock>
         {
         let segment = ManagedSegment.shared
         let start = segment.startOffset
@@ -109,7 +109,7 @@ struct HeaderView: View
         }
     }
 
-struct SlotIndex:Identifiable
+struct SlotIndex:Identifiable,Hashable
     {
     var id:Int
         {
@@ -158,16 +158,33 @@ struct SlotRowView: View
 //            Text(self.slotName)
             Text(self.slotName.aligned(.right,in:24)).inspectorFont()
             Text(String(format: " %05d ",atIndex * 8)).inspectorFont()
-            Text("\(slotValue.bitString)").inspectorFont()
+            Text("\(slotValue.bitString)").inspectorFont().foregroundColor(self.colorChooser())
             if atIndex < inBlock.classPointer.slots.count
                 {
-                Text(" \(inBlock.classPointer.slot(atIndex: atIndex).format(value: slotValue))".aligned(.left,in:25)).inspectorFont()
+                Text(" \(inBlock.classPointer.slot(atIndex: atIndex).format(value: slotValue))".aligned(.left,in:25)).inspectorFont().foregroundColor(self.colorChooser())
                 }
             else
                 {
                 Text(" ".aligned(.left,in:25)).inspectorFont()
                 }
             }
+        }
+        
+    private func colorChooser() -> Color
+        {
+        if atIndex == 2 && inBlock.words[atIndex] == 0
+            {
+            return(.orange)
+            }
+        if atIndex >= self.inBlock.classPointer.slotCount
+            {
+            return(.red)
+            }
+        if self.inBlock.classPointer.slot(atIndex: atIndex).isArraySlot
+            {
+            return(.green)
+            }
+        return(.white)
         }
     }
 

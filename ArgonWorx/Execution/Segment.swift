@@ -29,6 +29,11 @@ public class Segment
         self.sizeInBytes = sizeInBytes
         }
         
+    public func address(offset: Word) -> Word
+        {
+        return(0)
+        }
+        
     public func allocateObject(sizeInBytes:Int) -> Word
         {
         fatalError("This has not been implemented")

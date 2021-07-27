@@ -19,6 +19,8 @@ extension Word:Identifiable
     
 extension Word
     {
+    public static let nilValue:Word = Word(0).tagged(with: .nil)
+        
     public var bitString: String
         {
         var bitPattern = UInt64(1)
@@ -36,6 +38,13 @@ extension Word
     public var tagDropped: Word
         {
         return(self & ~(Header.kTagBits << Header.kTagShift))
+        }
+        
+    public func tagged(with:Argon.Tag) -> Word
+        {
+        var value = Header(self)
+        value.tag = .nil
+        return(value)
         }
         
     public var isZero: Bool

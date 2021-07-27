@@ -27,6 +27,10 @@
 		BF6108BF269F03E80008A9A3 /* ParameterizedSystemClassInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6108BE269F03E80008A9A3 /* ParameterizedSystemClassInstance.swift */; };
 		BF694C1926AAA58A00235048 /* BooleanSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF694C1826AAA58A00235048 /* BooleanSlot.swift */; };
 		BF694C1F26AAAC0100235048 /* HeaderSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF694C1E26AAAC0100235048 /* HeaderSlot.swift */; };
+		BF751C9226AF930700D40852 /* Interpreter.c in Sources */ = {isa = PBXBuildFile; fileRef = BF751C8F26AF930700D40852 /* Interpreter.c */; };
+		BF751C9B26AFA10900D40852 /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF751C9A26AFA10900D40852 /* Instruction.swift */; };
+		BF751C9D26AFAC9700D40852 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF751C9C26AFAC9700D40852 /* Thread.swift */; };
+		BF751C9F26AFD00E00D40852 /* BitField.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF751C9E26AFD00E00D40852 /* BitField.swift */; };
 		BF82BFBC26A9D0B500A96C8F /* ArrayPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF82BFBB26A9D0B500A96C8F /* ArrayPointer.swift */; };
 		BF82BFBE26A9E7E400A96C8F /* TypeCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF82BFBD26A9E7E400A96C8F /* TypeCode.swift */; };
 		BF82BFC226A9EE7200A96C8F /* IntegerSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF82BFC126A9EE7200A96C8F /* IntegerSlot.swift */; };
@@ -149,6 +153,12 @@
 		BF6108BE269F03E80008A9A3 /* ParameterizedSystemClassInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParameterizedSystemClassInstance.swift; sourceTree = "<group>"; };
 		BF694C1826AAA58A00235048 /* BooleanSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BooleanSlot.swift; sourceTree = "<group>"; };
 		BF694C1E26AAAC0100235048 /* HeaderSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderSlot.swift; sourceTree = "<group>"; };
+		BF751C8F26AF930700D40852 /* Interpreter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Interpreter.c; path = ArgonWorx/Interpreter/Interpreter.c; sourceTree = SOURCE_ROOT; };
+		BF751C9026AF930700D40852 /* Interpreter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Interpreter.h; path = ArgonWorx/Interpreter/Interpreter.h; sourceTree = SOURCE_ROOT; };
+		BF751C9126AF930700D40852 /* module.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.modulemap; path = ArgonWorx/Interpreter/module.modulemap; sourceTree = SOURCE_ROOT; };
+		BF751C9A26AFA10900D40852 /* Instruction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruction.swift; sourceTree = "<group>"; };
+		BF751C9C26AFAC9700D40852 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
+		BF751C9E26AFD00E00D40852 /* BitField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitField.swift; sourceTree = "<group>"; };
 		BF82BFBB26A9D0B500A96C8F /* ArrayPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayPointer.swift; sourceTree = "<group>"; };
 		BF82BFBD26A9E7E400A96C8F /* TypeCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeCode.swift; sourceTree = "<group>"; };
 		BF82BFC126A9EE7200A96C8F /* IntegerSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegerSlot.swift; sourceTree = "<group>"; };
@@ -283,6 +293,9 @@
 				BF1ED32B26A8D8F4008CBB52 /* Word.swift */,
 				BF1ED32D26A8DA67008CBB52 /* WordPointer.swift */,
 				BF38137C26AC198E00EBCE6C /* InnerInstancePointer.swift */,
+				BF751C9A26AFA10900D40852 /* Instruction.swift */,
+				BF751C9C26AFAC9700D40852 /* Thread.swift */,
+				BF751C9E26AFD00E00D40852 /* BitField.swift */,
 			);
 			path = Execution;
 			sourceTree = "<group>";
@@ -343,6 +356,16 @@
 			path = Modules;
 			sourceTree = "<group>";
 		};
+		BF751C8E26AF92EF00D40852 /* Interpreter */ = {
+			isa = PBXGroup;
+			children = (
+				BF751C8F26AF930700D40852 /* Interpreter.c */,
+				BF751C9026AF930700D40852 /* Interpreter.h */,
+				BF751C9126AF930700D40852 /* module.modulemap */,
+			);
+			path = Interpreter;
+			sourceTree = "<group>";
+		};
 		BF91976D2690FA6A00E348F6 = {
 			isa = PBXGroup;
 			children = (
@@ -367,6 +390,7 @@
 		BF9197782690FA6A00E348F6 /* ArgonWorx */ = {
 			isa = PBXGroup;
 			children = (
+				BF751C8E26AF92EF00D40852 /* Interpreter */,
 				BF1ED31E26A8B4FE008CBB52 /* Execution */,
 				BF91977F2690FA6B00E348F6 /* Assets.xcassets */,
 				BF9197A62690FAAE00E348F6 /* Compiler and Phases */,
@@ -588,6 +612,7 @@
 				TargetAttributes = {
 					BF9197752690FA6A00E348F6 = {
 						CreatedOnToolsVersion = 13.0;
+						LastSwiftMigration = 1300;
 					};
 					BF9197882690FA6B00E348F6 = {
 						CreatedOnToolsVersion = 13.0;
@@ -697,6 +722,7 @@
 				BF9197EF2690FB4100E348F6 /* Initializer.swift in Sources */,
 				BF9197B32690FAC300E348F6 /* Compiler.swift in Sources */,
 				BF9EFA4326A44F51004A6FE3 /* SystemMethodInstance.swift in Sources */,
+				BF751C9D26AFAC9700D40852 /* Thread.swift in Sources */,
 				BF9198062690FB4100E348F6 /* Constant.swift in Sources */,
 				BF9197C72690FB2100E348F6 /* NamingContext.swift in Sources */,
 				BF9197FE2690FB4100E348F6 /* Import.swift in Sources */,
@@ -711,7 +737,9 @@
 				BF1ED32826A8C24D008CBB52 /* ManagedSegment.swift in Sources */,
 				BF9197AF2690FAC300E348F6 /* Parser.swift in Sources */,
 				BF9198002690FB4100E348F6 /* Parameter.swift in Sources */,
+				BF751C9226AF930700D40852 /* Interpreter.c in Sources */,
 				BF82BFC426A9EE8C00A96C8F /* FloatSlot.swift in Sources */,
+				BF751C9F26AFD00E00D40852 /* BitField.swift in Sources */,
 				BF9198172690FB6500E348F6 /* ClassType.swift in Sources */,
 				BF91980A2690FB4100E348F6 /* Module.swift in Sources */,
 				BF38137D26AC198E00EBCE6C /* InnerInstancePointer.swift in Sources */,
@@ -747,6 +775,7 @@
 				BF9EFA4126A44F1D004A6FE3 /* SystemMethod.swift in Sources */,
 				BF9198192690FB6500E348F6 /* EnumerationType.swift in Sources */,
 				BF91980C2690FB4100E348F6 /* TypeConstraint.swift in Sources */,
+				BF751C9B26AFA10900D40852 /* Instruction.swift in Sources */,
 				BF9198092690FB4100E348F6 /* TaggedPrimitiveClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -903,6 +932,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -924,9 +954,13 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
+				MODULEMAP_FILE = Interpreter/module.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}/ArgonWorx/Interpreter";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -936,6 +970,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -957,9 +992,12 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
+				MODULEMAP_FILE = Interpreter/module.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macsemantics.ArgonWorx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INCLUDE_PATHS = "${SRCROOT}/ArgonWorx/Interpreter";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

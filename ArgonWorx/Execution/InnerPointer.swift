@@ -95,7 +95,7 @@ public class InnerPointer
         {
         if let offset = self.keys[atKey]?.offset
             {
-            return(self.wordPointer![offset/8].tagDropped)
+            return((self.wordPointer?[offset/8].tagDropped) ?? Word.nilValue)
             }
         fatalError("Slot at key \(atKey) not found")
         }

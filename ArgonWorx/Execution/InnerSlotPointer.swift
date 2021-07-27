@@ -23,6 +23,11 @@ public class InnerSlotPointer:InnerPointer
         return(pointer)
         }
         
+    public var isArraySlot: Bool
+        {
+        return(self.typeCode == 17)
+        }
+        
     public var offset:Int
         {
         get

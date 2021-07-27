@@ -8,15 +8,6 @@
 import Foundation
 import AppKit
 
-public enum SlotValue
-    {
-    case none
-//    case classPointer(Word)
-//    case classMagicNumber(Int)
-//    case array([Word])
-//    case header(Header)
-    }
-    
 public class Slot:Symbol
     {
     public override var type:Type
@@ -78,7 +69,6 @@ public class Slot:Symbol
         
     private let _type:Type
     public private(set) var offset:Int = 0
-    public var value:SlotValue = .none
     
     init(label:Label,type:Type)
         {
