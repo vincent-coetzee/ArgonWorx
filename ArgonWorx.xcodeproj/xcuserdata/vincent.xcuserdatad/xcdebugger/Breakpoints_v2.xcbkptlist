@@ -46,8 +46,8 @@
             filePath = "ArgonWorx/User Interface/ArgonWorxApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "62"
+            endingLineNumber = "62"
             landmarkName = "init()"
             landmarkType = "7">
          </BreakpointContent>
@@ -71,16 +71,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "93EDF5F0-5BE3-4215-B27A-7F83598887C6"
+            uuid = "9B2916E4-98C9-4CAB-88E5-EA4197D49975"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ArgonWorx/User Interface/ArgonWorxApp.swift"
+            filePath = "ArgonWorx/Execution/BitEncoder.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
-            landmarkName = "init()"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
+            landmarkName = "encode(value:inWidth:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A5432960-710C-4AB6-A96A-8A3F9D766712"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ArgonWorx/Execution/BitEncoder.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
+            landmarkName = "encode(value:inWidth:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

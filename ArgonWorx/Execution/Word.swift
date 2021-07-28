@@ -114,3 +114,5 @@ extension Word
     }
 
 public typealias Words = Array<Word>
+
+public typealias HWord = Int32

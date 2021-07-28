@@ -7,24 +7,6 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
-
-struct OpcodeField:BitField
-    {
-    public var width: Word
-        {
-        32
-        }
-        
-    public var shift: Word
-        {
-        64 - 32 - 4
-        }
-    }
-    
-enum Values:Int
-    {
-    case a,b,c,d,e
-    }
     
 @main
 struct ArgonWorxApp: App {
@@ -84,20 +66,14 @@ struct ArgonWorxApp: App {
         let slot1Pointer = InnerSlotPointer(address: slotsPointer[4])
         print(slot1Pointer.name)
         print(slot1Pointer.typeCode)
-        var bits:Word
-        bits = 0
-        let field = OpcodeField()
-        print("     MASK: \(field.mask.bitString)")
-        print("FULL MASK: \(field.fullMask.bitString)")
-        field.setValue(0b111,in: &bits)
-        print("     WORD: \(bits.bitString)")
-        print("    VALUE: \(field.value(in: bits).bitString)")
-        bits = 0
-        field.setTypeValue(Values.c,in: &bits)
-        let result:Values = field.typeValue(in: bits)
-        print("   RESULT: \(result)")
-        print("START BIT: \(field.startBit)")
-        print(" STOP BIT: \(field.stopBit)")
+        var encoder = BitEncoder()
+        var value:Int = 0b1111
+        encoder.encode(value: value,inWidth: 10)
+        print(encoder.words)
+        encoder = BitEncoder()
+        encoder.encode(value: 0b1100,inWidth: 4)
+        encoder.encode(value: 0b11111111,inWidth: 64)
+        encoder.encode(value: 0b11111111,inWidth: 8)
         }
         
     var body: some Scene

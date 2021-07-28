@@ -2,218 +2,78 @@
 //  Instruction.swift
 //  Instruction
 //
-//  Created by Vincent Coetzee on 27/7/21.
+//  Created by Vincent Coetzee on 28/7/21.
 //
 
 import Foundation
-import Interpreter
 
-extension Word
+public class Instruction
     {
-    init(float: Argon.Float)
+    public enum Register:Int
         {
-        self.init(float.bitPattern)
+        case none = 0
+        case code,stack,fixed,managed
+        case cp,ip,sp,bp,fp,mp
+        case r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15
+        case fr1,fr2,fr3,fr4,fr5,fr6,fr7,fr8,fr9,fr10,fr11,fr12,fr13,fr14,fr15
         }
         
-    init(integer: Int)
+    public enum Opcode:Int
         {
-        self = Word(bitPattern: integer)
-        }
-    }
-    
-public struct ProcessorContext
-    {
-    public var stackAddress: Word
-        {
-        return(0)
-        }
-    }
-    
-public struct Instruction
-    {
-    public enum Opcode
-        {
-        case iadd,isub,imul,idiv,imod,ipow
-        case fadd,fsub,fmul,fdiv,fmod,fpow
-        case lsr,ssr,lcr,ltr,str,lar,sra
-        }
-        
-    public enum Constant
-        {
-        case integer(Int)
-        case float(Argon.Float)
-        case string(Word)
-        case address(Word)
-        
-        public var wordValue: Word
-            {
-            switch(self)
-                {
-                case .integer(let integer):
-                    return(Word(integer: integer))
-                case .float(let float):
-                    return(Word(float: float))
-                case .string(let address):
-                    return(address)
-                case .address(let address):
-                    return(address)
-                }
-            }
-            
-        public var integerValue: Int
-            {
-            switch(self)
-                {
-                case .integer(let integer):
-                    return(integer)
-                case .float(let float):
-                    return(Int(float))
-                case .string(let address):
-                    return(Int(address))
-                case .address(let address):
-                    return(Int(address))
-                }
-            }
-            
-        public var floatValue: Argon.Float
-            {
-            switch(self)
-                {
-                case .integer(let integer):
-                    return(Argon.Float(integer))
-                case .float(let float):
-                    return(float)
-                case .string(let address):
-                    return(Argon.Float(address))
-                case .address(let address):
-                    return(Argon.Float(address))
-                }
-            }
+        case nop = 0
+        case iadd,isub,imul,idiv,imod
+        case fadd,fsub,fmul,fdiv,fmod
         }
         
     public enum Operand
         {
         case none
+        case register(Register)
         case slot(Word,Word)
+        case float(Argon.Float)
+        case integer(Argon.Integer)
+        case location(Word)
         case stack(Word)
-        case constant(Constant)
+        case array(Word,Word)
         
-        public func value(in context:ProcessorContext) -> Word
+        fileprivate var rawValue: OperandField
             {
             switch(self)
                 {
                 case .none:
-                    return(0)
-                case .slot(let address,let offset):
-                    return(WordAtAddressAtOffset(address,offset))
-                case .stack(let offset):
-                    return(WordAtAddressAtOffset(context.stackAddress,offset))
-                case .constant(let constant):
-                    return(constant.wordValue)
+                    return(.none)
+                case .register:
+                    return(.register)
+                case .slot:
+                    return(.slot)
+                case .float:
+                    return(.float)
+                case .integer:
+                    return(.integer)
+                case .location:
+                    return(.location)
+                case .stack:
+                    return(.stack)
+                case .array:
+                    return(.array)
                 }
             }
-            
-        public func integerValue(in context:ProcessorContext) -> Int
-            {
-            switch(self)
-                {
-                case .none:
-                    return(0)
-                case .slot(let address,let offset):
-                    return(IntegerAtAddressAtOffset(address,offset))
-                case .stack(let offset):
-                    return(IntegerAtAddressAtOffset(context.stackAddress,offset))
-                case .constant(let constant):
-                    return(constant.integerValue)
-                }
-            }
-            
-        public func setIntegerValue(_ value:Int,in context:ProcessorContext)
-            {
-            switch(self)
-                {
-                case .none:
-                    break
-                case .slot(let address,let offset):
-                    return(SetIntegerAtAddressAtOffset(value,address,offset))
-                case .stack(let offset):
-                    return(SetIntegerAtAddressAtOffset(value,context.stackAddress,offset))
-                case .constant(let constant):
-                    break
-                }
-            }
-            
-        public func floatValue(in context:ProcessorContext) -> Argon.Float
-            {
-            switch(self)
-                {
-                case .none:
-                    return(0)
-                case .slot(let address,let offset):
-                    return(FloatAtAddressAtOffset(address,offset))
-                case .stack(let offset):
-                    return(FloatAtAddressAtOffset(context.stackAddress,offset))
-                case .constant(let constant):
-                    return(constant.floatValue)
-                }
-            }
-            
-        public func setFloatValue(_ value:Argon.Float,in context:ProcessorContext)
-            {
-            switch(self)
-                {
-                case .none:
-                    break
-                case .slot(let address,let offset):
-                    return(SetFloatAtAddressAtOffset(value,address,offset))
-                case .stack(let offset):
-                    return(SetFloatAtAddressAtOffset(value,context.stackAddress,offset))
-                case .constant(let constant):
-                    break
-                }
-            }
-            
         }
         
-    private let opcode:Opcode
-    private let lhs:Operand
-    private let rhs:Operand
-    private let output:Operand
-    
-    init(opcode:Opcode,lhs:Operand,rhs:Operand,output:Operand)
+    fileprivate enum OperandField:Int
         {
-        self.opcode = opcode
-        self.lhs = lhs
-        self.rhs = rhs
-        self.output = output
+        case none
+        case register
+        case slot
+        case float
+        case integer
+        case location
+        case stack
+        case array
         }
-
-    public func execute(in context:ProcessorContext)
-        {
-        switch(self.opcode)
-            {
-            case .iadd:
-                self.output.setIntegerValue(self.lhs.integerValue(in: context) + self.rhs.integerValue(in: context),in: context)
-            case .isub:
-                self.output.setIntegerValue(self.lhs.integerValue(in: context) - self.rhs.integerValue(in: context),in: context)
-            case .imul:
-                self.output.setIntegerValue(self.lhs.integerValue(in: context) * self.rhs.integerValue(in: context),in: context)
-            case .idiv:
-                self.output.setIntegerValue(self.lhs.integerValue(in: context) / self.rhs.integerValue(in: context),in: context)
-            case .imod:
-                self.output.setIntegerValue(self.lhs.integerValue(in: context) % self.rhs.integerValue(in: context),in: context)
-            case .fadd:
-                self.output.setFloatValue(self.lhs.floatValue(in: context) + self.rhs.floatValue(in: context),in: context)
-            case .fsub:
-                self.output.setFloatValue(self.lhs.floatValue(in: context) - self.rhs.floatValue(in: context),in: context)
-            case .fmul:
-                self.output.setFloatValue(self.lhs.floatValue(in: context) * self.rhs.floatValue(in: context),in: context)
-            case .fdiv:
-                self.output.setFloatValue(self.lhs.floatValue(in: context) / self.rhs.floatValue(in: context),in: context)
-            case .fmod:
-                self.output.setFloatValue(self.lhs.floatValue(in: context).truncatingRemainder(dividingBy: self.rhs.floatValue(in: context)),in: context)
-            default:
-                break
-            }
-        }
+        
+    public var opcode:Opcode = .nop
+    public var operand1:Operand? = nil
+    public var operand2:Operand? = nil
+    public var result:Operand? = nil
     }
