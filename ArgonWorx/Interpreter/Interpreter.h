@@ -21,13 +21,6 @@ typedef struct _SlotKey
     }
     SlotKey;
     
-typedef struct _ClassPointer
-    {
-    CWord address;
-    SlotKey* slotKeys;
-    }
-    ClassPointer;
-    
 void InitClassPointerSlotKeys();
 CWord WordAtAddressAtOffset(CWord address,CWord offset);
 SInt IntegerAtAddressAtOffset(CWord address,CWord offset);

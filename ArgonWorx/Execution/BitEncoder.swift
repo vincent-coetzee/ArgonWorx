@@ -11,12 +11,23 @@ public class BitEncoder
     {
     private static let kWordSizeInBits = 64
     
-    public func encode<T:RawRepresentable>(value:T,inWidth width:Int) where T.RawValue == Int
+    ///
+    ///
+    /// If you pass in a enum value to be encoded you must always add an extra bit
+    /// to allow for the encoding of a nil value
+    ///
+    ///
+    public func encode<T:RawRepresentable>(value:T,inWidth width: Int) where T.RawValue == Int
         {
-        self.encode(value:value.rawValue,inWidth:width)
+         self.encode(value:value.rawValue,inWidth: width)
         }
         
-    public func encode(value:Int,inWidth width:Int)
+    public func encode<T:RawConvertible>(value:T,inWidth width:Int)
+        {
+        self.encode(value:value.rawValue + 1,inWidth: width)
+        }
+        
+    public func encode(value:Word,inWidth width:Int)
         {
         print("    VALUE: \(Word(value).bitString)")
         let spaceRemaining = self.currentOffset
@@ -44,6 +55,17 @@ public class BitEncoder
             self.currentOffset = Self.kWordSizeInBits - extra
             self.currentOffset = Word.bitWidth - extra
             }
+        }
+        
+    public func encode<T>(value:T?,inWidth:Int) where T:BitCodable
+        {
+        self.encode(value: value.isNil ? 0 : 1,inWidth:inWidth)
+        value?.encode(in: self)
+        }
+        
+    public func encode(value:Int,inWidth width:Int)
+        {
+        self.encode(value: Word(bitPattern: value),inWidth: width)
         }
         
     private var currentOffset = Word.bitWidth

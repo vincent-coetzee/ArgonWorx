@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Interpreter
 
 public struct Thread
     {
@@ -21,7 +22,7 @@ public struct Thread
         pthread_key_create(&contextKey,nil)
         }
         
-    public static func current() -> Thread
+    public static var current:Thread
         {
         let address = pthread_getspecific(self.threadKey)
         if address == nil
@@ -33,4 +34,6 @@ public struct Thread
             }
         return(unsafeBitCast(address,to: Thread.self))
         }
+        
+    public private(set) var context = ExecutionContext()
     }

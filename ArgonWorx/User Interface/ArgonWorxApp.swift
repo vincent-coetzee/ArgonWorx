@@ -68,12 +68,29 @@ struct ArgonWorxApp: App {
         print(slot1Pointer.typeCode)
         var encoder = BitEncoder()
         var value:Int = 0b1111
-        encoder.encode(value: value,inWidth: 10)
+        var width = 10
+        encoder.encode(value: value,inWidth: width)
         print(encoder.words)
         encoder = BitEncoder()
-        encoder.encode(value: 0b1100,inWidth: 4)
-        encoder.encode(value: 0b11111111,inWidth: 64)
-        encoder.encode(value: 0b11111111,inWidth: 8)
+        width = 4
+        encoder.encode(value: 0b1100,inWidth: width)
+        encoder.encode(value: Instruction.Operand.slot(.sp,10),inWidth: width)
+        width = 64
+        encoder.encode(value: 0b11111111,inWidth: width)
+        width = 8
+        encoder.encode(value: 0b11111111,inWidth: width)
+        let thread = Thread.current
+        print(thread.context)
+        let sample = InstructionBuffer.sample
+        sample.dump()
+        do
+            {
+            try sample.execute(in: ExecutionContext())
+            }
+        catch let error
+            {
+            print("\(error)")
+            }
         }
         
     var body: some Scene
@@ -81,6 +98,10 @@ struct ArgonWorxApp: App {
         WindowGroup("Project Browser")
             {
             ContentView()
+            }
+        WindowGroup("Processor Browser")
+            {
+            ProcessorView()
             }
         WindowGroup("Memory Inspector")
             {
