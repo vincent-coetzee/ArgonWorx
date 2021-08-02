@@ -33,9 +33,9 @@ public protocol BitCodable
     func encode(in:BitEncoder)
     }
     
-public class Instruction:Identifiable,Encodable
+public class Instruction:Identifiable,Encodable,Decodable
     {
-    public let id = UUID()
+    public var id = UUID()
     
     public static func loadValue(ofSlotNamed:String,instanceType:Class,instance:Word,into:Instruction.Register) -> [Instruction]
         {
@@ -46,7 +46,7 @@ public class Instruction:Identifiable,Encodable
         return(array)
         }
         
-    public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable
+    public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable
         {
         public static func <(lhs:Register,rhs:Register) -> Bool
             {
@@ -77,7 +77,7 @@ public class Instruction:Identifiable,Encodable
             }
         }
         
-    public enum Opcode:Int,Encodable
+    public enum Opcode:Int,Encodable,Decodable
         {
         case nop = 0
         case iadd,isub,imul,idiv,imod,ipow
@@ -91,7 +91,7 @@ public class Instruction:Identifiable,Encodable
         case loopeq,loopneq,loopnz,loopz
         }
         
-    public enum Operand:Encodable
+    public enum Operand:Encodable,Decodable
         {
         case none
         case register(Register)
@@ -430,11 +430,20 @@ public class Instruction:Identifiable,Encodable
 
     public var operandText: String
         {
-        var text = ""
-        text += self.operand1.text
-        text += self.operand1.isNotNone ? "," : "" + self.operand2.text
-        text += (self.operand1.isNotNone || self.operand2.isNotNone ? "," : "") + self.result.text
-        return(text)
+        var text = Array<String>()
+        if self.operand1.isNotNone
+            {
+            text.append(self.operand1.text)
+            }
+        if self.operand2.isNotNone
+            {
+            text.append(self.operand2.text)
+            }
+        if self.result.isNotNone
+            {
+            text.append(self.result.text)
+            }
+        return(text.joined(separator: ","))
         }
         
     public let opcode:Opcode

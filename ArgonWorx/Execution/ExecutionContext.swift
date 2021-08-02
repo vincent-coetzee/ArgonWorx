@@ -11,6 +11,7 @@ public class ExecutionContext:ObservableObject
     {
     @Published var registers = Array<Word>(repeating: 0, count: 42)
     @Published var _allRegisters = Instruction.Register.allCases
+    @Published var changedRegisters = Set<Instruction.Register>()
     
     public func register(atIndex:Instruction.Register) -> Word
         {
@@ -19,11 +20,9 @@ public class ExecutionContext:ObservableObject
         
     public func setRegister(_ word:Word,atIndex:Instruction.Register) 
         {
+        self.changedRegisters = Set()
         self.registers[atIndex.rawValue] = word
-//        var someRegisters = self.registers
-//        someRegisters[atIndex.rawValue] = word
-//        self.registers = someRegisters
-//        self._allRegisters = Instruction.Register.allCases
+        self.changedRegisters.insert(atIndex)
         }
         
     public var bp:Word
@@ -63,16 +62,16 @@ public class ExecutionContext:ObservableObject
         self.stackSegment = StackSegment(sizeInBytes: 1024 * 1024 * 10)
         }
     
-    public var registerPairs: Array<(Instruction.Register,Instruction.Register)>
-        {
-        var registers = Array<(Instruction.Register,Instruction.Register)>()
-        
-        for index in stride(from: Instruction.Register.code.rawValue,through: Instruction.Register.fr15.rawValue,by: 2)
-            {
-            registers.append((Instruction.Register(rawValue: index)!,Instruction.Register(rawValue: index)!))
-            }
-        return(registers)
-        }
+//    public var registerPairs: Array<(Instruction.Register,Instruction.Register)>
+//        {
+//        var registers = Array<(Instruction.Register,Instruction.Register)>()
+//        
+//        for index in stride(from: Instruction.Register.code.rawValue,through: Instruction.Register.fr15.rawValue,by: 2)
+//            {
+//            registers.append((Instruction.Register(rawValue: index)!,Instruction.Register(rawValue: index)!))
+//            }
+//        return(registers)
+//        }
         
     public func update()
         {

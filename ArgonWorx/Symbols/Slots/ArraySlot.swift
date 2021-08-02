@@ -23,7 +23,7 @@ public class ArraySlot:Slot
         
     public override func printFormattedSlotContents(base:WordPointer)
         {
-        let offsetValue = self.offset ?? 0
+        let offsetValue = self.offset
         let offsetString = String(format: "%08X",offsetValue)
         let name = self.label.aligned(.left,in:25)
         let word = base.word(atByteOffset: offsetValue)

@@ -48,11 +48,6 @@ public class ManagedSegment:Segment
     public override func allocateObject(sizeInBytes:Int) -> Word
         {
         var newPointer = self.nextAddress;
-        if newPointer & ~0b1111 < newPointer
-            {
-            newPointer += 16
-            newPointer &= ~0b1111
-            }
         print("ALLOCATED \(sizeInBytes) BYTES @ \(newPointer.addressString)")
         self.nextAddress += UInt64(sizeInBytes)
         

@@ -103,7 +103,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "CB729769-B2A8-4DC4-9BCE-8CC3A7679EB9"
+            uuid = "0B1A8999-BB82-492F-B210-9AD3DBE1FEF4"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -119,32 +119,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "DE926CA9-1906-4D12-BED5-BACBE1C0DBE8"
+            uuid = "3DE5B4F7-1C16-483B-92F8-B5014933398B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ArgonWorx/User Interface/ArgonWorxApp.swift"
+            filePath = "ArgonWorx/User Interface/InspectorWindow.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
-            landmarkName = "init()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "21F042A4-0AF4-45E0-8CA3-AEBF65BDB563"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ArgonWorx/User Interface/ArgonWorxApp.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
-            landmarkName = "init()"
+            startingLineNumber = "53"
+            endingLineNumber = "53"
+            landmarkName = "loadBlocks()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

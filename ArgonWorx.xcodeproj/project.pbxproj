@@ -106,6 +106,9 @@
 		BF9A2D4A26B1668300D94C10 /* BitField.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9A2D4926B1668300D94C10 /* BitField.swift */; };
 		BF9A2D4C26B16CC100D94C10 /* Instruction.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9A2D4B26B16CC100D94C10 /* Instruction.swift */; };
 		BF9A2D4E26B1D8BC00D94C10 /* BitEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9A2D4D26B1D8BC00D94C10 /* BitEncoder.swift */; };
+		BF9D5DE826B82EBB0022EC4E /* StickyEncoding in Frameworks */ = {isa = PBXBuildFile; productRef = BF9D5DE726B82EBB0022EC4E /* StickyEncoding */; };
+		BF9D5DE926B82EBB0022EC4E /* StickyEncoding in Embed Frameworks */ = {isa = PBXBuildFile; productRef = BF9D5DE726B82EBB0022EC4E /* StickyEncoding */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		BF9D5DEB26B82FB70022EC4E /* InnerByteArrayPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9D5DEA26B82FB70022EC4E /* InnerByteArrayPointer.swift */; };
 		BF9EB37F269E05800057609A /* NSColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EB37E269E05800057609A /* NSColor+Extensions.swift */; };
 		BF9EB381269E06900057609A /* SystemModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EB380269E06900057609A /* SystemModule.swift */; };
 		BF9EFA4126A44F1D004A6FE3 /* SystemMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EFA4026A44F1D004A6FE3 /* SystemMethod.swift */; };
@@ -127,6 +130,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				BF9D5DE926B82EBB0022EC4E /* StickyEncoding in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,6 +244,8 @@
 		BF9A2D4926B1668300D94C10 /* BitField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitField.swift; sourceTree = "<group>"; };
 		BF9A2D4B26B16CC100D94C10 /* Instruction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instruction.swift; sourceTree = "<group>"; };
 		BF9A2D4D26B1D8BC00D94C10 /* BitEncoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BitEncoder.swift; sourceTree = "<group>"; };
+		BF9D5DE626B82EA90022EC4E /* sticky-encoding */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "sticky-encoding"; path = "../sticky-encoding"; sourceTree = "<group>"; };
+		BF9D5DEA26B82FB70022EC4E /* InnerByteArrayPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerByteArrayPointer.swift; sourceTree = "<group>"; };
 		BF9EB37E269E05800057609A /* NSColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Extensions.swift"; sourceTree = "<group>"; };
 		BF9EB380269E06900057609A /* SystemModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemModule.swift; sourceTree = "<group>"; };
 		BF9EFA4026A44F1D004A6FE3 /* SystemMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMethod.swift; sourceTree = "<group>"; };
@@ -260,6 +266,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF9D5DE826B82EBB0022EC4E /* StickyEncoding in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +310,7 @@
 				BF4E066126A94D68007069EA /* ValueHolder.swift */,
 				BF1ED32B26A8D8F4008CBB52 /* Word.swift */,
 				BF1ED32D26A8DA67008CBB52 /* WordPointer.swift */,
+				BF9D5DEA26B82FB70022EC4E /* InnerByteArrayPointer.swift */,
 			);
 			path = Execution;
 			sourceTree = "<group>";
@@ -376,6 +384,7 @@
 		BF91976D2690FA6A00E348F6 = {
 			isa = PBXGroup;
 			children = (
+				BF9D5DE526B82EA90022EC4E /* Packages */,
 				BFFEBB0526AC7CFD0047B0B6 /* Tasks.md */,
 				BF9197782690FA6A00E348F6 /* ArgonWorx */,
 				BF91978C2690FA6B00E348F6 /* ArgonWorxTests */,
@@ -537,6 +546,14 @@
 			path = "Error Handling";
 			sourceTree = "<group>";
 		};
+		BF9D5DE526B82EA90022EC4E /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				BF9D5DE626B82EA90022EC4E /* sticky-encoding */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		BFD041A9269243CA009C34B1 /* User Interface */ = {
 			isa = PBXGroup;
 			children = (
@@ -569,6 +586,7 @@
 			);
 			name = ArgonWorx;
 			packageProductDependencies = (
+				BF9D5DE726B82EBB0022EC4E /* StickyEncoding */,
 			);
 			productName = ArgonWorx;
 			productReference = BF9197762690FA6A00E348F6 /* ArgonWorx.app */;
@@ -701,6 +719,7 @@
 				BF38137D26AC198E00EBCE6C /* InnerInstancePointer.swift in Sources */,
 				BF9197FD2690FB4100E348F6 /* Class.swift in Sources */,
 				BF8C4076269E2127007E5DBD /* ImportedSymbol.swift in Sources */,
+				BF9D5DEB26B82FB70022EC4E /* InnerByteArrayPointer.swift in Sources */,
 				BF38137326ABE72C00EBCE6C /* InnerPointer.swift in Sources */,
 				BF1ED32C26A8D8F4008CBB52 /* Word.swift in Sources */,
 				BF9197FA2690FB4100E348F6 /* TypeAlias.swift in Sources */,
@@ -952,6 +971,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BF9D5DE726B82EBB0022EC4E /* StickyEncoding */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = StickyEncoding;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BF91976E2690FA6A00E348F6 /* Project object */;
 }

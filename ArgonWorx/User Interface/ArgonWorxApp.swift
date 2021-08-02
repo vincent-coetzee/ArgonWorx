@@ -66,23 +66,17 @@ struct ArgonWorxApp: App {
         let slot1Pointer = InnerSlotPointer(address: slotsPointer[4])
         print(slot1Pointer.name)
         print(slot1Pointer.typeCode)
-        let innerArray = InnerInstructionArrayPointer.allocate(arraySize: 10*6, in: ManagedSegment.shared)
-        innerArray.append(.load, operand1: .integer(1024), result: .register(.r1))
-        innerArray.append(.push,operand1: .register(.r3))
-        innerArray.append(.loopnz,operand1: .register(.r1),operand2: .address(0x4000000))
-        innerArray.rewind()
-        var instruction = innerArray.instruction
-        print(instruction.opcode)
-        instruction = innerArray.instruction
-        print(instruction.opcode)
-        print("SIZE IN BYTES \(innerArray.sizeInBytes)")
+        let byteArray = InnerByteArrayPointer.with([0,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1])
+        let someBytes = byteArray.bytes
+        print(someBytes)
         let samples = InstructionBuffer.samples.allInstructions
-        let inner = InnerInstructionArrayPointer.allocate(arraySize: samples.count * 7,in: ManagedSegment.shared)
-        inner.append(samples)
-        inner.rewind()
-        for index in 0..<samples.count
+        let arrayP = InnerInstructionArrayPointer.allocate(arraySize: samples.count * 10, in: ManagedSegment.shared)
+        arrayP.append(samples)
+        print("ARRAY COUNT IS \(arrayP.count)")
+        for index in 0..<arrayP.count
             {
-            print(inner.instruction.opcode)
+            let instruction = arrayP.instruction(at: index)!
+            print("\(instruction.opcode) \(instruction.operandText)")
             }
         }
         

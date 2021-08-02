@@ -23,17 +23,6 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         print("halt")
         }
         
-    public override var sizeInBytes: Int
-        {
-        get
-            {
-            return(self.actualSize)
-            }
-        set
-            {
-            }
-        }
-        
     public override var startIndex: Int
         {
         0
@@ -44,21 +33,9 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         self.count - 1
         }
         
-    public override var count: Int
-        {
-        get
-            {
-            return(self._count)
-            }
-        set
-            {
-            }
-        }
-        
     private var offset = 0
     private var bytePointer:UnsafeMutableRawPointer
-    private var actualSize: Int = 0
-    private var _count: Int = 0
+    private var currentIndex = 0
     
     override init(address:Word)
         {
@@ -68,66 +45,58 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         
     public func append(_ opcode:Instruction.Opcode,operand1:Instruction.Operand = .none,operand2:Instruction.Operand = .none,result:Instruction.Operand = .none)
         {
-        self.append(opcode)
-        self.append(operand1)
-        self.append(operand2)
-        self.append(result)
-        self._count += 1
+        let instruction = Instruction(opcode,operand1:operand1,operand2:operand2,result:result)
+        self.append(instruction)
         }
         
-    public var instruction:Instruction
+    public func append(_ instruction:Instruction)
         {
-        let opcode = Instruction.Opcode(rawValue: self.bytePointer.load(fromByteOffset: self.offset, as: Int.self))!
-        self.offset += self.align(MemoryLayout<Instruction.Opcode>.size,to: 8)
-        let op1 = self.bytePointer.load(fromByteOffset: self.offset, as: Instruction.Operand.self)
-        self.offset += self.align(MemoryLayout<Instruction.Operand>.size,to: 8)
-        let op2 = self.bytePointer.load(fromByteOffset: self.offset, as: Instruction.Operand.self)
-        self.offset += self.align(MemoryLayout<Instruction.Operand>.size,to: 8)
-        let result = self.bytePointer.load(fromByteOffset: self.offset, as: Instruction.Operand.self)
-        self.offset += self.align(MemoryLayout<Instruction.Operand>.size,to: 8)
-        self.actualSize = Swift.max(self.actualSize,self.offset)
-        return(Instruction(opcode, operand1: op1, operand2: op2, result: result))
+        let encoder = BinaryEncoder()
+        let output = try! encoder.encode(instruction)
+        let array = InnerByteArrayPointer.with(output)
+        self[self.count] = array.address
+        self.count += 1
+        }
+        
+    public func instruction(at index:Int) -> Instruction?
+        {
+        if index < 0 || index >= count
+            {
+            return(nil)
+            }
+        let bytes = InnerByteArrayPointer(address: self[index]).bytes
+        let decoder = BinaryDecoder()
+        let instruction = try? decoder.decode(Instruction.self, from: bytes)
+        return(instruction)
         }
 
-    public func append(_ opcode:Instruction.Opcode)
+    public func append(_ instructions:Array<Instruction>) -> Self
         {
-        self.bytePointer.storeBytes(of: opcode.rawValue, toByteOffset: self.offset, as: Int.self)
-        self.offset += self.align(MemoryLayout<Instruction.Opcode>.size,to: 8)
-        self.actualSize = Swift.max(self.actualSize,self.offset)
-        }
-        
-    public func append(_ operand:Instruction.Operand)
-        {
-        self.bytePointer.storeBytes(of: operand, toByteOffset: self.offset, as: Instruction.Operand.self)
-        self.offset += self.align(MemoryLayout<Instruction.Operand>.size,to: 8)
-        self.actualSize = Swift.max(self.actualSize,self.offset)
-        }
-        
-    public func append(_ instructions:Array<Instruction>)
-        {
-        self.rewind()
         for instruction in instructions
             {
-            self.append(instruction.opcode)
-            self.append(instruction.operand1)
-            self.append(instruction.operand2)
-            self.append(instruction.result)
-            self._count += 1
+            self.append(instruction)
             }
+        return(self)
         }
         
-    public func rewind()
+    public var currentInstructionId: UUID?
         {
-        self.offset = 0
+        return(self.instruction(at: self.currentIndex)?.id)
         }
         
-    public func align(_ size:Int,to align:Int) -> Int
+    public func singleStep(in context:ExecutionContext) throws
         {
-        return(((size / (align - 1)) + 1) * align)
+        if self.currentIndex >= self.count
+            {
+            return
+            }
+        try self.instruction(at: self.currentIndex)?.execute(in: context)
+        self.currentIndex += 1
         }
         
-    public subscript(_ index:Int) -> Instruction
+    public func rewind() -> Self
         {
-        return(self.instruction)
+        self.currentIndex = 0
+        return(self)
         }
     }

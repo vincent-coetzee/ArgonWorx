@@ -85,7 +85,7 @@ public class InstructionBuffer
             }
         if self.currentIndex < self.instructions.count
             {
-            var timer = Timer()
+            let timer = Timer()
             try self.instructions[self.currentIndex].execute(in: context)
             print("Milliseconds to execute: \(timer.stop())")
             self.currentIndex += 1

@@ -10,7 +10,8 @@ import SwiftUI
 struct ProcessorView: View
     {
     @StateObject private var context = ExecutionContext()
-    @State private var buffer = InstructionBuffer.samples
+    @State private var buffer = InnerInstructionArrayPointer.allocate(arraySize: 10*10, in: ManagedSegment.shared).append(InstructionBuffer.samples.allInstructions).rewind()
+    @State private var color:Color = .white
     
     var body: some View
         {
@@ -22,7 +23,7 @@ struct ProcessorView: View
             HStack
                 {
                 Text("\(register)".aligned(.right,in:10) as String).inspectorFont()
-                Text(Word(self.context.register(atIndex: register)).bitString).inspectorFont()
+                Text(Word(self.context.register(atIndex: register)).bitString).inspectorFont().foregroundColor(self.context.changedRegisters.contains(register) ? .orange : .white)
                 }
             }
         Button(action:
@@ -30,7 +31,6 @@ struct ProcessorView: View
             do
                 {
                 try self.buffer.singleStep(in: self.context)
-                self.context.update()
                 }
             catch
                 {
@@ -44,8 +44,9 @@ struct ProcessorView: View
             instruction in
             HStack
                 {
-                Text(" \(instruction.opcode)".aligned(.right,in:10)).inspectorFont()
-                Text(instruction.operandText.aligned(.left,in:33)).inspectorFont()
+                Text(" \(instruction.opcode)".aligned(.right,in:10)).inspectorFont().foregroundColor(instruction.id == self.buffer.currentInstructionId ? .orange : .white)
+                Text(instruction.operandText.aligned(.left,in:33)).inspectorFont().foregroundColor(instruction.id == self.buffer.currentInstructionId ? .orange : .white)
+                Spacer()
                 }
             }
         }
@@ -58,3 +59,4 @@ struct ProcessorView_Previews: PreviewProvider {
         ProcessorView()
     }
 }
+
