@@ -38,8 +38,30 @@ public class ExecutionContext:ObservableObject
             }
         }
         
+    public var ip:Word
+        {
+        get
+            {
+            return(self.registers[Instruction.Register.ip.rawValue])
+            }
+        set
+            {
+            self.registers[Instruction.Register.ip.rawValue] = newValue
+            }
+        }
+        
+    public var currentInstruction: InnerInstructionArrayPointer
+        {
+        return(InnerInstructionArrayPointer(address: WordPointer(address: self.ip)!.pointee))
+        }
+        
     public var managedSegment: Segment = ManagedSegment.shared
-
+    public var stackSegment: StackSegment
+    
+    public init()
+        {
+        self.stackSegment = StackSegment(sizeInBytes: 1024 * 1024 * 10)
+        }
     
     public var registerPairs: Array<(Instruction.Register,Instruction.Register)>
         {

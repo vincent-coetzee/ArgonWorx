@@ -66,30 +66,23 @@ struct ArgonWorxApp: App {
         let slot1Pointer = InnerSlotPointer(address: slotsPointer[4])
         print(slot1Pointer.name)
         print(slot1Pointer.typeCode)
-        var encoder = BitEncoder()
-        var value:Int = 0b1111
-        var width = 10
-        encoder.encode(value: value,inWidth: width)
-        print(encoder.words)
-        encoder = BitEncoder()
-        width = 4
-        encoder.encode(value: 0b1100,inWidth: width)
-        encoder.encode(value: Instruction.Operand.slot(.sp,10),inWidth: width)
-        width = 64
-        encoder.encode(value: 0b11111111,inWidth: width)
-        width = 8
-        encoder.encode(value: 0b11111111,inWidth: width)
-        let thread = Thread.current
-        print(thread.context)
-        let sample = InstructionBuffer.sample
-        sample.dump()
-        do
+        let innerArray = InnerInstructionArrayPointer.allocate(arraySize: 10*6, in: ManagedSegment.shared)
+        innerArray.append(.load, operand1: .integer(1024), result: .register(.r1))
+        innerArray.append(.push,operand1: .register(.r3))
+        innerArray.append(.loopnz,operand1: .register(.r1),operand2: .address(0x4000000))
+        innerArray.rewind()
+        var instruction = innerArray.instruction
+        print(instruction.opcode)
+        instruction = innerArray.instruction
+        print(instruction.opcode)
+        print("SIZE IN BYTES \(innerArray.sizeInBytes)")
+        let samples = InstructionBuffer.samples.allInstructions
+        let inner = InnerInstructionArrayPointer.allocate(arraySize: samples.count * 7,in: ManagedSegment.shared)
+        inner.append(samples)
+        inner.rewind()
+        for index in 0..<samples.count
             {
-            try sample.execute(in: ExecutionContext())
-            }
-        catch let error
-            {
-            print("\(error)")
+            print(inner.instruction.opcode)
             }
         }
         

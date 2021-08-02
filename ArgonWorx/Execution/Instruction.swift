@@ -33,7 +33,7 @@ public protocol BitCodable
     func encode(in:BitEncoder)
     }
     
-public class Instruction:Identifiable
+public class Instruction:Identifiable,Encodable
     {
     public let id = UUID()
     
@@ -46,7 +46,7 @@ public class Instruction:Identifiable
         return(array)
         }
         
-    public enum Register:Int,Comparable,CaseIterable,Identifiable
+    public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable
         {
         public static func <(lhs:Register,rhs:Register) -> Bool
             {
@@ -77,7 +77,7 @@ public class Instruction:Identifiable
             }
         }
         
-    public enum Opcode:Int
+    public enum Opcode:Int,Encodable
         {
         case nop = 0
         case iadd,isub,imul,idiv,imod,ipow
@@ -87,31 +87,12 @@ public class Instruction:Identifiable
         case inc,dec
         case make
         case call,ret
+        case push,pop
+        case loopeq,loopneq,loopnz,loopz
         }
         
-    public enum Operand:RawConvertible,BitCodable
+    public enum Operand:Encodable
         {
-        public var neededWordCount: Int
-            {
-            switch(self)
-                {
-                case .slot:
-                    return(2)
-                case .float:
-                    return(1)
-                case .integer:
-                    return(1)
-                case .address:
-                    return(1)
-                case .stack:
-                    return(1)
-                case .array:
-                    return(2)
-                default:
-                    return(0)
-                }
-            }
-            
         case none
         case register(Register)
         case slot(Register,Word)
@@ -120,15 +101,49 @@ public class Instruction:Identifiable
         case address(Word)
         case stack(Word)
         case array(Register,Word)
-        
-        public var address: Word
+            
+        public var isNotNone: Bool
             {
             switch(self)
                 {
-                case .address(let address):
-                    return(address)
+                case .none:
+                    return(false)
                 default:
-                    return(0)
+                    return(true)
+                }
+            }
+            
+    public var address: Word
+        {
+        switch(self)
+            {
+            case .address(let word):
+                return(word)
+            default:
+                fatalError("Error")
+            }
+        }
+        
+        public var sizeInBits: Int
+            {
+            switch(self)
+                {
+                case .none:
+                    return(7)
+                case .register:
+                    return(7)
+                case .slot:
+                    return(7+7+64)
+                case .float:
+                    return(7+64)
+                case .integer:
+                    return(7+64)
+                case .address:
+                    return(7+64)
+                case .stack:
+                    return(7+64)
+                case .array:
+                    return(7+7+64)
                 }
             }
             
@@ -183,70 +198,21 @@ public class Instruction:Identifiable
             switch(self)
                 {
                 case .none:
-                    return(1)
+                    return(0)
                 case .register:
-                    return(2)
+                    return(1)
                 case .slot:
-                    return(3)
+                    return(2)
                 case .float:
-                    return(4)
+                    return(3)
                 case .integer:
-                    return(5)
+                    return(4)
                 case .address:
-                    return(6)
+                    return(5)
                 case .stack:
-                    return(7)
+                    return(6)
                 case .array:
-                    return(8)
-                }
-            }
-            
-        public func encode(in encoder:BitEncoder)
-            {
-            switch(self)
-                {
-                case .none:
-                    let width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                case .register(let register):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 7
-                    encoder.encode(value: register,inWidth: width)
-                case .slot(let register,let offset):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 7
-                    encoder.encode(value:register,inWidth: width)
-                    width = 64
-                    encoder.encode(value: Int(offset),inWidth: width)
-                case .float(let register):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 64
-                    encoder.encode(value: register.bitPattern,inWidth: width)
-                case .integer(let integer):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 64
-                    encoder.encode(value: Int(integer),inWidth: width)
-                case .address(let address1):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 64
-                    encoder.encode(value: address1,inWidth: width)
-                case .stack(let address):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 64
-                    encoder.encode(value: address,inWidth: width)
-                case .array(let register,let address):
-                    var width:Int = 7
-                    encoder.encode(value:self.rawValue,inWidth: width)
-                    width = 7
-                    encoder.encode(value:register,inWidth: width)
-                    width = 64
-                    encoder.encode(value: address,inWidth: width)
+                    return(7)
                 }
             }
 
@@ -461,40 +427,22 @@ public class Instruction:Identifiable
                 }
             }
         }
-    
-    public var neededWordCount:Int
-        {
-        var count = 1
-        count += self.operand1?.neededWordCount ?? 0
-        count += self.operand2?.neededWordCount ?? 0
-        count += self.result?.neededWordCount ?? 0
-        return(count)
-        }
-        
+
     public var operandText: String
         {
         var text = ""
-        if self.operand1.isNotNil
-            {
-            text += self.operand1!.text
-            }
-        if self.operand2.isNotNil
-            {
-            text += (self.operand1.isNotNil ? "," : "") + self.operand2!.text
-            }
-        if self.result.isNotNil
-            {
-            text += (self.operand1.isNotNil || self.operand2.isNotNil ? "," : "") + self.result!.text
-            }
+        text += self.operand1.text
+        text += self.operand1.isNotNone ? "," : "" + self.operand2.text
+        text += (self.operand1.isNotNone || self.operand2.isNotNone ? "," : "") + self.result.text
         return(text)
         }
         
     public let opcode:Opcode
-    public let operand1:Operand?
-    public let operand2:Operand?
-    public let result:Operand?
+    public let operand1:Operand
+    public let operand2:Operand
+    public let result:Operand
     
-    public init(_ opcode:Opcode,operand1:Operand?=nil,operand2:Operand?=nil,result:Operand?=nil)
+    public init(_ opcode:Opcode,operand1:Operand = .none,operand2:Operand = .none,result:Operand = .none)
         {
         self.opcode = opcode
         self.operand1 = operand1
@@ -506,16 +454,16 @@ public class Instruction:Identifiable
         {
         self.opcode = opcode
         self.operand1 = .integer(Argon.Integer(integer))
-        self.operand2 = nil
-        self.result = nil
+        self.operand2 = .none
+        self.result = .none
         }
         
     public init(_ opcode:Opcode,address:Word)
         {
         self.opcode = opcode
         self.operand1 = .address(address)
-        self.operand2 = nil
-        self.result = nil
+        self.operand2 = .none
+        self.result = .none
         }
         
     public init(_ opcode:Opcode,register: Register,address:Word)
@@ -523,7 +471,7 @@ public class Instruction:Identifiable
         self.opcode = opcode
         self.operand1 = .register(register)
         self.operand2 = .address(address)
-        self.result = nil
+        self.result = .none
         }
         
     public init(_ opcode:Opcode,address:Word,register1:Register,register2:Register)
@@ -545,11 +493,11 @@ public class Instruction:Identifiable
     public func dump()
         {
         print("\(self.opcode) ",terminator:"")
-        self.operand1?.dump()
-        print(self.operand1.isNotNil && self.operand2.isNotNil ? "," : "", terminator:"")
-        self.operand2?.dump()
-        print(self.operand2.isNotNil && self.result.isNotNil ? "," : "",terminator:"")
-        self.result?.dump()
+        self.operand1.dump()
+        print(self.operand1.isNotNone && self.operand2.isNotNone ? "," : "", terminator:"")
+        self.operand2.dump()
+        print(self.operand2.isNotNone && self.result.isNotNone ? "," : "",terminator:"")
+        self.result.dump()
         print()
         }
         
@@ -560,49 +508,59 @@ public class Instruction:Identifiable
             case .nop:
                 break
             case .iadd:
-                try self.result!.setIntValue(self.operand1!.intValue(in: context) + self.operand2!.intValue(in: context),in: context)
+                try self.result.setIntValue(self.operand1.intValue(in: context) + self.operand2.intValue(in: context),in: context)
             case .isub:
-                try self.result!.setIntValue(self.operand1!.intValue(in: context) - self.operand2!.intValue(in: context),in: context)
+                try self.result.setIntValue(self.operand1.intValue(in: context) - self.operand2.intValue(in: context),in: context)
             case .imul:
-                try self.result!.setIntValue(self.operand1!.intValue(in: context) * self.operand2!.intValue(in: context),in: context)
+                try self.result.setIntValue(self.operand1.intValue(in: context) * self.operand2.intValue(in: context),in: context)
             case .idiv:
-                try self.result!.setIntValue(self.operand1!.intValue(in: context) / self.operand2!.intValue(in: context),in: context)
+                try self.result.setIntValue(self.operand1.intValue(in: context) / self.operand2.intValue(in: context),in: context)
             case .imod:
-                try self.result!.setIntValue(self.operand1!.intValue(in: context) % self.operand2!.intValue(in: context),in: context)
+                try self.result.setIntValue(self.operand1.intValue(in: context) % self.operand2.intValue(in: context),in: context)
             case .load:
-                try self.result!.setValue(self.operand1!.value(in: context),in: context)
+                try self.result.setValue(self.operand1.value(in: context),in: context)
             case .store:
-                try self.result!.setValue(self.operand1!.value(in: context),in: context)
+                try self.result.setValue(self.operand1.value(in: context),in: context)
             case .ipow:
-                var value = try self.operand1!.intValue(in: context)
+                var value = try self.operand1.intValue(in: context)
                 let mul = value
-                var power = try self.operand2!.intValue(in: context)
+                var power = try self.operand2.intValue(in: context)
                 while power > 0
                     {
                     value *= mul
                     power -= 1
                     }
-                try self.result!.setIntValue(value,in: context)
+                try self.result.setIntValue(value,in: context)
             case .fadd:
-                try self.result!.setFloatValue(self.operand1!.floatValue(in: context) + self.operand2!.floatValue(in: context),in: context)
+                try self.result.setFloatValue(self.operand1.floatValue(in: context) + self.operand2.floatValue(in: context),in: context)
             case .fsub:
-                try self.result!.setFloatValue(self.operand1!.floatValue(in: context) - self.operand2!.floatValue(in: context),in: context)
+                try self.result.setFloatValue(self.operand1.floatValue(in: context) - self.operand2.floatValue(in: context),in: context)
             case .fmul:
-                try self.result!.setFloatValue(self.operand1!.floatValue(in: context) * self.operand2!.floatValue(in: context),in: context)
+                try self.result.setFloatValue(self.operand1.floatValue(in: context) * self.operand2.floatValue(in: context),in: context)
             case .fdiv:
-                try self.result!.setFloatValue(self.operand1!.floatValue(in: context) / self.operand2!.floatValue(in: context),in: context)
+                try self.result.setFloatValue(self.operand1.floatValue(in: context) / self.operand2.floatValue(in: context),in: context)
             case .fmod:
-            try self.result!.setFloatValue(self.operand1!.floatValue(in: context).truncatingRemainder(dividingBy: self.operand2!.floatValue(in: context)),in: context)
+            try self.result.setFloatValue(self.operand1.floatValue(in: context).truncatingRemainder(dividingBy: self.operand2.floatValue(in: context)),in: context)
             case .fpow:
-                try self.result!.setFloatValue(pow(self.operand1!.floatValue(in: context),self.operand2!.floatValue(in: context)),in: context)
+                try self.result.setFloatValue(pow(self.operand1.floatValue(in: context),self.operand2.floatValue(in: context)),in: context)
             case .make:
-                let targetClassPointer = InnerClassPointer(address: self.operand1!.address)
-                let extraBytes = try self.operand2!.intValue(in: context)
+                let targetClassPointer = InnerClassPointer(address: self.operand1.address)
+                let extraBytes = try self.operand2.intValue(in: context)
                 let address = context.managedSegment.allocateObject(sizeInBytes: targetClassPointer.sizeInBytes + Int(extraBytes))
                 let pointer = InnerInstancePointer(address: address)
                 pointer.classPointer = targetClassPointer
                 pointer.magicNumber = targetClassPointer.magicNumber
-                try self.result?.setValue(pointer.address,in:context)
+                try self.result.setValue(pointer.address,in:context)
+            case .push:
+                context.stackSegment.push(try self.operand1.value(in: context))
+            case .pop:
+                try self.result.setValue(context.stackSegment.pop(),in: context)
+            case .loopeq:
+                let value = try self.operand1.value(in:context)
+                if value == 1
+                    {
+                    context.ip = try self.result.value(in: context)
+                    }
             default:
                 fatalError("Unhandled instruction opcode \(self.opcode)")
             }
@@ -624,12 +582,5 @@ public class Instruction:Identifiable
             {
             encoder.encode(value: 1,inWidth:2)
             }
-        }
-    public func encode(in encoder:BitEncoder)
-        {
-        encoder.encode(value:self.opcode,inWidth: 16)
-        encoder.encode(value:self.operand1,inWidth: 1)
-        encoder.encode(value:self.operand2,inWidth: 1)
-        encoder.encode(value:self.result,inWidth: 1)
         }
     }

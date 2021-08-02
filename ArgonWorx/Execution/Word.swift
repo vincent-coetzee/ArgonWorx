@@ -73,6 +73,24 @@ extension Word
         return(self & ~(0b111 << 60))
         }
         
+    public func with(_ value:Word,in width:Word) -> Word
+        {
+        let mask = Word(1) << width - 1
+        let newValue = value & mask
+        return(self | newValue)
+        }
+        
+    public func with(_ value:Int,in width:Int) -> Word
+        {
+        let mask = Word(1) << Word(width) - 1
+        let newValue = Word(value) & mask
+        return(self | newValue)
+        }
+        
+    public func shifted(_ amount:Word) -> Word
+        {
+        return(self << amount)
+        }
     ///
     ///
     /// Strip off the tag and return the value of he

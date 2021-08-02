@@ -12,7 +12,7 @@ public class InnerArrayPointer:InnerPointer,Collection
     public typealias Element = Word
     public typealias Index = Int
     
-    public static func allocate(arraySize:Int,in segment:ManagedSegment) -> InnerArrayPointer
+    public class func allocate(arraySize:Int,in segment:ManagedSegment) -> InnerArrayPointer
         {
         let extra = arraySize * MemoryLayout<Word>.size
         let totalSize = Self.kArraySizeInBytes + extra
@@ -62,7 +62,7 @@ public class InnerArrayPointer:InnerPointer,Collection
             }
         }
     
-    private var basePointer: WordPointer
+    internal var basePointer: WordPointer
     
     override init(address:Word)
         {

@@ -10,6 +10,7 @@
 		BF19B1EB26B7322F004E8A2A /* ExecutionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF19B1EA26B7322F004E8A2A /* ExecutionContext.swift */; };
 		BF19B1ED26B74E7A004E8A2A /* Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF19B1EC26B74E7A004E8A2A /* Timer.swift */; };
 		BF19B1EF26B751CB004E8A2A /* StackSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF19B1EE26B751CB004E8A2A /* StackSegment.swift */; };
+		BF19B1F126B7731D004E8A2A /* InnerInstructionArrayPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF19B1F026B7731D004E8A2A /* InnerInstructionArrayPointer.swift */; };
 		BF1ED32026A8B517008CBB52 /* Segment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED31F26A8B517008CBB52 /* Segment.swift */; };
 		BF1ED32426A8B6AA008CBB52 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32326A8B6AA008CBB52 /* Header.swift */; };
 		BF1ED32826A8C24D008CBB52 /* ManagedSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF1ED32726A8C24D008CBB52 /* ManagedSegment.swift */; };
@@ -119,11 +120,25 @@
 		BFFAAD4E26AB9BE80019B082 /* InnerArrayPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFAAD4D26AB9BE80019B082 /* InnerArrayPointer.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		BF02560926B7C9850093489C /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		BF19B1E926B724B7004E8A2A /* x86_64.swiftmodule */ = {isa = PBXFileReference; lastKnownFileType = file; name = x86_64.swiftmodule; path = Build/Products/Debug/ArgonWorx.swiftmodule/x86_64.swiftmodule; sourceTree = "<group>"; };
 		BF19B1EA26B7322F004E8A2A /* ExecutionContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExecutionContext.swift; sourceTree = "<group>"; };
 		BF19B1EC26B74E7A004E8A2A /* Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
 		BF19B1EE26B751CB004E8A2A /* StackSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackSegment.swift; sourceTree = "<group>"; };
+		BF19B1F026B7731D004E8A2A /* InnerInstructionArrayPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerInstructionArrayPointer.swift; sourceTree = "<group>"; };
 		BF1ED31F26A8B517008CBB52 /* Segment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segment.swift; sourceTree = "<group>"; };
 		BF1ED32326A8B6AA008CBB52 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		BF1ED32726A8C24D008CBB52 /* ManagedSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedSegment.swift; sourceTree = "<group>"; };
@@ -265,11 +280,13 @@
 				BF82BFBB26A9D0B500A96C8F /* ArrayPointer.swift */,
 				BF9A2D4D26B1D8BC00D94C10 /* BitEncoder.swift */,
 				BF9A2D4926B1668300D94C10 /* BitField.swift */,
+				BF19B1EA26B7322F004E8A2A /* ExecutionContext.swift */,
 				BF1ED32326A8B6AA008CBB52 /* Header.swift */,
 				BFFAAD4D26AB9BE80019B082 /* InnerArrayPointer.swift */,
 				BFFAAD4926AB97180019B082 /* InnerClassPointer.swift */,
 				BF38137A26AC15E700EBCE6C /* InnerFunctionPointer.swift */,
 				BF38137C26AC198E00EBCE6C /* InnerInstancePointer.swift */,
+				BF19B1F026B7731D004E8A2A /* InnerInstructionArrayPointer.swift */,
 				BF38137226ABE72C00EBCE6C /* InnerPointer.swift */,
 				BFFAAD4B26AB97710019B082 /* InnerSlotPointer.swift */,
 				BF38137426ABF50400EBCE6C /* InnerStringPointer.swift */,
@@ -279,14 +296,13 @@
 				BFF8CF9226A8FF8D00785ABD /* ObjectPointer.swift */,
 				BF38137626AC058400EBCE6C /* RawPointer.swift */,
 				BF1ED31F26A8B517008CBB52 /* Segment.swift */,
+				BF19B1EE26B751CB004E8A2A /* StackSegment.swift */,
 				BF82BFC926A9F6E600A96C8F /* StringPointer.swift */,
 				BF751C9C26AFAC9700D40852 /* Thread.swift */,
+				BF19B1EC26B74E7A004E8A2A /* Timer.swift */,
 				BF4E066126A94D68007069EA /* ValueHolder.swift */,
 				BF1ED32B26A8D8F4008CBB52 /* Word.swift */,
 				BF1ED32D26A8DA67008CBB52 /* WordPointer.swift */,
-				BF19B1EA26B7322F004E8A2A /* ExecutionContext.swift */,
-				BF19B1EC26B74E7A004E8A2A /* Timer.swift */,
-				BF19B1EE26B751CB004E8A2A /* StackSegment.swift */,
 			);
 			path = Execution;
 			sourceTree = "<group>";
@@ -545,12 +561,15 @@
 				BF9197722690FA6A00E348F6 /* Sources */,
 				BF9197732690FA6A00E348F6 /* Frameworks */,
 				BF9197742690FA6A00E348F6 /* Resources */,
+				BF02560926B7C9850093489C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = ArgonWorx;
+			packageProductDependencies = (
+			);
 			productName = ArgonWorx;
 			productReference = BF9197762690FA6A00E348F6 /* ArgonWorx.app */;
 			productType = "com.apple.product-type.application";
@@ -697,6 +716,7 @@
 				BF91981E2690FB7400E348F6 /* ReportingContext.swift in Sources */,
 				BF9198012690FB4100E348F6 /* PrimitiveClass.swift in Sources */,
 				BF9198052690FB4100E348F6 /* EnumerationCase.swift in Sources */,
+				BF19B1F126B7731D004E8A2A /* InnerInstructionArrayPointer.swift in Sources */,
 				BF82BFCA26A9F6E600A96C8F /* StringPointer.swift in Sources */,
 				BF9197F92690FB4100E348F6 /* ParameterizedClass.swift in Sources */,
 				BF9197B22690FAC300E348F6 /* Argon.swift in Sources */,

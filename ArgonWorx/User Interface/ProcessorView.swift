@@ -10,7 +10,7 @@ import SwiftUI
 struct ProcessorView: View
     {
     @StateObject private var context = ExecutionContext()
-    @State private var buffer = InstructionBuffer.sample
+    @State private var buffer = InstructionBuffer.samples
     
     var body: some View
         {
@@ -39,7 +39,7 @@ struct ProcessorView: View
             {
             Text("Next")
             }
-        ForEach(InstructionBuffer.sample.allInstructions)
+        ForEach(InstructionBuffer.samples.allInstructions)
             {
             instruction in
             HStack
