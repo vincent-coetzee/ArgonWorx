@@ -211,6 +211,8 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
         case `super`
         case TIMES
         case TO
+        case INTERCEPTOR
+        case INTERCEPT
         case TYPE
         case UNLOADED
         case UNSEALED
@@ -482,6 +484,17 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             }
         }
         
+    public var isSystemClassName:Bool
+        {
+        switch(self)
+            {
+            case .identifier(let keyword,_):
+                return(Self.systemClassNames.contains(keyword))
+            default:
+                return(false)
+            }
+        }
+        
     public var path:String
         {
         switch(self)
@@ -703,6 +716,17 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             }
         }
         
+    public var nameLiteral:Name
+        {
+        switch(self)
+            {
+            case .name(let name,_):
+                return(name)
+            default:
+                fatalError("This should not be called on a Token of class \(Swift.type(of: self))")
+            }
+        }
+        
     public var operatorName:String
         {
         switch(self)
@@ -885,6 +909,17 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             {
             case .keyword(let value,_):
                 return(value == .MAKE)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isPrivacyModifier:Bool
+        {
+        switch(self)
+            {
+            case .keyword(let value,_):
+                return(value == .PROTECTED || value == .PUBLIC || value == .PRIVATE || value == .EXPORTED)
             default:
                 return(false)
             }

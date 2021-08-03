@@ -32,14 +32,12 @@ public class InnerInstancePointer:InnerPointer
             }
         return(dict)
         }
-        
-    private static var sizeInBytes = 24
     
-    override init(address:Word)
+    required init(address:Word)
         {
         super.init(address:address)
         self._classPointer = InnerClassPointer(address: self.slotValue(atKey: "_classPointer"))
-        Self.sizeInBytes = self.classPointer.instanceSizeInBytes
+        self.sizeInBytes = Self.kInstanceSizeInBytes
         }
         
     public override func slotValue(atKey:String) -> Word

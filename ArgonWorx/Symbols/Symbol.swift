@@ -9,7 +9,7 @@ import Foundation
 import AppKit
 import SwiftUI
 
-public class Symbol:Node
+public class Symbol:Node,ParseNode
     {
     public func newItemButton(_ binding:Binding<String?>) -> AnyView
         {
@@ -64,6 +64,7 @@ public class Symbol:Node
     internal var memoryAddress: Word = 0
     internal var isMemoryLayoutDone: Bool = false
     internal var isSlotLayoutDone: Bool = false
+    public var privacyScope:PrivacyScope? = nil
     
     public override init(label:Label)
         {

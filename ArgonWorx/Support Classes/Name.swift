@@ -53,6 +53,11 @@ public struct Name:CustomStringConvertible,Comparable
             }
         }
         
+    public var string: String
+        {
+        return(self.components.map{$0.string}.joined(separator: "\\"))
+        }
+        
     public var description: String
         {
         return(self.components.map{$0.string}.joined(separator: "\\"))

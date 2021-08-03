@@ -1,12 +1,15 @@
 //
-//  Expression.swift
-//  ArgonWx
+//  ParseExpression.swift
+//  ArgonCompiler
 //
-//  Created by Vincent Coetzee on 3/7/21.
+//  Created by Vincent Coetzee on 5/3/21.
 //
 
 import Foundation
 
-public class Expression:Node
+public class Expression
     {
     }
+    
+
+public typealias Expressions = Array<Expression>

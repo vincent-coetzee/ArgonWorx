@@ -10,9 +10,11 @@ import Foundation
 public class Parameter:Symbol
     {
     private let _type:Type
+    private let isHidden:Bool
     
-    init(label:Label,type:Type)
+    init(label:Label,type:Type,isHidden:Bool = false)
         {
+        self.isHidden = isHidden
         self._type = type
         super.init(label: label)
         }

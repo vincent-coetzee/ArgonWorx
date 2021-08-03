@@ -10,6 +10,8 @@ import SwiftUI
 
 struct SymbolEditingView: View
     {
+    var tokens:Array<Token>
+    
     var body: some View
         {
         EmptyView()

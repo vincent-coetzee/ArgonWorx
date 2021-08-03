@@ -10,7 +10,7 @@ import SwiftUI
 struct ProcessorView: View
     {
     @StateObject private var context = ExecutionContext()
-    @State private var buffer = InnerInstructionArrayPointer.allocate(arraySize: 10*10, in: ManagedSegment.shared).append(InstructionBuffer.samples.allInstructions).rewind()
+    @State private var buffer = InnerInstructionArrayPointer.allocate(arraySize: 10*10, in: ManagedSegment.shared).append(InnerInstructionArrayPointer.samples.allInstructions).rewind()
     @State private var color:Color = .white
     
     var body: some View
@@ -39,7 +39,7 @@ struct ProcessorView: View
             {
             Text("Next")
             }
-        ForEach(InstructionBuffer.samples.allInstructions)
+        ForEach(InnerInstructionArrayPointer.samples.allInstructions)
             {
             instruction in
             HStack

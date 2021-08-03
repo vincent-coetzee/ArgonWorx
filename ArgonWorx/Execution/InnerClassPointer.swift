@@ -82,7 +82,7 @@ public class InnerClassPointer:InnerPointer
             }
         }
         
-    override init(address:Word)
+    required init(address:Word)
         {
         super.init(address: address)
         self._classPointer = nil

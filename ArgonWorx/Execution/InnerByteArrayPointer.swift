@@ -33,7 +33,7 @@ public class InnerByteArrayPointer:InnerArrayPointer
         
     private var bytePointer:UnsafeMutablePointer<UInt8>!
     
-    override init(address:Word)
+    override required init(address:Word)
         {
         self.bytePointer = UnsafeMutablePointer<UInt8>(bitPattern: UInt(bitPattern: 0))
         super.init(address: address)

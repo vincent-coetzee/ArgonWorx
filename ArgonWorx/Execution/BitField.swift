@@ -7,130 +7,75 @@
 
 import Foundation
 
-public protocol BitFielding
+public protocol WordConvertible
     {
-    var width:Int { get }
-    var shift:Int { get }
-    }
-
-extension BitFielding
-    {
-    private var mask: Word
-        {
-        (Word(width) * 4) - 1
-        }
-        
-    private var fullMask: Word
-        {
-        self.mask << Word(self.shift)
-        }
-        
-    public func _setValue(_ value:Word,in word:inout Word)
-        {
-        let newValue = value & mask
-        word = (word & ~self.fullMask) | (newValue << Word(self.shift))
-        }
-        
-    public func _value(in word:Word) -> Word
-        {
-        (word & self.fullMask) >> Word(self.shift)
-        }
-    }
-
-public protocol BitKeeper:AnyObject
-    {
-    var bits: Word { get set }
+    static var bitWidth: Int { get }
+    var word: Word { get }
+    init(word: Word)
     }
     
-public class BitField<T>:BitFielding
+extension WordConvertible where Self:RawRepresentable,Self.RawValue == Int
     {
-    public var width: Int
+    public var word: Word
         {
-        self._width
+        Word(self.rawValue)
         }
         
-    public var shift: Int
+    public init(word: Word)
         {
-        self._shift
-        }
-    
-    var value:T
-        {
-        get
-            {
-            return(self.getter!())
-            }
-        set
-            {
-            self.setter!(newValue)
-            }
-        }
-
-    private typealias GetterFunction = () -> T
-    private typealias SetterFunction = (T) -> Void
-    
-    private var getter: GetterFunction?
-    private var setter: SetterFunction?
-    private let _width: Int
-    private let _shift: Int
-    private var bitKeeper: BitKeeper
-    
-    public init(shift: Int,width: Int,bitKeeper: BitKeeper) where T:RawRepresentable,T.RawValue == Int
-        {
-        self._width = width
-        self._shift = shift
-        self.bitKeeper = bitKeeper
-        self.getter =
-            {
-            () -> T in
-            return(T(rawValue: Int(self._value(in: bitKeeper.bits)))!)
-            }
-        self.setter =
-            {
-            (argument) -> Void in
-            var bits = bitKeeper.bits
-            self._setValue(Word(argument.rawValue),in: &bits)
-            bitKeeper.bits = bits
-            }
-        }
-    
-    public init(shift: Int,width: Int,bitKeeper: BitKeeper) where T == Int
-        {
-        self._width = width
-        self._shift = shift
-        self.bitKeeper = bitKeeper
-        self.getter =
-            {
-            () -> T in
-            return(Int(self._value(in: bitKeeper.bits)))
-            }
-        self.setter =
-            {
-            (argument) -> Void in
-            var bits = bitKeeper.bits
-            self._setValue(Word(argument),in: &bits)
-            bitKeeper.bits = bits
-            }
-        }
-        
-    public init(shift: Int,width: Int,bitKeeper: BitKeeper,initialValue:T) where T == Int
-        {
-        self._width = width
-        self._shift = shift
-        self.bitKeeper = bitKeeper
-        self.getter =
-            {
-            () -> T in
-            return(Int(self._value(in: bitKeeper.bits)))
-            }
-        self.setter =
-            {
-            (argument) -> Void in
-            var bits = bitKeeper.bits
-            self._setValue(Word(argument),in: &bits)
-            bitKeeper.bits = bits
-            }
-        self.value = initialValue
+        self = Self.init(rawValue: Int(word))!
         }
     }
-
+    
+extension Word:WordConvertible
+    {
+    public var word: Word
+        {
+        return(self)
+        }
+        
+    public init(word: Word)
+        {
+        self = word
+        }
+    }
+    
+public struct BitField<T>:Codable where T:WordConvertible
+    {
+    private let start:Int
+    private let stop:Int
+    private let width:Int
+    private let mask: Word
+    private let placeMask: Word
+    
+    init(start:Int,stop:Int)
+        {
+        self.start = start
+        self.stop = stop
+        self.width = stop - start
+        self.mask = (1 << Word(self.width + 1)) - 1
+        self.placeMask = mask << Word(start)
+        }
+        
+    init(start:Int)
+        {
+        self.start = start
+        self.width = T.bitWidth
+        self.stop = start + width
+        self.mask = (1 << Word(self.width)) - 1
+        self.placeMask = mask << Word(start)
+        }
+        
+    func encode(_ value:T,into base:inout Word)
+        {
+        let amount = value.word & self.mask
+        let wordValue = amount << self.start
+        base = (base & ~self.placeMask) | wordValue
+        }
+        
+    func decode(from base:Word,as: T.Type) -> T
+        {
+        let amount = (base & self.placeMask) >> start
+        return(T(word: amount))
+        }
+    }

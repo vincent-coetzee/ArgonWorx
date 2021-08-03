@@ -177,6 +177,11 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "DateTime") as! Class)
         }
         
+    public var closure: ClosureClass
+        {
+        return(self.lookup(label: "Closure") as! ClosureClass)
+        }
+        
     public var enumeration: Class
         {
         return(self.lookup(label: "Enumeration") as! Class)
@@ -233,6 +238,7 @@ public class ArgonModule: SystemModule
         self.addSymbol(PrimitiveClass.booleanClass.superclass("\\\\Argon\\Object").slotClass(BooleanSlot.self))
         self.addSymbol(PrimitiveClass.characterClass.superclass("\\\\Argon\\Magnitude"))
         self.addSymbol(SystemClass(label:"Class").superclass("\\\\Argon\\Type").slotClass(ObjectSlot.self))
+        self.addSymbol(ClosureClass(label:"Closure").superclass("\\\\Argon\\Function").slotClass(ObjectSlot.self))
         collections.addSymbol(SystemClass(label:"Collection").superclass("\\\\Argon\\Object").superclass("\\\\Argon\\Collections\\Iterable"))
         self.addSymbol(PrimitiveClass.dateClass.superclass("\\\\Argon\\Magnitude"))
         self.addSymbol(PrimitiveClass.dateTimeClass.superclass("\\\\Argon\\Date").superclass("\\\\Argon\\Time"))
@@ -295,6 +301,7 @@ public class ArgonModule: SystemModule
         self.array.slot("elementType",self.typeClass).slot("size",self.integer).slot("firstBlock",self.block).hasBytes(true)
         self.instruction.virtual("opcode",self.integer).virtual("mode",self.integer).virtual("operand1",self.integer).virtual("operand2",self.integer).virtual("operand3",self.integer)
         self.string.slot("count",self.integer).virtual("bytes",self.address).hasBytes(true)
+        self.closure.slot("codeSegment",self.address).slot("initialIP",self.address).slot("localCount",self.integer).slot("localSlots",self.array.of(self.slot)).slot("contextPointer",self.address).slot("instructions",self.array.of(self.instruction)).slot("parameters",self.array.of(self.parameter)).slot("returnType",self.typeClass)
         self.instructionArray.hasBytes(true)
         }
         

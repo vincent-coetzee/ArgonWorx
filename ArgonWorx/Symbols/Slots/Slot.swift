@@ -138,3 +138,7 @@ public class HiddenSlot: Slot
         return(true)
         }
     }
+
+public class ScopedSlot: Slot
+    {
+    }

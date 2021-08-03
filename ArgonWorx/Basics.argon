@@ -1,0 +1,55 @@
+///
+///
+///
+///
+///
+///
+MAIN MODULE Basics
+    {
+    MAIN METHOD begin() -> Void
+        {
+        doTheThing()
+        runOfTheMill(with::things)
+        LET result = createTheWidget()
+        doWhatIsHard()
+        returnToTheMoon()
+        }
+        
+    ///
+    ///
+    /// Entity is a root class because it inherits
+    /// from nothing, in reality it actually inherits
+    /// from Object because all classes must
+    ///
+    ///
+    CLASS Entity
+        {
+        SLOT name::String = ""
+        SLOT identityNumber::String = ""
+        }
+        
+    CLASS LegalEntity::Entity
+        {
+        }
+        
+    CLASS Corporate::LegalEntity
+        {
+        }
+        
+    CLASS SovereignState::LegalEntity
+        {
+        }
+        
+    CLASS Person::LegalEntity
+        {
+        }
+    ///
+    ///
+    /// A TYPE is an alias for some TYPE construct defined
+    /// elsewhere in the system. Typically a TYPE is defined
+    /// as a shortcut for more complicated types.
+    ///
+    ///
+    TYPE PersonList IS Array<Person>
+    TYPE Sovereign IS SovereignState
+    }

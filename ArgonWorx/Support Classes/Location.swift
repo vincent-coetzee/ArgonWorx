@@ -26,3 +26,5 @@ public struct Location
         self.tokenStop = tokenStop
         }
     }
+
+public typealias Locations = Array<Location>

@@ -61,14 +61,17 @@ public class InnerArrayPointer:InnerPointer,Collection
             self.setSlotValue(Word(newValue),atKey:"size")
             }
         }
+
+    public let firstBlock = PointerHolder<InnerBlockPointer,InnerPointer>(name: "firstBlock")
     
     internal var basePointer: WordPointer
     
-    override init(address:Word)
+    required init(address:Word)
         {
         self.basePointer = WordPointer(address: address + Word(Self.kArraySizeInBytes))!
         super.init(address: address)
         self._classPointer = nil
+        self.firstBlock.setSubstrate(self)
         }
         
     internal override func initKeys()
@@ -92,11 +95,29 @@ public class InnerArrayPointer:InnerPointer,Collection
         {
         get
             {
-            return(self.basePointer[index])
+            if index > self.size && self.firstBlock.isNotNil
+                {
+                return(self.firstBlock.pointer[index - self.size])
+                }
+            else if index < self.size
+                {
+                return(self.basePointer[index])
+                }
+            fatalError("Invalid array index")
             }
         set
             {
-            self.basePointer[index] = newValue
+            if index < self.size
+                {
+                self.basePointer[index] = newValue
+                return
+                }
+            if index > self.count && self.firstBlock.isNotNil && index - self.size < self.firstBlock.pointer.size
+                {
+                self.firstBlock.pointer[index] = newValue
+                return
+                }
+            fatalError("Invalid array index")
             }
         }
         
@@ -112,6 +133,17 @@ public class InnerArrayPointer:InnerPointer,Collection
             {
             self[self.count] = word
             self.count += 1
+            }
+        }
+        
+    public func grow(by:Int)
+        {
+        let hasBlock = self.slotValue(atKey: "firstBlock") != 0
+        var totalSize = 0
+        if hasBlock
+            {
+            let blockPointer = InnerBlockPointer(address: self.slotValue(atKey:"firstBlock"))
+            totalSize = self.size + blockPointer.size
             }
         }
     }

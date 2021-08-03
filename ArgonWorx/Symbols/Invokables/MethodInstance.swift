@@ -14,6 +14,7 @@ public class MethodInstance:Function
         return(false)
         }
         
+    private var expressions = Expressions()
     public var parameters = Parameters()
     public var returnType = Type(label:"")
     
@@ -141,6 +142,14 @@ public class MethodInstance:Function
         super.init(label: label)
         self.parameters = [leftParm]
         self.returnType = result
+        }
+        
+    init(label: Label,parameters: Parameters,returnType:Type? = nil,expressions: Expressions)
+        {
+        self.parameters = parameters
+        self.returnType = returnType ?? VoidClass.voidClass.type
+        self.expressions = expressions
+        super.init(label: label)
         }
         
     public func `where`(_ name:String,_ aClass:Class) -> MethodInstance

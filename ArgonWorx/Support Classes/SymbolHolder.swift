@@ -7,22 +7,24 @@
 
 import Foundation
 
-public class SymbolHolder
+public class SymbolHolder:Symbol
     {
     private static var list:Array<SymbolHolder> = []
-    
-    private let name:Name
-    private let context:NamingContext?
-    private let reporter:ReportingContext
-    private let location:Location
+    private let symbolName: Name
+    private let context: NamingContext?
+    private let reporter: ReportingContext
+    private let location: Location
     private var symbol: Symbol?
+    private let types: Types?
     
-    init(name:Name,location:Location,namingContext:NamingContext?,reporter:ReportingContext)
+    init(name:Name,location:Location,namingContext:NamingContext?,reporter:ReportingContext,types:Types? = nil)
         {
-        self.name = name
+        self.symbolName = name
+        self.types = types
         self.context = namingContext
         self.reporter = reporter
         self.location = location
+        super.init(label: name.string)
         Self.list.append(self)
         }
         
@@ -30,12 +32,12 @@ public class SymbolHolder
     public func reify() -> Symbol?
         {
         let theContext = context.isNil ? ArgonModule.argonModule : context!
-        if let theSymbol = theContext.lookup(name: name)
+        if let theSymbol = theContext.lookup(name: self.symbolName)
             {
             self.symbol = theSymbol
             return(self.symbol!)
             }
-        reporter.dispatchError(at: self.location,message: "Could not resolve symbol with reference \(self.name), unresolved reference.")
+        reporter.dispatchError(at: self.location,message: "Could not resolve symbol with reference \(self.symbolName), unresolved reference.")
         return(nil)
         }
     }

@@ -7,13 +7,22 @@
 
 import Foundation
 
-public class InnerPointer
+public class InnerPointer:Addressable
     {
     public static let kClassSizeInBytes = 152
     public static let kSlotSizeInBytes = 88
     public static let kArraySizeInBytes = 136
     public static let kStringSizeInBytes = 64
+    public static let kBlockSizeInBytes = 80
+    public static let kMethodInstanceSizeInBytes = 136
+    public static let kInstanceSizeInBytes = 24
+    public static let kDictionarySizeInBytes = 112
     
+    public static func ==(lhs:InnerPointer,rhs:InnerPointer) -> Bool
+        {
+        return(lhs.address == rhs.address)
+        }
+        
     public var classPointer:InnerClassPointer
         {
         get
@@ -38,13 +47,18 @@ public class InnerPointer
         let offset:Int
         }
 
+    public var isNil: Bool
+        {
+        return(self.address == 0)
+        }
+        
     internal var sizeInBytes:Int = 0
     internal var keys:Dictionary<String,Key> = [:]
     var _classPointer:InnerClassPointer?
-    let address:Word
+    public let address:Word
     var wordPointer:WordPointer?
 
-    init(address:Word)
+    public required init(address:Word)
         {
         self._classPointer = nil
         self.address = address

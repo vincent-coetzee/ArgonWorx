@@ -389,6 +389,20 @@ public class Class:ContainerSymbol,ObservableObject
         print("")
         print("SizeInBytes: \(self.sizeInBytes)")
         print("")
+        let names = self.layoutSlots.sorted(by: {$0.offset < $1.offset}).map{"\($0.label)"}
+        let mappedNames = names.map{"\"\($0)\""}.joined(separator: ",")
+        print("[\(mappedNames)]")
+        print()
+        print("typedef struct _\(self.label)")
+        print("\t{")
+        for name in names
+            {
+            print("\tCWord \(name);")
+            }
+        print("\t}")
+        print("\t\(self.label);")
+        print()
+        print("typedef \(self.label)* \(self.label)Pointer;")
         var index = 0
         for slot in self.layoutSlots.sorted(by: {$0.offset < $1.offset})
             {

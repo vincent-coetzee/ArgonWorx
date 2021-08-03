@@ -62,7 +62,7 @@ public class InnerSlotPointer:InnerPointer
         return(Int(bitPattern: UInt(self.slotValue(atKey:"typeCode"))))
         }
     
-    override init(address:Word)
+    required init(address:Word)
         {
         super.init(address:address)
         self._classPointer = nil

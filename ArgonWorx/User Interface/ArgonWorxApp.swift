@@ -69,14 +69,36 @@ struct ArgonWorxApp: App {
         let byteArray = InnerByteArrayPointer.with([0,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1])
         let someBytes = byteArray.bytes
         print(someBytes)
-        let samples = InstructionBuffer.samples.allInstructions
+        let samples = InnerInstructionArrayPointer.samples.allInstructions
         let arrayP = InnerInstructionArrayPointer.allocate(arraySize: samples.count * 10, in: ManagedSegment.shared)
+        let from = arrayP.fromHere("start")
         arrayP.append(samples)
         print("ARRAY COUNT IS \(arrayP.count)")
-        for index in 0..<arrayP.count
+        let offset = arrayP.toHere(from)
+        arrayP.append(.loopeq,operand1:.integer(1),operand2: .integer(1),result: .label(offset))
+        arrayP.rewind()
+        while arrayP.instruction.isNotNil
             {
-            let instruction = arrayP.instruction(at: index)!
-            print("\(instruction.opcode) \(instruction.operandText)")
+            print("\(arrayP.instruction!.opcode) \(arrayP.instruction!.operandText)")
+            arrayP.next()
+            }
+        let program = InnerInstructionArrayPointer.allocate(arraySize: 100*10, in: ManagedSegment.shared)
+        program.append(.load,operand1: .integer(2021),result: .register(.r1))
+        program.append(.load,operand1: .integer(1965),result: .register(.r2))
+        program.append(.isub,operand1: .register(.r1),operand2: .register(.r2),result:.register(.r3))
+        program.append(.load,operand1: .integer(112000),result: .register(.r4))
+        program.append(.imul,operand1: .register(.r4),operand2: .integer(12),result: .register(.r5))
+        program.append(.imul,operand1: .register(.r5),operand2: .register(.r3),result: .register(.r6))
+        program.append(.load,operand1: .integer(200),result: .register(.r15))
+        let marker = program.append(.zero,result: .register(.r14)).fromHere("marker")
+        program.append(.inc,result: .register(.r14))
+        program.append(.dec,result: .register(.r15))
+        program.append(.breq,operand1: .register(.r15),operand2: .integer(0),result: .label(program.toHere(marker)))
+        program.rewind()
+        while program.instruction.isNotNil
+            {
+            print("\(program.instruction!.opcode) \(program.instruction!.operandText)")
+            program.next()
             }
         }
         

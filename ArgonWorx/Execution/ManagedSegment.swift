@@ -48,7 +48,7 @@ public class ManagedSegment:Segment
     public override func allocateObject(sizeInBytes:Int) -> Word
         {
         var newPointer = self.nextAddress;
-        print("ALLOCATED \(sizeInBytes) BYTES @ \(newPointer.addressString)")
+//        print("ALLOCATED \(sizeInBytes) BYTES @ \(newPointer.addressString)")
         self.nextAddress += UInt64(sizeInBytes)
         
         let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(newPointer))!

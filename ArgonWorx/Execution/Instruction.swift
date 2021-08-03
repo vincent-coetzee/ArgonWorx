@@ -48,6 +48,8 @@ public class Instruction:Identifiable,Encodable,Decodable
         
     public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable
         {
+        public static let bitWidth = 8
+        
         public static func <(lhs:Register,rhs:Register) -> Bool
             {
             return(lhs.rawValue < rhs.rawValue)
@@ -79,6 +81,8 @@ public class Instruction:Identifiable,Encodable,Decodable
         
     public enum Opcode:Int,Encodable,Decodable
         {
+        public static let bitWidth = 8
+        
         case nop = 0
         case iadd,isub,imul,idiv,imod,ipow
         case fadd,fsub,fmul,fdiv,fmod,fpow
@@ -89,6 +93,10 @@ public class Instruction:Identifiable,Encodable,Decodable
         case call,ret
         case push,pop
         case loopeq,loopneq,loopnz,loopz
+        case scat,srev,scmp,scnt,scpy
+        case rein
+        case sig,hnd
+        case zero
         }
         
     public enum Operand:Encodable,Decodable
@@ -101,7 +109,8 @@ public class Instruction:Identifiable,Encodable,Decodable
         case address(Word)
         case stack(Word)
         case array(Register,Word)
-            
+        case label(Argon.Integer)
+        
         public var isNotNone: Bool
             {
             switch(self)
@@ -123,52 +132,6 @@ public class Instruction:Identifiable,Encodable,Decodable
                 fatalError("Error")
             }
         }
-        
-        public var sizeInBits: Int
-            {
-            switch(self)
-                {
-                case .none:
-                    return(7)
-                case .register:
-                    return(7)
-                case .slot:
-                    return(7+7+64)
-                case .float:
-                    return(7+64)
-                case .integer:
-                    return(7+64)
-                case .address:
-                    return(7+64)
-                case .stack:
-                    return(7+64)
-                case .array:
-                    return(7+7+64)
-                }
-            }
-            
-        public func dump()
-            {
-            switch(self)
-                {
-                case .none:
-                    print("",terminator:"")
-                case .register(let register):
-                    print("\(register)",terminator:"")
-                case .slot(let register,let offset):
-                    print("\(register)+\(offset)",terminator:"")
-                case .float(let float):
-                    print("\(float)",terminator:"")
-                case .integer(let register):
-                    print("\(register)",terminator:"")
-                case .address(let register):
-                    print("0x\(register.addressString)",terminator:"")
-                case .stack(let register):
-                    print("SS:[\(register)]",terminator:"")
-                case .array(let register,let offset):
-                    print("\(register)+\(offset)",terminator:"")
-                }
-            }
             
         public var text: String
             {
@@ -190,29 +153,9 @@ public class Instruction:Identifiable,Encodable,Decodable
                     return("SS:[\(register)]")
                 case .array(let register,let offset):
                     return("\(register)+\(offset)")
-                }
-            }
-            
-        public var rawValue: Int
-            {
-            switch(self)
-                {
-                case .none:
-                    return(0)
-                case .register:
-                    return(1)
-                case .slot:
-                    return(2)
-                case .float:
-                    return(3)
-                case .integer:
-                    return(4)
-                case .address:
-                    return(5)
-                case .stack:
-                    return(6)
-                case .array:
-                    return(7)
+                case .label(let integer):
+                    let label = integer >= 0 ? "+" : ""
+                    return("IP \(label) \(integer)")
                 }
             }
 
@@ -246,6 +189,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let value = context.registers[object.rawValue]
                     let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
                     return(Argon.Float(bitPattern: pointer?.pointee.withoutTag ?? 0))
+                case .label:
+                    return(0)
                 }
             }
             
@@ -275,6 +220,9 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let value = context.registers[object.rawValue]
                     let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
                     return(pointer?.pointee.withoutTag ?? 0)
+                case .label(let integer):
+                    return(Word(bitPattern: integer))
+                    
                 }
             }
             
@@ -304,6 +252,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let value = context.registers[object.rawValue]
                     let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
                     return(pointer?.pointee.withoutTag ?? 0)
+                case .label(let integer):
+                    return(Word(bitPattern: integer))
                 }
             }
             
@@ -333,6 +283,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let value = context.registers[object.rawValue]
                     let pointer = UnsafePointer<Int64>(bitPattern: UInt(value + offset))
                     return(pointer?.pointee ?? 0)
+                case .label(let integer):
+                    return(Argon.Integer(integer))
                 }
             }
             
@@ -362,6 +314,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let inner = context.registers[object.rawValue]
                     let pointer = UnsafeMutablePointer<Int64>(bitPattern: UInt(inner + offset))
                     pointer?.pointee = value
+                case .label:
+                    break
                 }
             }
             
@@ -391,6 +345,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let inner = context.registers[object.rawValue]
                     let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
                     pointer?.pointee = value
+                case .label:
+                    break
                 }
             }
             
@@ -424,6 +380,8 @@ public class Instruction:Identifiable,Encodable,Decodable
                     let inner = context.registers[object.rawValue]
                     let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
                     pointer?.pointee = value.bitPattern.tagged(with: .float)
+                case .label:
+                    break
                 }
             }
         }
@@ -458,58 +416,7 @@ public class Instruction:Identifiable,Encodable,Decodable
         self.operand2 = operand2
         self.result = result
         }
-        
-    public init(_ opcode:Opcode,integer:Int)
-        {
-        self.opcode = opcode
-        self.operand1 = .integer(Argon.Integer(integer))
-        self.operand2 = .none
-        self.result = .none
-        }
-        
-    public init(_ opcode:Opcode,address:Word)
-        {
-        self.opcode = opcode
-        self.operand1 = .address(address)
-        self.operand2 = .none
-        self.result = .none
-        }
-        
-    public init(_ opcode:Opcode,register: Register,address:Word)
-        {
-        self.opcode = opcode
-        self.operand1 = .register(register)
-        self.operand2 = .address(address)
-        self.result = .none
-        }
-        
-    public init(_ opcode:Opcode,address:Word,register1:Register,register2:Register)
-        {
-        self.opcode = opcode
-        self.operand1 = .register(register1)
-        self.operand2 = .register(register2)
-        self.result = .address(address)
-        }
-        
-    public init(_ opcode:Opcode,address:Word,integer:Int,register:Register)
-        {
-        self.opcode = opcode
-        self.operand1 = .address(address)
-        self.operand2 = .integer(Argon.Integer(integer))
-        self.result = .register(register)
-        }
-        
-    public func dump()
-        {
-        print("\(self.opcode) ",terminator:"")
-        self.operand1.dump()
-        print(self.operand1.isNotNone && self.operand2.isNotNone ? "," : "", terminator:"")
-        self.operand2.dump()
-        print(self.operand2.isNotNone && self.result.isNotNone ? "," : "",terminator:"")
-        self.result.dump()
-        print()
-        }
-        
+
     public func execute(in context:ExecutionContext) throws
         {
         switch(self.opcode)
@@ -568,8 +475,32 @@ public class Instruction:Identifiable,Encodable,Decodable
                 let value = try self.operand1.value(in:context)
                 if value == 1
                     {
-                    context.ip = try self.result.value(in: context)
+                    let offset = try self.operand2.intValue(in: context)
+                    context.ip = context.ip + Int(offset)
                     }
+            case .inc:
+                try  self.result.setIntValue(self.operand1.intValue(in: context) + 1,in:context)
+            case .dec:
+                try  self.result.setIntValue(self.operand1.intValue(in: context) - 1,in:context)
+            case .scat:
+                let address1 = try self.operand1.value(in: context)
+                let address2 = try self.operand2.value(in: context)
+                let pointer1 = InnerStringPointer(address: address1)
+                let pointer2 = InnerStringPointer(address: address2)
+                let string1 = pointer1.string
+                let string2 = pointer2.string
+                let newPointer = InnerStringPointer.allocateString(string1+string2, in: context.managedSegment)
+                try self.result.setValue(newPointer.address,in: context)
+            case .scpy:
+                let address1 = try self.operand1.value(in: context)
+                let pointer1 = InnerStringPointer(address: address1)
+                let string1 = pointer1.string
+                let newPointer = InnerStringPointer.allocateString(string1, in: context.managedSegment)
+                try self.result.setValue(newPointer.address,in: context)
+            case .rein:
+                break
+            case .zero:
+                try self.result.setValue(0,in: context)
             default:
                 fatalError("Unhandled instruction opcode \(self.opcode)")
             }

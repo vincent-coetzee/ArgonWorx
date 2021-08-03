@@ -37,23 +37,18 @@ public class ExecutionContext:ObservableObject
             }
         }
         
-    public var ip:Word
+    public var ip:Int
         {
         get
             {
-            return(self.registers[Instruction.Register.ip.rawValue])
+            return(Int(self.registers[Instruction.Register.ip.rawValue]))
             }
         set
             {
-            self.registers[Instruction.Register.ip.rawValue] = newValue
+            self.registers[Instruction.Register.ip.rawValue] = Word(bitPattern: newValue)
             }
         }
-        
-    public var currentInstruction: InnerInstructionArrayPointer
-        {
-        return(InnerInstructionArrayPointer(address: WordPointer(address: self.ip)!.pointee))
-        }
-        
+
     public var managedSegment: Segment = ManagedSegment.shared
     public var stackSegment: StackSegment
     
@@ -84,5 +79,10 @@ public class ExecutionContext:ObservableObject
     public var allRegisters: Array<Instruction.Register>
         {
         return(self._allRegisters)
+        }
+        
+    public subscript(_ index:Instruction.Register) -> Word
+        {
+        return(self.registers[index.rawValue])
         }
     }

@@ -104,7 +104,7 @@ public class InnerStringPointer:InnerPointer
         return(InnerStringPointer(address: self.slotValue(atKey:"name")).string)
         }
     
-    override init(address:Word)
+    required init(address:Word)
         {
         super.init(address:address)
         self._classPointer = nil

@@ -30,15 +30,4 @@ extension Optional
                 return(true)
             }
         }
-        
-    public func sizeInBits() -> Int where Wrapped == Instruction.Operand
-        {
-        switch(self)
-            {
-            case .some(let some):
-                return(some.sizeInBits)
-            case .none:
-                return(0)
-            }
-        }
     }
