@@ -7,8 +7,10 @@
 
 import Foundation
 
-public struct Library
+public struct DynamicLibrary
     {
+    public static let emptyLibrary = DynamicLibrary()
+    
     public struct Symbol
         {
         public let address:Word?
@@ -32,6 +34,12 @@ public struct Library
             {
             print(String(cString: dlerror()!))
             }
+        }
+        
+    init()
+        {
+        self.path = ""
+        self.handle = nil
         }
         
     public func findSymbol(_ symbol:String) -> Symbol?

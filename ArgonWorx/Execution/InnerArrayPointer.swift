@@ -92,20 +92,11 @@ public class InnerArrayPointer:InnerPointer,Collection
         {
         get
             {
-            if index < self.size
-                {
-                return(self.basePointer[index])
-                }
-            fatalError("Invalid array index")
+            return(self.basePointer[index])
             }
         set
             {
-            if index < self.size
-                {
-                self.basePointer[index] = newValue
-                return
-                }
-            fatalError("Invalid array index")
+            self.basePointer[index] = newValue
             }
         }
         

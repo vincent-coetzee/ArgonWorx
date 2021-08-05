@@ -142,6 +142,16 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "Object") as! Class)
         }
         
+    public var function: Class
+        {
+        return(self.lookup(label: "Function") as! Class)
+        }
+        
+    public var invokable: Class
+        {
+        return(self.lookup(label: "Invokable") as! Class)
+        }
+        
     public var list: Class
         {
         return(self.lookup(label: "List") as! Class)
@@ -322,6 +332,7 @@ public class ArgonModule: SystemModule
         self.dictionaryBucket.slot("key",self.object).slot("value",self.object).slot("next",self.dictionaryBucket)
         self.enumeration.slot("valueType",self.typeClass).slot("cases",self.array.of(self.enumerationCase))
         self.enumerationCase.slot("symbol",self.symbol).slot("associatedTypes",self.array.of(self.typeClass)).slot("enumeration",self.enumeration).slot("value",self.integer)
+        self.function.slot("name",self.string).slot("parameters",self.array.of(self.parameter)).slot("resultType",self.typeClass).slot("code",self.instructionArray).slot("localSlots",self.array.of(self.slot)).slot("libraryPath",self.string).slot("libraryHandle",self.address).slot("librarySymbol",self.address)
         self.instruction.virtual("opcode",self.integer).virtual("mode",self.integer).virtual("operand1",self.integer).virtual("operand2",self.integer).virtual("operand3",self.integer)
         self.instructionArray.hasBytes(true)
         self.list.slot("elementSize",self.integer).slot("first",self.listNode).slot("last",self.listNode)

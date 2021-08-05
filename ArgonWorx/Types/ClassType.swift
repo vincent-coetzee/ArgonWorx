@@ -29,6 +29,11 @@ public class ClassType:Type
         return(self.clazz.isStringClass)
         }
         
+    public override var isVoidType: Bool
+        {
+        return(self.clazz == VoidClass.voidClass)
+        }
+        
     private let clazz:Class
     
     public init(`class`:Class)

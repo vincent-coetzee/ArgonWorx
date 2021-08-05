@@ -125,7 +125,7 @@ struct ArgonWorxApp: App {
 //        let compiler = Compiler()
 //        let element = compiler.compileChunk(source)
 //        print(element)
-        let library = Library(path: "/Users/vincent/Desktop/libXenon.dylib")
+        let library = DynamicLibrary(path: "/Users/vincent/Desktop/libXenon.dylib")
         let symbol = library.findSymbol("PrintString")
         let stringAddress = InnerStringPointer.allocateString("Can we c this string in c ?", in: ManagedSegment.shared)
         var array = [stringAddress.address]

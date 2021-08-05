@@ -156,10 +156,13 @@
 		BF9DF9CC26BB183500B5DE6C /* SlotReadExpression.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DF9CB26BB183500B5DE6C /* SlotReadExpression.swift */; };
 		BF9DF9CE26BB32E500B5DE6C /* AssignmentExpression.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DF9CD26BB32E500B5DE6C /* AssignmentExpression.swift */; };
 		BF9DF9D026BB333D00B5DE6C /* ExpressionBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DF9CF26BB333D00B5DE6C /* ExpressionBlock.swift */; };
-		BF9DF9EF26BB42F900B5DE6C /* Library.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DF9EE26BB42F900B5DE6C /* Library.swift */; };
+		BF9DF9EF26BB42F900B5DE6C /* DynamicLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DF9EE26BB42F900B5DE6C /* DynamicLibrary.swift */; };
 		BF9DFA0526BB61FB00B5DE6C /* Secondary.argon in Resources */ = {isa = PBXBuildFile; fileRef = BF9DFA0426BB61FB00B5DE6C /* Secondary.argon */; };
 		BF9DFA0726BB6A9100B5DE6C /* LibraryModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DFA0626BB6A9100B5DE6C /* LibraryModule.swift */; };
 		BF9DFA0926BB6F7C00B5DE6C /* TokenMappedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DFA0826BB6F7C00B5DE6C /* TokenMappedView.swift */; };
+		BF9DFAAA26BBC6D600B5DE6C /* InnerEnumerationPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DFAA926BBC6D600B5DE6C /* InnerEnumerationPointer.swift */; };
+		BF9DFAAC26BBC79500B5DE6C /* InnerEnumerationCasePointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DFAAB26BBC79500B5DE6C /* InnerEnumerationCasePointer.swift */; };
+		BF9DFAAE26BBCB0500B5DE6C /* EnumerationCaseInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9DFAAD26BBCB0500B5DE6C /* EnumerationCaseInstance.swift */; };
 		BF9EB37F269E05800057609A /* NSColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EB37E269E05800057609A /* NSColor+Extensions.swift */; };
 		BF9EB381269E06900057609A /* SystemModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EB380269E06900057609A /* SystemModule.swift */; };
 		BF9EFA4126A44F1D004A6FE3 /* SystemMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EFA4026A44F1D004A6FE3 /* SystemMethod.swift */; };
@@ -345,10 +348,13 @@
 		BF9DF9CB26BB183500B5DE6C /* SlotReadExpression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlotReadExpression.swift; sourceTree = "<group>"; };
 		BF9DF9CD26BB32E500B5DE6C /* AssignmentExpression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignmentExpression.swift; sourceTree = "<group>"; };
 		BF9DF9CF26BB333D00B5DE6C /* ExpressionBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionBlock.swift; sourceTree = "<group>"; };
-		BF9DF9EE26BB42F900B5DE6C /* Library.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Library.swift; sourceTree = "<group>"; };
+		BF9DF9EE26BB42F900B5DE6C /* DynamicLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicLibrary.swift; sourceTree = "<group>"; };
 		BF9DFA0426BB61FB00B5DE6C /* Secondary.argon */ = {isa = PBXFileReference; lastKnownFileType = text; path = Secondary.argon; sourceTree = "<group>"; };
 		BF9DFA0626BB6A9100B5DE6C /* LibraryModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryModule.swift; sourceTree = "<group>"; };
 		BF9DFA0826BB6F7C00B5DE6C /* TokenMappedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenMappedView.swift; sourceTree = "<group>"; };
+		BF9DFAA926BBC6D600B5DE6C /* InnerEnumerationPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerEnumerationPointer.swift; sourceTree = "<group>"; };
+		BF9DFAAB26BBC79500B5DE6C /* InnerEnumerationCasePointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerEnumerationCasePointer.swift; sourceTree = "<group>"; };
+		BF9DFAAD26BBCB0500B5DE6C /* EnumerationCaseInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumerationCaseInstance.swift; sourceTree = "<group>"; };
 		BF9EB37E269E05800057609A /* NSColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Extensions.swift"; sourceTree = "<group>"; };
 		BF9EB380269E06900057609A /* SystemModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemModule.swift; sourceTree = "<group>"; };
 		BF9EFA4026A44F1D004A6FE3 /* SystemMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemMethod.swift; sourceTree = "<group>"; };
@@ -390,6 +396,7 @@
 				BF82BFBB26A9D0B500A96C8F /* ArrayPointer.swift */,
 				BF9A2D4D26B1D8BC00D94C10 /* BitEncoder.swift */,
 				BF9A2D4926B1668300D94C10 /* BitField.swift */,
+				BF9DF9EE26BB42F900B5DE6C /* DynamicLibrary.swift */,
 				BF19B1EA26B7322F004E8A2A /* ExecutionContext.swift */,
 				BF9DF9C126BAE9B600B5DE6C /* FixedSegment.swift */,
 				BF1ED32326A8B6AA008CBB52 /* Header.swift */,
@@ -422,7 +429,8 @@
 				BF4E066126A94D68007069EA /* ValueHolder.swift */,
 				BF1ED32B26A8D8F4008CBB52 /* Word.swift */,
 				BF1ED32D26A8DA67008CBB52 /* WordPointer.swift */,
-				BF9DF9EE26BB42F900B5DE6C /* Library.swift */,
+				BF9DFAA926BBC6D600B5DE6C /* InnerEnumerationPointer.swift */,
+				BF9DFAAB26BBC79500B5DE6C /* InnerEnumerationCasePointer.swift */,
 			);
 			path = Execution;
 			sourceTree = "<group>";
@@ -613,6 +621,7 @@
 				BF9197D42690FB4000E348F6 /* ContainerSymbol.swift */,
 				BF9197EC2690FB4100E348F6 /* Enumeration.swift */,
 				BF9197E42690FB4100E348F6 /* EnumerationCase.swift */,
+				BF9DFAAD26BBCB0500B5DE6C /* EnumerationCaseInstance.swift */,
 				BF9197DD2690FB4000E348F6 /* Import.swift */,
 				BF8C4075269E2127007E5DBD /* ImportedSymbol.swift */,
 				BF9197CE2690FB4000E348F6 /* Initializer.swift */,
@@ -839,8 +848,10 @@
 				BF9DF9CC26BB183500B5DE6C /* SlotReadExpression.swift in Sources */,
 				BF9197F52690FB4100E348F6 /* ContainerSymbol.swift in Sources */,
 				BF9D5DF326B875680022EC4E /* InnerClosurePointer.swift in Sources */,
+				BF9DFAAA26BBC6D600B5DE6C /* InnerEnumerationPointer.swift in Sources */,
 				BF9197C92690FB2100E348F6 /* Stack.swift in Sources */,
 				BF38137B26AC15E700EBCE6C /* InnerFunctionPointer.swift in Sources */,
+				BF9DFAAE26BBCB0500B5DE6C /* EnumerationCaseInstance.swift in Sources */,
 				BF58630526A21CD000508A10 /* SymbolHolder.swift in Sources */,
 				BF694C1926AAA58A00235048 /* BooleanSlot.swift in Sources */,
 				BF9DF9C426BAF3E400B5DE6C /* InnerVectorPointer.swift in Sources */,
@@ -871,7 +882,7 @@
 				BF9DFA0726BB6A9100B5DE6C /* LibraryModule.swift in Sources */,
 				BF9DF9A226BAE0D900B5DE6C /* Block.swift in Sources */,
 				BF82BFC226A9EE7200A96C8F /* IntegerSlot.swift in Sources */,
-				BF9DF9EF26BB42F900B5DE6C /* Library.swift in Sources */,
+				BF9DF9EF26BB42F900B5DE6C /* DynamicLibrary.swift in Sources */,
 				BF91980E2690FB4100E348F6 /* MethodInstance.swift in Sources */,
 				BF9197FC2690FB4100E348F6 /* Slot.swift in Sources */,
 				BF2691A526B9CCB000C2D6D0 /* Expression.swift in Sources */,
@@ -964,6 +975,7 @@
 				BF91977E2690FA6A00E348F6 /* ContentView.swift in Sources */,
 				BF9198162690FB6500E348F6 /* TypeParameter.swift in Sources */,
 				BF9198072690FB4100E348F6 /* Argument.swift in Sources */,
+				BF9DFAAC26BBC79500B5DE6C /* InnerEnumerationCasePointer.swift in Sources */,
 				BFFAAD4A26AB97180019B082 /* InnerClassPointer.swift in Sources */,
 				BF9DF9B626BAE33E00B5DE6C /* SignalBlock.swift in Sources */,
 				BF9197F62690FB4100E348F6 /* Node.swift in Sources */,

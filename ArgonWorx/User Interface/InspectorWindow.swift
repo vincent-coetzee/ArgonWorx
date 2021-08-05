@@ -26,22 +26,23 @@ struct InspectorWindow: View
             }
         VStack
             {
-            List(self.loadBlocks())
+            List(self.loadNodes())
                 {
-                block in
-                VStack
+                node in
+                OutlineGroup(node,children: \.children)
                     {
-                    HStack
+                    inner in
+                    if inner.children.isNotNil
                         {
-                        Text(("0x\(block.address.addressString) " + block.className).aligned(.right,in:24)).inspectorFont()
-                        }.frame(maxWidth: .infinity,alignment: .leading)
-                    VStack
-                        {
-                        ForEach(block.indices)
+                        OutlineGroup(inner,children: \.children)
                             {
-                            index in
-                            SlotRowView(atIndex: index.index,inBlock:block)
+                            child in
+                            Text(child.displayString)
                             }
+                        }
+                    else
+                        {
+                        Text(inner.displayString)
                         }
                     }
                 }
@@ -73,6 +74,26 @@ struct InspectorWindow: View
                 offset += 1
                 }
             objects.append(WordBlock(address:Word(startOffset*8),words:words))
+            }
+        return(objects)
+        }
+        
+    private func loadNodes() -> Array<AddressNode>
+        {
+        let segment = ManagedSegment.shared
+        let start = segment.startOffset
+        let end = Int((segment.endOffset - start) / 8)
+        var offset = 0
+        var objects = Array<ObjectNode>()
+        let pointer = WordPointer(address: start)!
+        while offset < end
+            {
+            print("STARTING OBJECT AT \((Word(offset*8) + start).addressString)")
+            let objectNode = ObjectNode(address: Word(offset*8) + start)
+            let header = pointer[offset]
+            let size = Header(header).sizeInWords
+            offset += size
+            objects.append(objectNode)
             }
         return(objects)
         }
@@ -293,5 +314,127 @@ extension View
     func inspectorFont() -> some View
         {
         self.modifier(InspectorFont())
+        }
+    }
+
+class AddressNode:Identifiable
+    {
+    public var displayString: String
+        {
+        return("AddressNode")
+        }
+        
+    public let id = UUID()
+    public var children: Array<AddressNode>?
+        {
+        return(nil)
+        }
+    }
+    
+class ObjectNode: AddressNode
+    {
+    public override var displayString: String
+        {
+        return("HEADER: \(self.header.bitString)")
+        }
+        
+    public override var children: Array<AddressNode>?
+        {
+        var children = Array<AddressNode>()
+        if !self.classPointer.isNil
+        {
+        for index in 1..<self.classPointer.slots.count
+            {
+            if self.classPointer.isNil
+                {
+                children.append(ChildAddressNode(word: self.wordPointer[index]))
+                }
+            else
+                {
+                let slot = self.classPointer.slot(atIndex: index)
+                let typeCode = slot.typeCode
+                if typeCode == 17
+                    {
+                    children.append(ArrayAddressNode(word: self.wordPointer[index]))
+                    }
+                else
+                    {
+                    children.append(ChildAddressNode(word: self.wordPointer[index]))
+                    }
+                }
+            }
+        for index in self.classPointer.slots.count..<self.wordCount
+            {
+            children.append(ChildAddressNode(word: self.wordPointer[index]))
+            }
+            }
+        else
+            {
+            for index in 1..<self.wordCount
+                {
+                children.append(ChildAddressNode(word: self.wordPointer[index]))
+                }
+            }
+        return(children)
+        }
+        
+    private let address: Word
+    private let header: Header
+    private let wordCount: Int
+    private let wordPointer:WordPointer
+    private let classPointer: InnerClassPointer
+    
+    init(address: Word)
+        {
+        self.address = address
+        let pointer = WordPointer(address: address)!
+        self.wordPointer = pointer
+        let header = Header(pointer[0])
+        self.wordCount = header.sizeInWords
+        self.header = header
+        self.classPointer = InnerClassPointer(address: pointer[2])
+        }
+    }
+    
+class ArrayAddressNode: AddressNode
+    {
+    public override var displayString: String
+        {
+        return("ARRAY: \(self.word.bitString)")
+        }
+        
+    public override var children: Array<AddressNode>?
+        {
+        var children = Array<AddressNode>()
+        for index in 0..<self.arrayPointer.count
+            {
+            let aWord = self.arrayPointer[index]
+            children.append(ChildAddressNode(word: aWord))
+            }
+        return(children)
+        }
+        
+    public var word: Word
+    private let arrayPointer: InnerArrayPointer
+    
+    init(word: Word)
+        {
+        self.word = word
+        self.arrayPointer = InnerArrayPointer(address: word)
+        }
+    }
+
+class ChildAddressNode: AddressNode
+    {
+    public override var displayString: String
+        {
+        return("CHILD: \(self.word.bitString)")
+        }
+        
+    public var word: Word
+    
+    init(word: Word)
+        {
+        self.word = word
         }
     }

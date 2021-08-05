@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FFI
 
 public class Type
     {
@@ -29,6 +30,16 @@ public class Type
         return(false)
         }
         
+    public var ffiType: ffi_type
+        {
+        return(ffi_type_uint64)
+        }
+        
+    public var isVoidType: Bool
+        {
+        return(false)
+        }
+    
     public let label:Label
     
     init(label:Label)

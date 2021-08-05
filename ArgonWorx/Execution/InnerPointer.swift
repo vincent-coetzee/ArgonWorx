@@ -19,7 +19,10 @@ public class InnerPointer:Addressable
     public static let kInstanceSizeInBytes = 24
     public static let kDictionarySizeInBytes = 136
     public static let kClosureSizeInBytes = 192
+    public static let kEnumerationSizeInBytes = 112
     public static let kDictionaryBucketSizeInBytes = 80
+    public static let kEnumerationCaseSizeInBytes = 88
+    public static let kFunctionSizeInBytes = 168
     
     public static func ==(lhs:InnerPointer,rhs:InnerPointer) -> Bool
         {
