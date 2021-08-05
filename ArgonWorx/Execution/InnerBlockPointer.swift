@@ -36,17 +36,29 @@ public class InnerBlockPointer: InnerPointer
         {
         get
             {
-            return(Int(self.slotValue(atKey:"size")))
+            return(Int(self.slotValue(atKey:"blockSize")))
             }
         set
             {
-            self.setSlotValue(newValue,atKey:"size")
+            self.setSlotValue(newValue,atKey:"blockSize")
+            }
+        }
+        
+    public var nextBlock: Word
+        {
+        get
+            {
+            return(Word(self.slotValue(atKey:"nextBlock")))
+            }
+        set
+            {
+            self.setSlotValue(newValue,atKey:"nextBlock")
             }
         }
         
     internal var basePointer:WordPointer
     
-    override required init(address:Word)
+    required init(address:Word)
         {
         self.basePointer = WordPointer(address: address + Word(Self.kArraySizeInBytes))!
         super.init(address: address)
@@ -55,11 +67,11 @@ public class InnerBlockPointer: InnerPointer
     internal override func initKeys()
         {
         self.sizeInBytes = Self.kBlockSizeInBytes
-        let names = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","count","nextBlock","size"]
+        let names = ["_header","_magicNumber","_classPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","blockSize","count","nextBlock"]
         var offset = 0
         for name in names
             {
-            self.keys[name] = Key(name:name,offset:offset)
+            self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
         }

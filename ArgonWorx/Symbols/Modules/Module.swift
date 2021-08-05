@@ -54,6 +54,18 @@ public class Module:ContainerSymbol
         return(classes)
         }
         
+    public var methodInstances:MethodInstances
+        {
+        return(self.methods.flatMap{$0.instances})
+        }
+        
+    public var methods:Methods
+        {
+        var methods = Array(self.symbols.values.compactMap{$0 as? Method})
+        methods += self.symbols.values.compactMap{($0 as? Module)?.methods}.flatMap{$0}
+        return(methods)
+        }
+        
     public var isSystemModule: Bool
         {
         return(false)

@@ -61,8 +61,6 @@ public class InnerArrayPointer:InnerPointer,Collection
             self.setSlotValue(Word(newValue),atKey:"size")
             }
         }
-
-    public let firstBlock = PointerHolder<InnerBlockPointer,InnerPointer>(name: "firstBlock")
     
     internal var basePointer: WordPointer
     
@@ -71,17 +69,16 @@ public class InnerArrayPointer:InnerPointer,Collection
         self.basePointer = WordPointer(address: address + Word(Self.kArraySizeInBytes))!
         super.init(address: address)
         self._classPointer = nil
-        self.firstBlock.setSubstrate(self)
         }
         
     internal override func initKeys()
         {
         self.sizeInBytes = Self.kArraySizeInBytes
-        let names = ["_header","_magicNumber","_classPointer","_CollectionHeader","_CollectionMagicNumber","_CollectionClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","_IterableHeader","_IterableMagicNumber","_IterableClassPointer","count","elementType","firstBlock","size"]
+        let names = ["_header","_magicNumber","_classPointer","_CollectionHeader","_CollectionMagicNumber","_CollectionClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","_IterableHeader","_IterableMagicNumber","_IterableClassPointer","count","elementType","size"]
         var offset = 0
         for name in names
             {
-            self.keys[name] = Key(name:name,offset:offset)
+            self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
         }
@@ -95,11 +92,7 @@ public class InnerArrayPointer:InnerPointer,Collection
         {
         get
             {
-            if index > self.size && self.firstBlock.isNotNil
-                {
-                return(self.firstBlock.pointer[index - self.size])
-                }
-            else if index < self.size
+            if index < self.size
                 {
                 return(self.basePointer[index])
                 }
@@ -110,11 +103,6 @@ public class InnerArrayPointer:InnerPointer,Collection
             if index < self.size
                 {
                 self.basePointer[index] = newValue
-                return
-                }
-            if index > self.count && self.firstBlock.isNotNil && index - self.size < self.firstBlock.pointer.size
-                {
-                self.firstBlock.pointer[index] = newValue
                 return
                 }
             fatalError("Invalid array index")
@@ -133,17 +121,6 @@ public class InnerArrayPointer:InnerPointer,Collection
             {
             self[self.count] = word
             self.count += 1
-            }
-        }
-        
-    public func grow(by:Int)
-        {
-        let hasBlock = self.slotValue(atKey: "firstBlock") != 0
-        var totalSize = 0
-        if hasBlock
-            {
-            let blockPointer = InnerBlockPointer(address: self.slotValue(atKey:"firstBlock"))
-            totalSize = self.size + blockPointer.size
             }
         }
     }

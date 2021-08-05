@@ -10,3 +10,5 @@ import Foundation
 public class LocalSlot:Slot
     {
     }
+
+public typealias LocalSlots = Array<LocalSlot>

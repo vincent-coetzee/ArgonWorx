@@ -11,11 +11,11 @@ public struct Location
     {
     public static let zero = Location(line:0,lineStart:0,lineStop:0,tokenStart:0,tokenStop:0)
     
-    private let line:Int
-    private let tokenStart:Int
-    private let tokenStop:Int
-    private let lineStart:Int
-    private let lineStop:Int
+    public let line:Int
+    public let tokenStart:Int
+    public let tokenStop:Int
+    public let lineStart:Int
+    public let lineStop:Int
     
     public init(line:Int,lineStart:Int,lineStop:Int,tokenStart:Int,tokenStop:Int)
         {

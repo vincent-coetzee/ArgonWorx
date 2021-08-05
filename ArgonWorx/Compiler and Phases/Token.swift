@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum Token:CustomStringConvertible,CustomDebugStringConvertible
+public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifiable
     {
     public static let systemClassNames = ["Object","Array","List","Set","Dictionary","Integer","Float","Boolean","Byte","Character","Pointer","Tuple","String","Symbol","Date","Time","DateTime"]
     
@@ -43,6 +43,12 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             default:
                 return(false)
             }
+        }
+        
+    public var id: String
+        {
+        let string = "\(self).\(self.location)"
+        return(string)
         }
         
 //    public static func == (lhs: Token, rhs: Token) -> Bool
@@ -273,6 +279,8 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             {
             case .name:
                 return(.name)
+            case .invisible:
+                return(.none)
             case .hashString:
                 return(.hashString)
             case .note:
@@ -340,6 +348,7 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
     case note(String,Location)
     case path(String,Location)
     case name(Name,Location)
+    case invisible(String,Location)
     
     public init(_ symbol:String,_ location:Location)
         {
@@ -375,6 +384,8 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             {
             case .name(let string,_):
                 return(".name(\(string))")
+            case .invisible(let string,_):
+                return(".invisible(\(string))")
             case .path(let string,_):
                 return(".path(\(string))")
             case .hashString(let string,_):
@@ -483,6 +494,17 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
                 return(false)
             }
         }
+
+    public var isInvisible:Bool
+        {
+        switch(self)
+            {
+            case .invisible:
+                return(true)
+            default:
+                return(false)
+            }
+        }
         
     public var isSystemClassName:Bool
         {
@@ -500,6 +522,17 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
         switch(self)
             {
             case .path(let identifier,_):
+                return(identifier)
+            default:
+                fatalError()
+            }
+        }
+        
+    public var invisible:String
+        {
+        switch(self)
+            {
+            case .invisible(let identifier,_):
                 return(identifier)
             default:
                 fatalError()
@@ -540,7 +573,7 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             case .boolean:
                 return(true)
             default:
-                fatalError("Invalid call on Boolean")
+                return(false)
             }
         }
         
@@ -577,7 +610,7 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
 //            }
 //        }
         
-    public var hashStringValue:Argon.Symbol
+    public var hashStringLiteral:Argon.Symbol
         {
         switch(self)
             {
@@ -615,6 +648,8 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
         switch(self)
             {
             case .name(_,let location):
+                return(location)
+            case .invisible(_,let location):
                 return(location)
             case .byte(_,let location):
                 return(location)
@@ -1018,7 +1053,7 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible
             }
         }
         
-    public var isNil:Bool
+    public var isNilLiteral:Bool
         {
         switch(self)
             {

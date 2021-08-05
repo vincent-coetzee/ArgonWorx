@@ -24,8 +24,9 @@ MAIN MODULE Basics
     ///
     CLASS Entity
         {
-        SLOT name::String = ""
+        SLOT name::String = "Entity Name"
         SLOT identityNumber::String = ""
+        SLOT age::Integer = 47
         }
         
     CLASS LegalEntity::Entity

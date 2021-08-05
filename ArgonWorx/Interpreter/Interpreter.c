@@ -33,15 +33,15 @@ void SetWordAtAddressAtOffset(CWord value,CWord address,CWord offset)
     *pointer = value;
     }
 
-long IntegerAtAddressAtOffset(CWord address,CWord offset)
+SInt64 IntegerAtAddressAtOffset(CWord address,CWord offset)
     {
-    long* pointer = (long*)(address + offset);
+    SInt64* pointer = (long long*)(address + offset);
     return(*pointer);
     }
 
-void SetIntegerAtAddressAtOffset(long value,CWord address,CWord offset)
+void SetIntegerAtAddressAtOffset(SInt64 value,CWord address,CWord offset)
     {
-    long* pointer = (long*)(address + offset);
+    SInt64* pointer = (SInt64*)(address + offset);
     *pointer = value;
     }
     
@@ -55,4 +55,24 @@ void SetFloatAtAddressAtOffset(double value,CWord address,CWord offset)
     {
     double* pointer = (double*)(address + offset);
     *pointer = value;
+    }
+
+CWord CallSymbolWithArguments(CWord symbol,CWord* arguments,CWord count)
+    {
+    if (count == 1)
+        {
+        void (*function1)(CWord) = (void (*) (CWord)) symbol;
+        function1(*arguments);
+        return(0);
+        }
+    return(0);
+    }
+
+void CallSymbol(CWord symbol,CWord* arguments,CWord count,CWord* result)
+    {
+    }
+
+SwiftClosureType MutateSymbol(CWord word)
+    {
+    return((SwiftClosureType)word);
     }

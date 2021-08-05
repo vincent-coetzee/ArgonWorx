@@ -69,7 +69,7 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
     private var bytePointer:UnsafeMutableRawPointer
     private var currentIndex = 0
     
-    override required init(address:Word)
+    required init(address:Word)
         {
         self.bytePointer = UnsafeMutableRawPointer(bitPattern: UInt(address + Word(Self.kArraySizeInBytes)))!
         super.init(address: address)

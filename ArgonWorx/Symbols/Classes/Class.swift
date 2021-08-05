@@ -215,12 +215,11 @@ public class Class:ContainerSymbol,ObservableObject
             superclass.layoutInMemory(segment: segment)
             array.append(superclass.memoryAddress)
             }
-        segment.allocatedClasses.insert(self.memoryAddress)
         let pointer = InnerClassPointer(address: self.memoryAddress)
         pointer.setName(self.label,in: segment)
         let slotsArray = InnerArrayPointer.allocate(arraySize: self.layoutSlots.count, in: segment)
         pointer.slots = slotsArray
-        for slot in self.layoutSlots
+        for slot in self.layoutSlots.sorted(by: {$0.offset < $1.offset})
             {
             slot.layoutSymbol(in: segment)
             slotsArray.append(slot.memoryAddress)
@@ -252,7 +251,6 @@ public class Class:ContainerSymbol,ObservableObject
             }
         self.isMemoryPreallocated = true
         self.memoryAddress = segment.allocateObject(sizeInBytes: size)
-        segment.allocatedClasses.insert(self.memoryAddress)
         ObjectPointer(address: self.memoryAddress).setWord(ArgonModule.argonModule.class.memoryAddress,atSlot:"_classPointer")
         let header = Header(WordPointer(address:self.memoryAddress)!.word(atByteOffset: 0))
         assert(header.sizeInWords == size / 8,"ALLOCATED SIZE DOES NOT EQUAL 512")
@@ -338,6 +336,7 @@ public class Class:ContainerSymbol,ObservableObject
                 offset += clonedSlot.size
                 }
             }
+        self.layoutSlots = self.layoutSlots.sorted{$0.offset < $1.offset}
         self.isSlotLayoutDone = true
         }
         

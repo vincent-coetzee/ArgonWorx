@@ -11,18 +11,25 @@ public class InnerMethodInstancePointer: InnerPointer
     {
     public class func allocate(in segment:ManagedSegment) -> InnerMethodInstancePointer
         {
-        let address = segment.allocateObject(sizeInBytes: self.kClassSizeInBytes)
-        return(InnerMethodInstancePointer(address: address))
+        let address = segment.allocateObject(sizeInBytes: Self.kMethodInstanceSizeInBytes)
+        let pointer = InnerMethodInstancePointer(address: address)
+        pointer.assignSystemSlots(from: ArgonModule.argonModule.methodInstance)
+        return(pointer)
         }
 
+    public var localSlotCount:Int
+        {
+        return(InnerArrayPointer(address: self.slotValue(atKey:"localSlots")).count)
+        }
+        
     internal override func initKeys()
         {
         self.sizeInBytes = Self.kMethodInstanceSizeInBytes
-        let names = ["_header","_magicNumber","_classPointer","_InvokableHeader","_InvokableMagicNumber","_InvokableClassPointer","_BehaviorHeader","_BehaviorMagicNumber","_BehaviorClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","code","name","parameters","resultType"]
+        let names = ["_header","_magicNumber","_classPointer","_InvokableHeader","_InvokableMagicNumber","_InvokableClassPointer","_BehaviorHeader","_BehaviorMagicNumber","_BehaviorClassPointer","_ObjectHeader","_ObjectMagicNumber","_ObjectClassPointer","hash","code","localSlots","name","parameters","resultType"]
         var offset = 0
         for name in names
             {
-            self.keys[name] = Key(name:name,offset:offset)
+            self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
         }
@@ -38,11 +45,10 @@ public class InnerMethodInstancePointer: InnerPointer
         {
         context.stackSegment.push(context[.code])
         context.stackSegment.push(context[.ip])
-        context.stackSegment.push(self.address)
-        context.stackSegment.push(self.slotValue(atKey:"code"))
-        for argument in arguments.reversed
+        for argument in arguments.reversed()
             {
             context.stackSegment.push(argument)
             }
+//        context.enter(
         }
     }

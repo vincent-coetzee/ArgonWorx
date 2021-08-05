@@ -9,4 +9,8 @@ import Foundation
 
 public struct Argument
     {
+    public let tag:String?
+    public let value:Expression
     }
+
+public typealias Arguments = Array<Argument>

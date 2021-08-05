@@ -25,6 +25,14 @@ public struct Argon
         return(index)
         }
         
+    public static let sampleSource =
+        {
+        () -> String in
+        let url = Bundle.main.url(forResource: "Basics", withExtension: "argon")!
+        let string = try! String(contentsOf: url)
+        return(string)
+        }()
+        
     public static func nextUUIDIndex() -> UInt8
         {
         let index = self.uuidIndex

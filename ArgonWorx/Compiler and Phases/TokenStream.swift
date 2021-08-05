@@ -67,6 +67,7 @@ public class TokenStream:Equatable
     private var lineStop:Int = 0
     private var characterOffset = 0
     public var parseComments:Bool = false
+    public var parseInvisibles:Bool = false
     private var tokenStack:[Token] = []
     private var lineLength:Int = 0
     private var tokenLine:Int = 0
@@ -121,6 +122,7 @@ public class TokenStream:Equatable
         {
         self.reportingContext = context
         self.parseComments = withComments
+        self.parseInvisibles = withComments
         var tokens:[Token] = []
         var token:Token
         repeat
@@ -223,19 +225,21 @@ public class TokenStream:Equatable
         characterOffset -= 2
         }
     
-    private func eatSpace()
+    private func eatSpace() -> String
         {
+        var space = ""
         while (whitespace.contains(self.currentChar) || newline.contains(self.currentChar)) && !atEnd
             {
             if whitespace.contains(self.currentChar)
                 {
-                self.eatWhitespace()
+                space += self.eatWhitespace()
                 }
             if newline.contains(self.currentChar)
                 {
-                self.eatNewline()
+                space += self.eatNewline()
                 }
             }
+        return(space)
         }
     
     @inline(__always)
@@ -287,6 +291,16 @@ public class TokenStream:Equatable
             self.nextChar()
             }
         return(text)
+        }
+        
+    private func nextInvisible() -> Token?
+        {
+        let space = self.eatSpace()
+        if !space.isEmpty
+            {
+            return(Token.invisible(space,self.sourceLocation()))
+            }
+        return(nil)
         }
         
     private func nextComment() -> Token
@@ -364,7 +378,10 @@ public class TokenStream:Equatable
             return(tokenStack.removeFirst())
             }
         tokenStart = characterOffset
-        eatSpace()
+        if let invisible = self.nextInvisible()
+            {
+            return(invisible)
+            }
         ///
         ///
         /// Check to see if this is that odd case of a "</" occurring, handle
@@ -605,21 +622,25 @@ public class TokenStream:Equatable
         }
     
     @inline(__always)
-    private func eatNewline()
+    private func eatNewline() -> String
         {
+        var space = ""
         while newline.contains(self.currentChar) && !atEnd
             {
-            self.nextChar()
+            space += self.nextChar()
             }
+        return(space)
         }
     
     @inline(__always)
-    private func eatWhitespace()
+    private func eatWhitespace() -> String
         {
+        var space:String = ""
         while whitespace.contains(self.currentChar) && !self.atEnd
             {
-            self.nextChar()
+            space += self.nextChar()
             }
+        return(space)
         }
     
     public func markPosition() -> String.Index
@@ -773,11 +794,6 @@ public class TokenStream:Equatable
         if currentString == "?"
             {
             self.nextChar()
-            while digits.contains(self.currentChar)
-                {
-                currentString.append(String(self.currentChar))
-                self.nextChar()
-                }
             return(.identifier(String(self.currentString),self.sourceLocation()))
             }
         if self.keywords.contains(self.currentString)

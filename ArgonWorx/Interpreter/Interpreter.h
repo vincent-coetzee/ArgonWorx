@@ -13,6 +13,7 @@
 typedef unsigned long long CWord;
 typedef CWord* CWordPointer;
 typedef long SInt;
+typedef long long SInt64;
 
 typedef struct _SlotKey
     {
@@ -145,12 +146,17 @@ typedef struct _Enumeration
 
 typedef CEnumeration* CEnumerationPointer;
 
+typedef void (*SwiftClosureType) (void);
+
 void InitClassPointerSlotKeys();
 CWord WordAtAddressAtOffset(CWord address,CWord offset);
-SInt IntegerAtAddressAtOffset(CWord address,CWord offset);
+SInt64 IntegerAtAddressAtOffset(CWord address,CWord offset);
 double FloatAtAddressAtOffset(CWord address,CWord offset);
 void SetFloatAtAddressAtOffset(double value,CWord address,CWord offset);
-void SetIntegerAtAddressAtOffset(long value,CWord address,CWord offset);
+void SetIntegerAtAddressAtOffset(SInt64 value,CWord address,CWord offset);
 void SetWordAtAddressAtOffset(CWord value,CWord address,CWord offset);
+CWord CallSymbolWithArguments(CWord symbol,CWord* arguments,unsigned long long count);
+void CallSymbol(CWord symbol,CWord* arguments,CWord count,CWord* result);
+SwiftClosureType MutateSymbol(CWord word);
 
 #endif /* Interpreter_h */

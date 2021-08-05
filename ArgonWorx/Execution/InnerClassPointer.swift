@@ -95,14 +95,14 @@ public class InnerClassPointer:InnerPointer
         var offset = 0
         for name in names
             {
-            self.keys[name] = Key(name:name,offset:offset)
+            self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
         }
         
     public func slot(atKey: String) -> InnerSlotPointer?
         {
-        if self.keys[atKey].isNotNil
+        if self._keys[atKey].isNotNil
             {
             return(InnerSlotPointer(address: self.slotValue(atKey: atKey)))
             }
@@ -113,12 +113,6 @@ public class InnerClassPointer:InnerPointer
         {
         let stringPointer = InnerStringPointer.allocateString(string,in:segment)
         self.setSlotValue(stringPointer.address,atKey:"name")
-        }
-        
-    public func slot(atName:String) -> InnerSlotPointer
-        {
-        fatalError("Not implemented yet")
-        return(InnerSlotPointer(address:0))
         }
         
     public func slot(atIndex:Int) -> InnerSlotPointer

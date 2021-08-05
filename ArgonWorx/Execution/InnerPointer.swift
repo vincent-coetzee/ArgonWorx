@@ -11,12 +11,15 @@ public class InnerPointer:Addressable
     {
     public static let kClassSizeInBytes = 152
     public static let kSlotSizeInBytes = 88
-    public static let kArraySizeInBytes = 136
+    public static let kArraySizeInBytes = 128
+    public static let kVectorSizeInBytes = 144
     public static let kStringSizeInBytes = 64
     public static let kBlockSizeInBytes = 80
-    public static let kMethodInstanceSizeInBytes = 136
+    public static let kMethodInstanceSizeInBytes = 144
     public static let kInstanceSizeInBytes = 24
-    public static let kDictionarySizeInBytes = 112
+    public static let kDictionarySizeInBytes = 136
+    public static let kClosureSizeInBytes = 192
+    public static let kDictionaryBucketSizeInBytes = 80
     
     public static func ==(lhs:InnerPointer,rhs:InnerPointer) -> Bool
         {
@@ -53,7 +56,7 @@ public class InnerPointer:Addressable
         }
         
     internal var sizeInBytes:Int = 0
-    internal var keys:Dictionary<String,Key> = [:]
+    internal var _keys:Dictionary<String,Key> = [:]
     var _classPointer:InnerClassPointer?
     public let address:Word
     var wordPointer:WordPointer?
@@ -73,14 +76,14 @@ public class InnerPointer:Addressable
         var offset = 0
         for name in names
             {
-            self.keys[name] = Key(name:name,offset:offset)
+            self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
         }
         
     public func hasSlot(atKey:String) -> Bool
         {
-        return(self.keys[atKey] != nil)
+        return(self._keys[atKey] != nil)
         }
         
     public func word(atOffset:Int) -> Word
@@ -93,21 +96,9 @@ public class InnerPointer:Addressable
         self.wordPointer?[atOffset/8] = word
         }
         
-    public func slotValue(atName:String) -> Word
-        {
-        let slot = self.classPointer.slot(atName:atName)
-        return((self.wordPointer?[slot.offset] ?? 0).tagDropped)
-        }
-        
-    public func setSlotValue(_ value:Word,atName:String)
-        {
-        let slot = self.classPointer.slot(atName:atName)
-        self.wordPointer?[slot.offset] = value
-        }
-        
     public func slotValue(atKey:String) -> Word
         {
-        if let offset = self.keys[atKey]?.offset
+        if let offset = self._keys[atKey]?.offset
             {
             return((self.wordPointer?[offset/8].tagDropped) ?? Word.nilValue)
             }
@@ -116,7 +107,7 @@ public class InnerPointer:Addressable
         
     public func setSlotValue(_ value:Word,atKey:String)
         {
-        if let offset = self.keys[atKey]?.offset
+        if let offset = self._keys[atKey]?.offset
             {
             self.wordPointer![offset/8] = value
             return
@@ -126,7 +117,7 @@ public class InnerPointer:Addressable
         
     public func setSlotValue(_ value:Bool,atKey:String)
         {
-        if let offset = self.keys[atKey]?.offset
+        if let offset = self._keys[atKey]?.offset
             {
             var word = Word(value ? 1 : 0)
             word.tag = .boolean
@@ -139,7 +130,7 @@ public class InnerPointer:Addressable
     public func setSlotValue(_ value:String,in segment:ManagedSegment,atKey:String)
         {
         let stringPointer = InnerStringPointer.allocateString(value,in:segment)
-        let offset = self.keys[atKey]!.offset
+        let offset = self._keys[atKey]!.offset
         var word = stringPointer.address
         word.tag = .pointer
         self.wordPointer![offset/8] = word
@@ -147,7 +138,7 @@ public class InnerPointer:Addressable
         
     public func setSlotValue(_ value:Int,atKey:String)
         {
-        let offset = self.keys[atKey]!.offset
+        let offset = self._keys[atKey]!.offset
         self.wordPointer![offset/8] = Word(bitPattern: Int64(value))
         }
         

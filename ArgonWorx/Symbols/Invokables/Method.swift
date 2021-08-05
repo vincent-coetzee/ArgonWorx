@@ -15,7 +15,7 @@ public class Method:Symbol
         return(false)
         }
         
-    private var instances = MethodInstances()
+    public private(set) var instances = MethodInstances()
     
     public class func method(label:String) -> Method
         {
@@ -53,3 +53,5 @@ public class Method:Symbol
         self.instances.append(instance)
         }
     }
+
+public typealias Methods = Array<Method>

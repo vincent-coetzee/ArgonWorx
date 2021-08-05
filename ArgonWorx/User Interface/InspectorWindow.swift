@@ -52,26 +52,27 @@ struct InspectorWindow: View
         {
         let segment = ManagedSegment.shared
         let start = segment.startOffset
-        let end = segment.endOffset
-        var offset = start
+        let end = Int((segment.endOffset - start) / 8)
+        var offset = 0
         var objects = Array<WordBlock>()
+        let pointer = WordPointer(address: start)!
         while offset < end
             {
-            print("STARTING OBJECT AT \(offset.addressString)")
+            print("STARTING OBJECT AT \(Word(offset*8).addressString)")
             let startOffset = offset
             var words = Array<Word>()
-            let header = segment.word(atOffset: offset)
+            let header = pointer[offset]
             words.append(header)
             var size = Header(header).sizeInWords
             print("OBJECT SIZE IN WORDS = \(size)")
             size = min(1024,size)
-            offset += Word(MemoryLayout<Word>.size)
+            offset += size
             for _ in 1..<size
                 {
-                words.append(segment.word(atOffset: offset))
-                offset += Word(MemoryLayout<Word>.size)
+                words.append(pointer[offset])
+                offset += 1
                 }
-            objects.append(WordBlock(address:startOffset,words:words))
+            objects.append(WordBlock(address:Word(startOffset*8),words:words))
             }
         return(objects)
         }

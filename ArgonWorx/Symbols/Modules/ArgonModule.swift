@@ -107,6 +107,16 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "Array") as! ArrayClass)
         }
         
+    public var vector: ArrayClass
+        {
+        return(self.lookup(label: "Vector") as! ArrayClass)
+        }
+        
+    public var dictionary: Class
+        {
+        return(self.lookup(label: "Dictionary") as! Class)
+        }
+        
     public var slot: Class
         {
         return(self.lookup(label: "Slot") as! Class)
@@ -132,6 +142,16 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "Object") as! Class)
         }
         
+    public var list: Class
+        {
+        return(self.lookup(label: "List") as! Class)
+        }
+        
+    public var listNode: Class
+        {
+        return(self.lookup(label: "ListNode") as! Class)
+        }
+        
     public var typeClass: Class
         {
         return(self.lookup(label: "Type") as! Class)
@@ -150,6 +170,11 @@ public class ArgonModule: SystemModule
     public var address: Class
         {
         return(self.lookup(label: "Address") as! Class)
+        }
+        
+    public var dictionaryBucket: Class
+        {
+        return(self.lookup(label: "DictionaryBucket") as! Class)
         }
         
     public var moduleClass: Class
@@ -243,17 +268,19 @@ public class ArgonModule: SystemModule
         self.addSymbol(PrimitiveClass.dateClass.superclass("\\\\Argon\\Magnitude"))
         self.addSymbol(PrimitiveClass.dateTimeClass.superclass("\\\\Argon\\Date").superclass("\\\\Argon\\Time"))
         collections.addSymbol(ParameterizedSystemClass(label:"Dictionary",superclasses:["\\\\Argon\\Collections\\Collection","\\\\Argon\\Collections\\Iterable"],parameters:["KEY","VALUE"]))
+        collections.addSymbol(SystemClass(label:"DictionaryBucket").superclass("\\\\Argon\\Object"))
         self.addSymbol(SystemClass(label:"Enumeration").superclass("\\\\Argon\\Type"))
         self.addSymbol(SystemClass(label:"EnumerationCase").superclass("\\\\Argon\\Object"))
         self.addSymbol(SystemClass(label:"Error").superclass("\\\\Argon\\Object"))
-        self.addSymbol(SystemClass(label:"Invokable").superclass("\\\\Argon\\Behavior"))
-        self.addSymbol(SystemClass(label:"Instruction").superclass("\\\\Argon\\Object"))
         self.addSymbol(SystemClass(label:"Expression").superclass("\\\\Argon\\Object"))
         numbers.addSymbol(TaggedPrimitiveClass.floatClass.superclass("\\\\Argon\\Numbers\\Number"))
         self.addSymbol(SystemClass(label:"Function").superclass("\\\\Argon\\Invokable"))
         numbers.addSymbol(TaggedPrimitiveClass.integerClass.superclass("\\\\Argon\\Numbers\\Number").slotClass(IntegerSlot.self))
+        self.addSymbol(SystemClass(label:"Invokable").superclass("\\\\Argon\\Behavior"))
+        self.addSymbol(SystemClass(label:"Instruction").superclass("\\\\Argon\\Object"))
         collections.addSymbol(ParameterizedSystemClass(label:"Iterable",superclasses:["\\\\Argon\\Object"],parameters:["ELEMENT"]))
         collections.addSymbol(ParameterizedSystemClass(label:"List",superclasses:["\\\\Argon\\Collections\\Collection","\\\\Argon\\Collections\\Iterable"],parameters:["ELEMENT"]))
+        collections.addSymbol(ParameterizedSystemClass(label:"ListNode",superclasses:["\\\\Argon\\Collections\\Collection"],parameters:["ELEMENT"]))
         self.addSymbol(SystemClass(label:"Magnitude").superclass("\\\\Argon\\Object"))
         self.addSymbol(SystemClass(label:"Metaclass",typeCode:.metaclass).superclass("\\\\Argon\\Class"))
         self.addSymbol(SystemClass(label:"Method",typeCode:.method).superclass("\\\\Argon\\Invokable"))
@@ -276,6 +303,7 @@ public class ArgonModule: SystemModule
         self.addSymbol(SystemClass(label:"Tuple",typeCode:.tuple).superclass("\\\\Argon\\Type"))
         self.addSymbol(SystemClass(label:"Type",typeCode:.type).superclass("\\\\Argon\\Object"))
         numbers.addSymbol(TaggedPrimitiveClass.uIntegerClass.superclass("\\\\Argon\\Numbers\\Number"))
+        collections.addSymbol(ArrayClass(label:"Vector",superclasses:["\\\\Argon\\Collections\\Collection","\\\\Argon\\Collections\\Iterable"],parameters:["INDEX","ELEMENT"]).slotClass(ArraySlot.self))
         self.addSymbol(VoidClass.voidClass.superclass("\\\\Argon\\Object"))
         streams.addSymbol(SystemClass(label:"WriteStream",typeCode:.stream).superclass("\\\\Argon\\Streams\\Stream"))
         }
@@ -283,26 +311,31 @@ public class ArgonModule: SystemModule
     private func initSlots()
         {
         self.object.slot("hash",self.integer)
-        self.date.virtual("day",self.integer).virtual("month",self.string).virtual("monthIndex",self.integer).virtual("year",self.integer)
-        self.time.virtual("hour",self.integer).virtual("minute",self.integer).virtual("second",self.integer).virtual("millisecond",self.integer)
-        self.dateTime.virtual("date",self.date).virtual("time",self.time)
-        self.collection.slot("count",self.integer)
-        self.stream.slot("fileHandle",self.integer).slot("count",self.integer).virtual("isOpen",self.boolean).virtual("canRead",self.boolean).virtual("canWrite",self.boolean)
-        self.slot.slot("name",self.string).slot("type",self.typeClass).slot("offset",self.integer).slot("typeCode",self.integer)
-        self.typeClass.slot("name",self.string).slot("typeCode",self.integer)
+        self.array.hasBytes(true)
+        self.block.slot("count",self.integer).slot("blockSize",self.integer).slot("nextBlock",self.address)
         self.class.slot("superclasses",self.array.of(self.class)).virtual("subclasses",self.array.of(self.class)).slot("slots",self.array.of(self.slot)).slot("extraSizeInBytes",self.integer).slot("instanceSizeInBytes",self.integer).slot("hasBytes",self.boolean).slot("isValue",self.boolean).slot("magicNumber",self.integer)
-        self.method.slot("instances",self.array.of(self.methodInstance))
-        self.methodInstance.slot("name",self.string).slot("parameters",self.array.of(self.parameter)).slot("resultType",self.typeClass).slot("code",self.instructionArray)
-        self.enumerationCase.slot("symbol",self.symbol).slot("associatedTypes",self.array.of(self.typeClass)).slot("enumeration",self.enumeration).slot("value",self.integer)
-        self.enumeration.slot("valueType",self.typeClass).slot("cases",self.array.of(self.enumerationCase))
-        self.block.slot("count",self.integer).slot("size",self.integer).slot("nextBlock",self.address)
-        self.moduleClass.virtual("isSystemModule",self.boolean).slot("elements",self.typeClass).slot("isArgonModule",self.boolean).slot("isTopModule",self.boolean).slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
-        self.tuple.slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
-        self.array.slot("elementType",self.typeClass).slot("size",self.integer).slot("firstBlock",self.block).hasBytes(true)
-        self.instruction.virtual("opcode",self.integer).virtual("mode",self.integer).virtual("operand1",self.integer).virtual("operand2",self.integer).virtual("operand3",self.integer)
-        self.string.slot("count",self.integer).virtual("bytes",self.address).hasBytes(true)
         self.closure.slot("codeSegment",self.address).slot("initialIP",self.address).slot("localCount",self.integer).slot("localSlots",self.array.of(self.slot)).slot("contextPointer",self.address).slot("instructions",self.array.of(self.instruction)).slot("parameters",self.array.of(self.parameter)).slot("returnType",self.typeClass)
+        self.collection.slot("count",self.integer).slot("size",self.integer).slot("elementType",self.typeClass)
+        self.date.virtual("day",self.integer).virtual("month",self.string).virtual("monthIndex",self.integer).virtual("year",self.integer)
+        self.dateTime.virtual("date",self.date).virtual("time",self.time)
+        self.dictionary.slot("hashFunction",self.closure).slot("prime",self.integer)
+        self.dictionaryBucket.slot("key",self.object).slot("value",self.object).slot("next",self.dictionaryBucket)
+        self.enumeration.slot("valueType",self.typeClass).slot("cases",self.array.of(self.enumerationCase))
+        self.enumerationCase.slot("symbol",self.symbol).slot("associatedTypes",self.array.of(self.typeClass)).slot("enumeration",self.enumeration).slot("value",self.integer)
+        self.instruction.virtual("opcode",self.integer).virtual("mode",self.integer).virtual("operand1",self.integer).virtual("operand2",self.integer).virtual("operand3",self.integer)
         self.instructionArray.hasBytes(true)
+        self.list.slot("elementSize",self.integer).slot("first",self.listNode).slot("last",self.listNode)
+        self.listNode.slot("element",self.object).slot("next",self.listNode).slot("previous",self.listNode)
+        self.method.slot("instances",self.array.of(self.methodInstance))
+        self.methodInstance.slot("name",self.string).slot("parameters",self.array.of(self.parameter)).slot("resultType",self.typeClass).slot("code",self.instructionArray).slot("localSlots",self.array.of(self.slot))
+        self.moduleClass.virtual("isSystemModule",self.boolean).slot("elements",self.typeClass).slot("isArgonModule",self.boolean).slot("isTopModule",self.boolean).slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
+        self.slot.slot("name",self.string).slot("type",self.typeClass).slot("offset",self.integer).slot("typeCode",self.integer)
+        self.stream.slot("fileHandle",self.integer).slot("count",self.integer).virtual("isOpen",self.boolean).virtual("canRead",self.boolean).virtual("canWrite",self.boolean)
+        self.string.slot("count",self.integer).virtual("bytes",self.address).hasBytes(true)
+        self.time.virtual("hour",self.integer).virtual("minute",self.integer).virtual("second",self.integer).virtual("millisecond",self.integer)
+        self.tuple.slot("slots",self.array.of(self.slot)).slot("instanceSizeInBytes",self.integer)
+        self.typeClass.slot("name",self.string).slot("typeCode",self.integer)
+        self.vector.slot("startBlock",self.block).slot("blockCount",self.integer).hasBytes(true)
         }
         
     private func initBaseMethods()
@@ -399,7 +432,10 @@ public class ArgonModule: SystemModule
             {
             aClass.layoutInMemory(segment: ManagedSegment.shared)
             }
-        ManagedSegment.shared.backpatchAllocatedObjectClasses()
+        for instance in self.methodInstances
+            {
+            instance.layoutInMemory(segment: ManagedSegment.shared)
+            }
         print("LAID OUT MEMORY")
         }
     }

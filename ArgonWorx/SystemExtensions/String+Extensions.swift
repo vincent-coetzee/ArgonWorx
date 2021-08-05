@@ -18,6 +18,17 @@ extension String
         case right
         }
         
+    public var djb2Hash: Int
+        {
+        var hash:UInt64 = 5381
+        for char in self
+            {
+            hash = ((hash << 5) &+ hash) &+ UInt64(char.asciiValue!)
+            }
+        let mask = ~Word(bitPattern: 1<<63)
+        return(Int(hash & mask))
+        }
+        
     public var polynomialRollingHash:Int
         {
         let p:Int64 = 31

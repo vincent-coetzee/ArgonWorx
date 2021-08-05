@@ -141,7 +141,7 @@ public struct Name:CustomStringConvertible,Comparable
         {
         var bits = label.components(separatedBy: "\\")
         var first:Component? = nil
-        if bits[0...1] == ["",""]
+        if bits.count > 1 && bits[0...1] == ["",""]
             {
             first = .root
             bits.removeFirst(2)
