@@ -14,7 +14,7 @@ public struct ExecutionError:Error
     public let context:ExecutionContext
     public let errorType:ExecutionErrorType
     }
-
+    
 public enum ExecutionErrorType:Error
     {
     case invalidIntegerOperand
@@ -33,8 +33,29 @@ public protocol BitCodable
     func encode(in:BitEncoder)
     }
     
-public class Instruction:Identifiable,Encodable,Decodable
+public class Instruction:Identifiable,Encodable,Decodable,Equatable
     {
+    public static let opcodeField = PackedField<Instruction.Opcode>(offset: 0, width: 8)
+    public static let operand1KindField = PackedField<Word>(offset:8,width:4)
+    public static let operand1RegisterField = PackedField<Instruction.Register>(offset:12,width:8)
+    public static let operand2KindField = PackedField<Word>(offset:20,width:4)
+    public static let operand2RegisterField = PackedField<Instruction.Register>(offset:24,width:8)
+    public static let resultKindField = PackedField<Word>(offset:32,width:4)
+    public static let resultRegisterField = PackedField<Instruction.Register>(offset:36,width:44)
+    
+    public static func ==(lhs:Instruction,rhs:Instruction) -> Bool
+        {
+        if lhs.opcode != rhs.opcode
+            {
+            return(false)
+            }
+        if lhs.operand1 != rhs.operand1 || lhs.operand2 != rhs.operand2 || lhs.result != rhs.result
+            {
+            return(false)
+            }
+        return(true)
+        }
+        
     public var id = UUID()
     
     public static func loadValue(ofSlotNamed:String,instanceType:Class,instance:Word,into:Instruction.Register) -> [Instruction]
@@ -46,7 +67,7 @@ public class Instruction:Identifiable,Encodable,Decodable
         return(array)
         }
         
-    public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable
+    public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable,Equatable
         {
         public static let bitWidth = 8
         
@@ -55,16 +76,17 @@ public class Instruction:Identifiable,Encodable,Decodable
             return(lhs.rawValue < rhs.rawValue)
             }
             
-        case code = 0       /// This points to the current code segment
-        case stack       /// Points to the current stack segment
-        case fixed       /// Points to the fixed or static segment, we could not call it static because static is a reserved word
+        case code = 0   /// This points to the current code segment
+        case stack      /// Points to the current stack segment
+        case fixed      /// Points to the fixed or static segment, we could not call it static because static is a reserved word
         case managed    /// Points to the current managed segment
-        case cp           /// The code pointer points to the current routine been executed,
-        case ip           /// the ip points to teh instruction being executed
-        case sp           /// the sp points to the top of the stack
-        case bp           /// the bp points to the base of the current stack frame
-        case fp           /// the fp points to the next available slot in the fixed segment
-        case mp          /// the mp points to the next avaialble slot in the managed segmeng
+        case cp         /// The code pointer points to the current method instance being executed
+        case ip         /// the ip points to the sequence of instructions being executed
+        case ii         /// the instruction index, is an index into the sequence of instructions being executed
+        case sp         /// the sp points to the top of the stack
+        case bp         /// the bp points to the base of the current stack frame
+        case fp         /// the fp points to the next available slot in the fixed segment
+        case mp         /// the mp points to the next avaialble slot in the managed segmeng
         case r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15
         case fr0,fr1,fr2,fr3,fr4,fr5,fr6,fr7,fr8,fr9,fr10,fr11,fr12,fr13,fr14,fr15
         
@@ -99,7 +121,7 @@ public class Instruction:Identifiable,Encodable,Decodable
         case zero
         }
         
-    public enum Operand:Encodable,Decodable
+    public enum Operand:Encodable,Decodable,Equatable
         {
         case none
         case register(Register)
@@ -111,6 +133,81 @@ public class Instruction:Identifiable,Encodable,Decodable
         case array(Register,Word)
         case label(Argon.Integer)
         
+        public var wordValue:Word
+            {
+            switch(self)
+                {
+                case .none:
+                    return(0)
+                case .register:
+                    return(0)
+                case .slot(_,let word):
+                    return(word)
+                case .float(let float):
+                    return(float.bitPattern)
+                case .integer(let integer):
+                    return(Word(bitPattern: Int64(integer)))
+                case .address(let word):
+                    return(word)
+                case .stack(_,let integer):
+                    return(Word(bitPattern: Int64(integer)))
+                case .array(_,let word):
+                    return(word)
+                case .label(let integer):
+                    return(Word(bitPattern: Int64(integer)))
+                }
+            }
+            
+        public var registerValue:Int
+            {
+            switch(self)
+                {
+                case .none:
+                    return(0)
+                case .register(let register):
+                    return(register.rawValue)
+                case .slot(let register,_):
+                    return(register.rawValue)
+                case .float:
+                    return(0)
+                case .integer:
+                    return(0)
+                case .address:
+                    return(0)
+                case .stack(let register,_):
+                    return(register.rawValue)
+                case .array(let register,_):
+                    return(register.rawValue)
+                case .label:
+                    return(0)
+                }
+            }
+            
+        public var rawValue:Int
+            {
+            switch(self)
+                {
+                case .none:
+                    return(0)
+                case .register:
+                    return(1)
+                case .slot:
+                    return(2)
+                case .float:
+                    return(3)
+                case .integer:
+                    return(4)
+                case .address:
+                    return(5)
+                case .stack:
+                    return(6)
+                case .array:
+                    return(7)
+                case .label:
+                    return(8)
+                }
+            }
+            
         public var isNotNone: Bool
             {
             switch(self)
@@ -405,10 +502,10 @@ public class Instruction:Identifiable,Encodable,Decodable
         return(text.joined(separator: ","))
         }
         
-    public let opcode:Opcode
-    public let operand1:Operand
-    public let operand2:Operand
-    public let result:Operand
+    public var opcode:Opcode
+    public var operand1:Operand
+    public var operand2:Operand
+    public var result:Operand
     
     public init(_ opcode:Opcode,operand1:Operand = .none,operand2:Operand = .none,result:Operand = .none)
         {
@@ -418,6 +515,70 @@ public class Instruction:Identifiable,Encodable,Decodable
         self.result = result
         }
 
+    public init(from pointer:WordPointer)
+        {
+        self.opcode = .nop
+        self.operand1 = .none
+        self.operand2 = .none
+        self.result = .none
+        
+        var words = Array<Word>()
+        words.append(pointer[0])
+        words.append(pointer[1])
+        words.append(pointer[2])
+        words.append(pointer[3])
+        self.opcode = Self.opcodeField.value(in: words[0])
+        self.operand1 = self.operand(kindField: Self.operand1KindField, registerField: Self.operand1RegisterField,index: 1,words: words)
+        self.operand2 = self.operand(kindField: Self.operand2KindField, registerField: Self.operand2RegisterField,index: 2,words: words)
+        self.result = self.operand(kindField: Self.resultKindField, registerField: Self.resultRegisterField,index: 3,words: words)
+        }
+        
+    private func operand(kindField: PackedField<Word>,registerField: PackedField<Register>,index:Int,words:[Word]) -> Operand
+        {
+        let kind = kindField.value(in: words[0])
+        let register = registerField.value(in: words[0])
+        switch(kind)
+            {
+            case 0:
+                return(.none)
+            case 1:
+                return(.register(register))
+            case 2:
+                return(.slot(register,words[index]))
+            case 3:
+                return(.float(Argon.Float(bitPattern: words[index])))
+            case 4:
+                return(.integer(Argon.Integer(bitPattern: words[index])))
+            case 5:
+                return(.address(words[index]))
+            case 6:
+                return(.stack(register,Argon.Integer(bitPattern: words[index])))
+            case 7:
+                return(.array(register,words[index]))
+            case 8:
+                return(.label(Argon.Integer(bitPattern: words[index])))
+            default:
+                fatalError("Invalid kind received")
+            }
+        }
+        
+    public func write(to pointer:WordPointer)
+        {
+        var word:Word = 0
+        
+        Self.opcodeField.setValue(self.opcode,in: &word)
+        Self.operand1KindField.setValue(Word(self.operand1.rawValue),in: &word)
+        Self.operand1RegisterField.setValue(Word(self.operand1.registerValue),in: &word)
+        Self.operand2KindField.setValue(Word(self.operand2.rawValue),in: &word)
+        Self.operand2RegisterField.setValue(Word(self.operand2.registerValue),in: &word)
+        Self.resultKindField.setValue(Word(self.result.rawValue),in: &word)
+        Self.resultRegisterField.setValue(Word(self.result.registerValue),in: &word)
+        pointer[0] = word
+        pointer[1] = self.operand1.wordValue
+        pointer[2] = self.operand2.wordValue
+        pointer[3] = self.result.wordValue
+        }
+        
     public func execute(in context:ExecutionContext) throws
         {
         switch(self.opcode)
@@ -525,3 +686,4 @@ public class Instruction:Identifiable,Encodable,Decodable
             }
         }
     }
+

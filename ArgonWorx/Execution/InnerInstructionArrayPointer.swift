@@ -96,15 +96,15 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         return(self)
         }
         
-    public func instruction(at index:Int) -> Instruction?
+    public func instruction(at index:Int) -> Instruction
         {
         if index < 0 || index >= count
             {
-            return(nil)
+            fatalError("BAD INDEX TO INSTRUCTIONS")
             }
         let bytes = InnerByteArrayPointer(address: self[index]).bytes
         let decoder = BinaryDecoder()
-        let instruction = try? decoder.decode(Instruction.self, from: bytes)
+        let instruction = try! decoder.decode(Instruction.self, from: bytes)
         return(instruction)
         }
         
@@ -142,7 +142,7 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         
     public var currentInstructionId: UUID?
         {
-        return(self.instruction(at: self.currentIndex)?.id)
+        return(self.instruction(at: self.currentIndex).id)
         }
         
     public func singleStep(in context:ExecutionContext) throws
@@ -151,7 +151,7 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
             {
             return
             }
-        try self.instruction(at: self.currentIndex)?.execute(in: context)
+        try self.instruction(at: self.currentIndex).execute(in: context)
         self.currentIndex += 1
         }
         

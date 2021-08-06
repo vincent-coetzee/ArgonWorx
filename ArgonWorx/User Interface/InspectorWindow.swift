@@ -26,57 +26,51 @@ struct InspectorWindow: View
             }
         VStack
             {
-            List(self.loadNodes())
+            List
                 {
-                node in
-                OutlineGroup(node,children: \.children)
-                    {
-                    inner in
-                    if inner.children.isNotNil
-                        {
-                        OutlineGroup(inner,children: \.children)
-                            {
-                            child in
-                            Text(child.displayString)
-                            }
-                        }
-                    else
-                        {
-                        Text(inner.displayString)
-                        }
-                    }
+                ForEach(self.loadNodes(),content: self.loadLayoutClosure())
                 }
             }
         }
         
-    private func loadBlocks() -> Array<WordBlock>
+    private typealias LayoutClosure = (AddressNode) -> AnyView
+    
+    private func loadLayoutClosure() -> LayoutClosure
         {
-        let segment = ManagedSegment.shared
-        let start = segment.startOffset
-        let end = Int((segment.endOffset - start) / 8)
-        var offset = 0
-        var objects = Array<WordBlock>()
-        let pointer = WordPointer(address: start)!
-        while offset < end
+        let closure:LayoutClosure =
             {
-            print("STARTING OBJECT AT \(Word(offset*8).addressString)")
-            let startOffset = offset
-            var words = Array<Word>()
-            let header = pointer[offset]
-            words.append(header)
-            var size = Header(header).sizeInWords
-            print("OBJECT SIZE IN WORDS = \(size)")
-            size = min(1024,size)
-            offset += size
-            for _ in 1..<size
-                {
-                words.append(pointer[offset])
-                offset += 1
-                }
-            objects.append(WordBlock(address:Word(startOffset*8),words:words))
+            (node) -> AnyView in
+            AnyView(
+                VStack
+                    {
+                    HStack
+                        {
+                        Text(node.addressString).inspectorFont().foregroundColor(NSColor.argonNeonPink.swiftUIColor)
+                        Text(node.displayString).inspectorFont().foregroundColor(NSColor.argonNeonPink.swiftUIColor)
+                        }
+                    ForEach(node.children ?? [])
+                        {
+                        child in
+                        Text(child.displayString).inspectorFont().foregroundColor(NSColor.argonSeaGreen.swiftUIColor)
+                        let closure = self.loadLayoutClosure()
+                        List([child])
+                            {
+                            item in
+                            ForEach([item])
+                                {
+                                last in
+                                Text(node.displayString).inspectorFont().foregroundColor(NSColor.argonYellow.swiftUIColor)
+                                }
+                            }.padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20)).foregroundColor(NSColor.argonLime.swiftUIColor)
+                        }.padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 0))
+                    }
+//
+              
+            )
             }
-        return(objects)
+        return(closure)
         }
+        
         
     private func loadNodes() -> Array<AddressNode>
         {
@@ -99,207 +93,50 @@ struct InspectorWindow: View
         }
     }
 
+struct HeaderLineView: View
+    {
+    var node:AddressNode
+    
+    var body: some View
+        {
+        HStack
+            {
+            Text(node.addressString.aligned(.left,in:12)).inspectorFont()
+            Text(node.displayString.aligned(.left,in:80)).inspectorFont()
+            }.foregroundColor(.orange)
+        }
+    }
+    
+struct ExpandableLineView: View
+    {
+    var node: AddressNode
+    
+    var body: some View
+        {
+        VStack
+            {
+            if node.isExpandable
+                {
+                HeaderLineView(node: node)
+                List([node],children: \.children)
+                    {
+                    child in
+                    Text(child.displayString.aligned(.left,in:80)).inspectorFont()
+                    }
+                }
+            else
+                {
+                Text(node.displayString.aligned(.left,in:80)).inspectorFont()
+                }
+            }
+        }
+    }
+    
 struct InspectorView_Previews: PreviewProvider {
     static var previews: some View {
         InspectorWindow()
     }
 }
-
-
-struct ObjectView: View
-    {
-    private let block:WordBlock
-    
-    init(block:WordBlock)
-        {
-        self.block = block
-        }
-        
-    var body: some View
-        {
-        Text("\(block.address.addressString)")
-        }
-    }
-
-struct HeaderView: View
-    {
-    var word:Word
-    
-    var body: some View
-        {
-        Text("HEADER: \(word.bitString)")
-        }
-    }
-
-struct SlotIndex:Identifiable,Hashable
-    {
-    var id:Int
-        {
-        return(self.index)
-        }
-        
-    let index:Int
-    
-    init(index:Int)
-        {
-        self.index = index
-        }
-    }
-    
-struct SlotRowView: View
-    {
-    var atIndex:Int
-    var inBlock:WordBlock
-    let slotValue:Word
-    let slotName:String
-    var offset:Int = 0
-//    let slotPointer:InnerSlotPointer
-//    let slotName:String
-    
-    init(atIndex:Int,inBlock:WordBlock)
-        {
-        self.atIndex = atIndex
-        self.inBlock = inBlock
-        self.slotValue = inBlock.words[atIndex].tagDropped
-        if atIndex < self.inBlock.classPointer.slotCount
-            {
-            self.slotName = inBlock.classPointer.slot(atIndex: atIndex).name
-            }
-        else
-            {
-            self.slotName = ""
-            }
-//        self.slotPointer = self.inBlock.classPointer().slot(atIndex: atIndex)
-//        self.slotName = self.slotPointer.name.aligned(.left, in: 30)
-        }
-        
-    var body: some View
-        {
-        HStack
-            {
-//            Text(self.slotName)
-            Text(self.slotName.aligned(.right,in:24)).inspectorFont()
-            Text(String(format: " %05d ",atIndex * 8)).inspectorFont()
-            Text("\(slotValue.bitString)").inspectorFont().foregroundColor(self.colorChooser())
-            if atIndex < inBlock.classPointer.slots.count
-                {
-                Text(" \(inBlock.classPointer.slot(atIndex: atIndex).format(value: slotValue))".aligned(.left,in:25)).inspectorFont().foregroundColor(self.colorChooser())
-                }
-            else
-                {
-                Text(" ".aligned(.left,in:25)).inspectorFont()
-                }
-            }
-        }
-        
-    private func colorChooser() -> Color
-        {
-        if atIndex == 2 && inBlock.words[atIndex] == 0
-            {
-            return(.orange)
-            }
-        if atIndex >= self.inBlock.classPointer.slotCount
-            {
-            return(.red)
-            }
-        if self.inBlock.classPointer.slot(atIndex: atIndex).isArraySlot
-            {
-            return(.green)
-            }
-        return(.white)
-        }
-    }
-
-struct HeaderRowView: View
-    {
-    var atIndex:Int
-    var inBlock:WordBlock
-    let slotValue:Word
-//    let slotPointer:InnerSlotPointer
-//    let slotName:String
-    
-    init(atIndex:Int,inBlock:WordBlock)
-        {
-        self.atIndex = atIndex
-        self.inBlock = inBlock
-        self.slotValue = inBlock.words[atIndex]
-//        self.slotPointer = self.inBlock.classPointer().slot(atIndex: atIndex)
-//        self.slotName = self.slotPointer.name.aligned(.left, in: 30)
-        }
-        
-    var body: some View
-        {
-        HStack
-            {
-//            Text(self.slotName)
-            Text("\(slotValue.bitString)").font(Font.custom("Menlo",size: 11))
-            }
-        }
-    }
-    
-struct WordBlock:Identifiable
-    {
-    public var indices: Array<SlotIndex>
-        {
-        var set = Array<SlotIndex>()
-        for index in 0..<self.words.count
-            {
-            set.append(SlotIndex(index: index))
-            }
-        return(set)
-        }
-        
-    public var addressString:String
-        {
-        address.addressString
-        }
-        
-    public var typeString:String
-        {
-        "OBJECT"
-        }
-        
-    public var className: String
-        {
-        self.classPointer.name
-        }
-        
-    public var classPointer: InnerClassPointer
-        {
-        InnerPointer(address: self.address).classPointer
-        }
-        
-    public var id:Word
-        {
-        self.address
-        }
-        
-    public let address:Word
-    public let words:Words
-    public var _classPointer:InnerClassPointer?
-    
-    public var children: Array<SlotWord>?
-        {
-        return(words.map{SlotWord(word:$0)})
-        }
-        
-    init(address:Word,words:Words)
-        {
-        self.address = address
-        self.words = words
-        }
-    }
-
-struct SlotWord:Identifiable,Hashable
-    {
-    public var children:Array<Word>?
-        {
-        nil
-        }
-        
-    public let id = UUID()
-    public let word:Word
-    }
 
 struct InspectorFont: ViewModifier
     {
@@ -319,6 +156,27 @@ extension View
 
 class AddressNode:Identifiable
     {
+    public var addressString: String
+        {
+        return("")
+        }
+        
+    public var isExpandable: Bool
+        {
+        return(false)
+        }
+        
+    public var hasErrors: Bool
+        {
+        get
+            {
+            return(false)
+            }
+        set
+            {
+            }
+        }
+        
     public var displayString: String
         {
         return("AddressNode")
@@ -329,10 +187,25 @@ class AddressNode:Identifiable
         {
         return(nil)
         }
+        
+    public func view() -> some View
+        {
+        Text(self.displayString)
+        }
     }
     
 class ObjectNode: AddressNode
     {
+    public override var addressString: String
+        {
+        return(address.addressString)
+        }
+        
+    public override var isExpandable: Bool
+        {
+        return(true)
+        }
+        
     public override var displayString: String
         {
         return("HEADER: \(self.header.bitString)")
@@ -372,7 +245,9 @@ class ObjectNode: AddressNode
             {
             for index in 1..<self.wordCount
                 {
-                children.append(ChildAddressNode(word: self.wordPointer[index]))
+                let child = ChildAddressNode(word: self.wordPointer[index])
+                child.hasErrors = true
+                children.append(child)
                 }
             }
         return(children)
@@ -394,10 +269,36 @@ class ObjectNode: AddressNode
         self.header = header
         self.classPointer = InnerClassPointer(address: pointer[2])
         }
+        
+    public func view() -> some View
+        {
+        OutlineGroup(self.children ?? [],children: \.children)
+            {
+            child in
+            Section(content:
+                {
+                child.view()
+                },
+            header:
+                {
+                Text(child.displayString)
+                })
+            }
+        }
     }
     
 class ArrayAddressNode: AddressNode
     {
+    public override var addressString: String
+        {
+        return(word.addressString)
+        }
+        
+    public override var isExpandable: Bool
+        {
+        return(true)
+        }
+        
     public override var displayString: String
         {
         return("ARRAY: \(self.word.bitString)")
@@ -422,19 +323,50 @@ class ArrayAddressNode: AddressNode
         self.word = word
         self.arrayPointer = InnerArrayPointer(address: word)
         }
+        
+    public func view() -> some View
+        {
+        OutlineGroup(self.children ?? [],children: \.children)
+            {
+            child in
+            VStack
+                {
+                Text(child.displayString).inspectorFont()
+                child.view()
+                }.inspectorFont()
+            }
+        }
     }
 
 class ChildAddressNode: AddressNode
     {
+    public override var hasErrors: Bool
+        {
+        get
+            {
+            return(self._hasErrors)
+            }
+        set
+            {
+            self._hasErrors = newValue
+            }
+        }
+        
     public override var displayString: String
         {
         return("CHILD: \(self.word.bitString)")
         }
         
+    private var _hasErrors: Bool = false
     public var word: Word
     
     init(word: Word)
         {
         self.word = word
+        }
+        
+    public func view() -> some View
+        {
+        Text(self.displayString).inspectorFont()
         }
     }

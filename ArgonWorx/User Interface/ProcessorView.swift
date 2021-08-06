@@ -12,7 +12,13 @@ struct ProcessorView: View
     @StateObject private var context = ExecutionContext()
     @State private var buffer = InnerInstructionArrayPointer.allocate(arraySize: 10*10, in: ManagedSegment.shared).append(InnerInstructionArrayPointer.samples.allInstructions).rewind()
     @State private var color:Color = .white
+    var program = InnerInstructionArrayPointer(address:0)
     
+    init()
+        {
+        self.initProgram()
+        }
+        
     var body: some View
         {
         VStack
@@ -30,7 +36,7 @@ struct ProcessorView: View
             {
             do
                 {
-                try self.buffer.singleStep(in: self.context)
+                try self.context.singleStep()
                 }
             catch
                 {
@@ -51,6 +57,24 @@ struct ProcessorView: View
             }
         }
         .padding(20)
+        }
+        
+    mutating func initProgram()
+        {
+        self.program = InnerInstructionArrayPointer.allocate(arraySize: 100*10, in: ManagedSegment.shared)
+        program.append(.load,operand1: .integer(2021),result: .register(.r1))
+        program.append(.load,operand1: .integer(1965),result: .register(.r2))
+        program.append(.isub,operand1: .register(.r1),operand2: .register(.r2),result:.register(.r3))
+        program.append(.load,operand1: .integer(112000),result: .register(.r4))
+        program.append(.imul,operand1: .register(.r4),operand2: .integer(12),result: .register(.r5))
+        program.append(.imul,operand1: .register(.r5),operand2: .register(.r3),result: .register(.r6))
+        program.append(.load,operand1: .integer(200),result: .register(.r15))
+        let marker = program.append(.zero,result: .register(.r14)).fromHere("marker")
+        program.append(.inc,result: .register(.r14))
+        program.append(.dec,result: .register(.r15))
+        program.append(.breq,operand1: .register(.r15),operand2: .integer(0),result: .label(program.toHere(marker)))
+        program.rewind()
+        context.call(address: self.program.address)
         }
     }
 

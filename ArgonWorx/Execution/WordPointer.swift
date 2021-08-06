@@ -11,6 +11,11 @@ public typealias WordPointer = UnsafeMutablePointer<Word>
 
 extension WordPointer
     {
+    public var address: Word
+        {
+        Word(bitPattern: Int(bitPattern: self))
+        }
+        
     public var header:Header
         {
         get

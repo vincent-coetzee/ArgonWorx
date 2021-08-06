@@ -13,6 +13,10 @@ public class ExecutionContext:ObservableObject
     @Published var _allRegisters = Instruction.Register.allCases
     @Published var changedRegisters = Set<Instruction.Register>()
     
+    private var instructionCache = Array<Instruction>()
+    public var managedSegment: Segment = ManagedSegment.shared
+    public var stackSegment: StackSegment
+    
     public func register(atIndex:Instruction.Register) -> Word
         {
         return(self.registers[atIndex.rawValue])
@@ -49,25 +53,11 @@ public class ExecutionContext:ObservableObject
             }
         }
 
-    public var managedSegment: Segment = ManagedSegment.shared
-    public var stackSegment: StackSegment
-    
     public init()
         {
         self.stackSegment = StackSegment(sizeInBytes: 1024 * 1024 * 10)
         }
-    
-//    public var registerPairs: Array<(Instruction.Register,Instruction.Register)>
-//        {
-//        var registers = Array<(Instruction.Register,Instruction.Register)>()
-//        
-//        for index in stride(from: Instruction.Register.code.rawValue,through: Instruction.Register.fr15.rawValue,by: 2)
-//            {
-//            registers.append((Instruction.Register(rawValue: index)!,Instruction.Register(rawValue: index)!))
-//            }
-//        return(registers)
-//        }
-        
+
     public func update()
         {
         for index in 0..<registers.count
@@ -84,5 +74,31 @@ public class ExecutionContext:ObservableObject
     public subscript(_ index:Instruction.Register) -> Word
         {
         return(self.registers[index.rawValue])
+        }
+        
+    public func call(address:Word)
+        {
+        let pointer = InnerInstructionArrayPointer(address: address)
+        pointer.rewind()
+        let instructionsPointer = pointer.instructionsPointer
+        self.setRegister(0, atIndex: .ip)
+        var instruction:Instruction? = pointer.instruction
+        repeat
+            {
+            if let instruction = instruction
+                {
+                self.instructionCache.append(instruction)
+                pointer.next()
+                }
+            instruction = pointer.instruction
+            }
+        while instruction.isNotNil
+        }
+        
+    public func singleStep() throws
+        {
+        let ip = self.registers[Instruction.Register.ip.rawValue]
+        try self.instructionCache[Int(ip)].execute(in: self)
+        self.registers[Instruction.Register.ip.rawValue] = ip + 1
         }
     }

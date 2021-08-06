@@ -93,6 +93,12 @@ struct ArgonWorxApp: App {
             print("\(program.instruction!.opcode) \(program.instruction!.operandText)")
             program.next()
             }
+        let instructionCount = program.count
+        var collection = Array<Instruction>()
+        for index in 0..<instructionCount
+            {
+            collection.append(program.instruction(at: index))
+            }
         print("SIZE OF Int = \(MemoryLayout<Int>.size)")
         print("SIZE OF Int64 = \(MemoryLayout<Int64>.size)")
         let used = ManagedSegment.shared.bytesInUse
@@ -110,15 +116,19 @@ struct ArgonWorxApp: App {
             keyedValues[word.word] = random
             dictionary[word.word] = random
             index += 1
-            print("ADDED INDEX \(index) \(word.word)")
             }
         for (key,value) in keyedValues
             {
             let answer = dictionary[key]
-            assert(value == answer,"FOR KEY \(key) STORED VALUE \(value) WAS \(answer) INSTEAD oF \(value)")
+            assert(answer == value,"EXPECTED VALUE \(value) FOR KEY BUT RECEIVED \(answer)")
             }
         let allKeys = dictionary.keys
-        print(allKeys)
+        let storedKeys = keyedValues.keys
+        assert(allKeys.count == storedKeys.count,"STORED KEYS SIZE DOES NOT MATCH DICTIONARY KEYS SIZE")
+        for key in storedKeys
+            {
+            assert(allKeys.contains(key),"DICTIONARY KEYS IS MISSING KEY \(key)")
+            }
         let sourceURL = Bundle.main.url(forResource: "Basics", withExtension: "argon")
         let source = try! String(contentsOf: sourceURL!)
         print(source)
@@ -140,6 +150,41 @@ struct ArgonWorxApp: App {
         input!.pointee = stringAddress.address
         var voidValue:UnsafeMutableRawPointer? = UnsafeMutableRawPointer(input)
         ffi_call(&interface,MutateSymbol(symbol!.address!),nil,&voidValue)
+        print("SIZE AND STRIDE OF Instruction: \(MemoryLayout<Instruction>.stride) \(MemoryLayout<Instruction>.size)")
+        var packedPointer = WordPointer(address: ManagedSegment.shared.allocateObject(sizeInBytes: 1000 * 32))!
+        var offsetPointer = packedPointer
+        for index in 0..<program.count
+            {
+            let instruction = program.instruction(at: index)
+            instruction.write(to: offsetPointer)
+            offsetPointer += 4
+            }
+        var newList = Array<Instruction>()
+        offsetPointer = packedPointer
+        for index in 0..<program.count
+            {
+            let instruction = Instruction(from: offsetPointer)
+            newList.append(instruction)
+            offsetPointer += 4
+            }
+        for item in newList
+            {
+            print("\(item.opcode) \(item.operandText)")
+            }
+        let newArray = InnerPackedInstructionArrayPointer.allocate(numberOfInstructions: 20, in: ManagedSegment.shared)
+        newArray.count = 0
+        newArray.count = 4
+        print(newArray.count)
+        newArray.count = 0
+        print(newArray.count)
+        for item in newList
+            {
+            newArray.append(item)
+            }
+        for item:Instruction in newArray
+            {
+            print("\(item.opcode) \(item.operandText)")
+            }
         }
         
     var body: some Scene
