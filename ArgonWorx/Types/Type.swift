@@ -8,8 +8,25 @@
 import Foundation
 import FFI
 
-public class Type
+public class Type:Equatable
     {
+    public static let nilType = Type(label:"nil")
+    public static let integerType = Type(label:"integer")
+    public static let stringType = Type(label:"string")
+    public static let floatType = Type(label:"float")
+    public static let symbolType = Type(label:"symbol")
+    public static let arrayType = Type(label:"array")
+    public static let booleanType = Type(label:"boolean")
+    
+    public static func ==(lhs:Type,rhs:Type) -> Bool
+        {
+        if lhs is ClassType && rhs is ClassType
+            {
+            return((lhs as! ClassType).clazz == (rhs as! ClassType).clazz)
+            }
+        return(false)
+        }
+        
     public var typeClass: Class
         {
         fatalError("Should have been overridden")
@@ -38,6 +55,15 @@ public class Type
     public var isVoidType: Bool
         {
         return(false)
+        }
+        
+    public func realize(_ compiler:Compiler)
+        {
+        }
+        
+    public func emitCode(into instance: MethodInstance,using: CodeGenerator,operation: Token.Symbol)
+        {
+        fatalError("Should have been overridden")
         }
     
     public let label:Label

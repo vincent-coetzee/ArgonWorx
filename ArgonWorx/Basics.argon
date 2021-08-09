@@ -43,6 +43,7 @@ MAIN MODULE Basics
         
     CLASS Person::LegalEntity
         {
+        SLOT firstName::String
         }
     ///
     ///
@@ -53,4 +54,15 @@ MAIN MODULE Basics
     ///
     TYPE PersonList IS Array<Person>
     TYPE Sovereign IS SovereignState
+    
+    METHOD testingThings(argument::Object) -> Object
+        {
+        LET name = "Jones"
+        LET person = Person()
+        person->firstName = name
+        person->name = "Some Person or Other"
+        person->identityNumber = "650103093888288288"
+        person->age = 101
+        begin()
+        }
     }

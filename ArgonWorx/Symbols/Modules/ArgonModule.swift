@@ -17,6 +17,11 @@ import Foundation
 ///
 public class ArgonModule: SystemModule
     {
+    public override var typeCode:TypeCode
+        {
+        .argonModule
+        }
+        
     public var number: Class
         {
         return(self.lookup(label: "Number") as! Class)

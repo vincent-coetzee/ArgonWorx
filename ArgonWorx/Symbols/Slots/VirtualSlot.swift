@@ -10,6 +10,14 @@ import AppKit
 
 public class VirtualSlot:Slot
     {
+    public var readBlock: VirtualReadBlock?
+    public var writeBlock: VirtualWriteBlock?
+    
+    public override var typeCode:TypeCode
+        {
+        .virtualSlot
+        }
+        
     public override var cloned: Slot
         {
         let newSlot = VirtualSlot(label: self.label,type:self.type)

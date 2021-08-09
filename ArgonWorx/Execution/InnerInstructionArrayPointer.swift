@@ -30,7 +30,9 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
     public override class func allocate(arraySize:Int,in segment:ManagedSegment)  -> InnerInstructionArrayPointer
         {
         let pointer = super.allocate(arraySize: arraySize, in: segment)
-        return(InnerInstructionArrayPointer(address: pointer.address))
+        let wrapper = InnerInstructionArrayPointer(address: pointer.address)
+        wrapper.headerTypeCode = .instructionArray
+        return(wrapper)
         }
         
     public var allInstructions: Array<Instruction>
@@ -140,7 +142,7 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         return(instruction)
         }
         
-    public var currentInstructionId: UUID?
+    public var currentInstructionId: Int
         {
         return(self.instruction(at: self.currentIndex).id)
         }

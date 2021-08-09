@@ -13,6 +13,8 @@ import FFI
 @main
 struct ArgonWorxApp: App {
 
+    @StateObject var context = ExecutionContext()
+    
     init()
         {
         Thread.initThreads()
@@ -101,10 +103,10 @@ struct ArgonWorxApp: App {
             }
         print("SIZE OF Int = \(MemoryLayout<Int>.size)")
         print("SIZE OF Int64 = \(MemoryLayout<Int64>.size)")
-        let used = ManagedSegment.shared.bytesInUse
-        let usedK = used / 1024
-        let usedM = usedK / 1024
-        print("BYTES USED IN ManagedSegment: \(used) bytes, \(usedK) KB, \(usedM) MB" )
+        let used = ManagedSegment.shared.spaceUsed
+        let usedK = used.size(inUnits: .kilobytes)
+        let usedM = used.size(inUnits: .megabytes)
+        print("BYTES USED IN ManagedSegment: \(used.displayString), \(usedK.displayString), \(usedM.displayString)" )
         let dictionary = InnerStringKeyDictionaryPointer.allocate(size: 2000, in: ManagedSegment.shared)
         print("DICTIONARY PRIME IS: \(dictionary.prime)")
         let randomWords = EnglishWord.randomWords(maximum: 2000)
@@ -132,9 +134,9 @@ struct ArgonWorxApp: App {
         let sourceURL = Bundle.main.url(forResource: "Basics", withExtension: "argon")
         let source = try! String(contentsOf: sourceURL!)
         print(source)
-//        let compiler = Compiler()
-//        let element = compiler.compileChunk(source)
-//        print(element)
+        let compiler = Compiler()
+        let element = compiler.compileChunk(source)
+        print(element)
         let library = DynamicLibrary(path: "/Users/vincent/Desktop/libXenon.dylib")
         let symbol = library.findSymbol("PrintString")
         let stringAddress = InnerStringPointer.allocateString("Can we c this string in c ?", in: ManagedSegment.shared)
@@ -185,6 +187,28 @@ struct ArgonWorxApp: App {
             {
             print("\(item.opcode) \(item.operandText)")
             }
+        let vector = InnerVectorPointer.allocate(arraySize: 20, in: ManagedSegment.shared)
+        var randomSet = Array<Word>()
+        let randomCount = 100
+        for _ in 0..<randomCount
+            {
+            randomSet.append(Word.random(in: 0...1000_000_000))
+            }
+        for random in randomSet
+            {
+            vector.append(random)
+            }
+        assert(vector.count == randomSet.count,"VECTOR COUNT SHOULD BE \(randomSet.count) BUT IS \(vector.count)")
+        print("VECTOR COUNT = \(vector.count)")
+        let timer = Timer()
+        for value in randomSet
+            {
+            assert(vector.contains(value),"VECTOR SHOULD CONTAIN VALUE \(value) BUT DOES NOT")
+            }
+        let total = timer.stop()
+        print("AVERAGE TIME TO contains = \(total/randomSet.count) milliseconds")
+        print("ManagedSpace Used = \(ManagedSegment.shared.spaceUsed.size(inUnits: .kilobytes).displayString)")
+        print("ManagedSpace Freee = \(ManagedSegment.shared.spaceFree.size(inUnits: .kilobytes).displayString)")
         }
         
     var body: some Scene
@@ -196,6 +220,7 @@ struct ArgonWorxApp: App {
         WindowGroup("Processor Browser")
             {
             ProcessorView()
+                .environmentObject(context)
             }
         WindowGroup("Memory Inspector")
             {

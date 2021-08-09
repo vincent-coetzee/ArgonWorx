@@ -9,6 +9,10 @@ import Foundation
 
 public class EnumerationCase:Symbol
     {
+    public override var typeCode:TypeCode
+        {
+        .enumerationCase
+        }
     }
     
 public typealias EnumerationCases = Array<EnumerationCase>

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class TypeParameter:Type
+public class TypeParameter:Class
     {
     }
 

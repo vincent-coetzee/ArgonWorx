@@ -14,6 +14,7 @@ public class InnerByteArrayPointer:InnerArrayPointer
         let neededWords = (bytes.count / 7) + 7
         let address = super.allocate(arraySize: neededWords, in: ManagedSegment.shared)
         let pointer = InnerByteArrayPointer(address: address.address)
+        pointer.headerTypeCode = .byteArray
         pointer.copyBytes(bytes)
         return(pointer)
         }

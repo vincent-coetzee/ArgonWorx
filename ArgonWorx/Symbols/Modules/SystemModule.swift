@@ -9,6 +9,11 @@ import Foundation
 
 public class SystemModule: Module
     {
+    public override var typeCode:TypeCode
+        {
+        .systemModule
+        }
+        
     public override var isSystemModule: Bool
         {
         return(true)
@@ -51,7 +56,7 @@ public class SystemModule: Module
             {
             if let aClass = symbol as? Class
                 {
-                aClass.reifySuperclasses()
+                aClass.realizeSuperclasses()
                 }
             else if let aModule = symbol as? SystemModule
                 {

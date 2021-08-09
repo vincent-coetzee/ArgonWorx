@@ -82,7 +82,7 @@ struct InspectorWindow: View
         let pointer = WordPointer(address: start)!
         while offset < end
             {
-            print("STARTING OBJECT AT \((Word(offset*8) + start).addressString)")
+//            print("STARTING OBJECT AT \((Word(offset*8) + start).addressString)")
             let objectNode = ObjectNode(address: Word(offset*8) + start)
             let header = pointer[offset]
             let size = Header(header).sizeInWords

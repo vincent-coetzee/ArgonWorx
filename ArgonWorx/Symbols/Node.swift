@@ -27,7 +27,7 @@ public class Node:NSObject,NamingContext,ParseTreeNode,Identifiable
             }
         }
         
-    public var type: Type
+    public var type: Class
         {
         fatalError("This should have been implemented in a class")
         }

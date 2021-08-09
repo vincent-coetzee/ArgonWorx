@@ -9,10 +9,10 @@ import Foundation
 
 public class ParameterizedClassInstance:Class
     {
-    internal let concreteTypes:Types
+    internal let concreteTypes:Classes
     private let sourceClass:ParameterizedClass
     
-    init(label:Label,sourceClass:ParameterizedClass,types:Types)
+    init(label:Label,sourceClass:ParameterizedClass,types:Classes)
         {
         self.sourceClass = sourceClass
         self.concreteTypes = types

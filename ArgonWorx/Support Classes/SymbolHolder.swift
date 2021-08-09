@@ -15,9 +15,9 @@ public class SymbolHolder:Symbol
     private let reporter: ReportingContext
     private let location: Location
     private var symbol: Symbol?
-    private let types: Types?
+    private let types: Classes?
     
-    init(name:Name,location:Location,namingContext:NamingContext?,reporter:ReportingContext,types:Types? = nil)
+    init(name:Name,location:Location,namingContext:NamingContext?,reporter:ReportingContext,types:Classes? = nil)
         {
         self.symbolName = name
         self.types = types

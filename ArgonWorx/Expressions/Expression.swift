@@ -28,6 +28,27 @@ public class Expression
         {
         return(AssignmentExpression(self,index))
         }
+        
+    public func emitCode(into instance: MethodInstance,using: CodeGenerator)
+        {
+        }
+        
+    public func realize(_ compiler:Compiler)
+        {
+        }
+        
+    public func findType() -> Class?
+        {
+        fatalError("This should have been redefined")
+        }
+        
+    public func generateConstraints(into inferencer:TypeInferencer)
+        {
+        fatalError("This should have been overridden")
+        }
+        
+    public var annotatedType: Class?
+    public var valueLocation: Instruction.Operand = .none
     }
     
 

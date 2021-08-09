@@ -9,4 +9,11 @@ import Foundation
 
 public class ForBlock: Block
     {
+    public let name:String
+    
+    init(name:String)
+        {
+        self.name = name
+        super.init()
+        }
     }

@@ -131,7 +131,11 @@ public class TokenStream:Equatable
             tokens.append(token)
             }
         while !token.isEnd
-        return(tokens)
+        if withComments
+            {
+            return(tokens)
+            }
+        return(tokens.flatMap{($0.isComment || $0.isInvisible) ? nil : $0})
         }
         
     public func line(from:Int,to:Int) -> String

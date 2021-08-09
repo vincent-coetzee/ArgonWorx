@@ -41,7 +41,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
     public static let operand2KindField = PackedField<Word>(offset:20,width:4)
     public static let operand2RegisterField = PackedField<Instruction.Register>(offset:24,width:8)
     public static let resultKindField = PackedField<Word>(offset:32,width:4)
-    public static let resultRegisterField = PackedField<Instruction.Register>(offset:36,width:44)
+    public static let resultRegisterField = PackedField<Instruction.Register>(offset:36,width:8)
+    public static let indexField = PackedField<Word>(offset:44,width:19)
     
     public static func ==(lhs:Instruction,rhs:Instruction) -> Bool
         {
@@ -56,8 +57,6 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         return(true)
         }
         
-    public var id = UUID()
-    
     public static func loadValue(ofSlotNamed:String,instanceType:Class,instance:Word,into:Instruction.Register) -> [Instruction]
         {
         let offset = instanceType.layoutSlot(atLabel: ofSlotNamed)!.offset
@@ -69,6 +68,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         
     public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable,Equatable
         {
+        public static var generalPurposeRegisters = [Self.r0,Self.r1,Self.r2,Self.r3,Self.r4,Self.r5,Self.r6,Self.r7,Self.r8,Self.r9,Self.r10,Self.r11,Self.r12,Self.r13,Self.r14,Self.r15]
+        
         public static let bitWidth = 8
         
         public static func <(lhs:Register,rhs:Register) -> Bool
@@ -106,8 +107,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         public static let bitWidth = 8
         
         case nop = 0
-        case iadd,isub,imul,idiv,imod,ipow
-        case fadd,fsub,fmul,fdiv,fmod,fpow
+        case iadd,isub,imul,idiv,imod,ipow,ineg
+        case fadd,fsub,fmul,fdiv,fmod,fpow,fneg
+        case iBitAnd,iBitOr,iBitXor,iBitNot
+        case not
         case load,store
         case br,breq,brneq
         case inc,dec
@@ -502,6 +505,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         return(text.joined(separator: ","))
         }
         
+    public var id:Int = 0
     public var opcode:Opcode
     public var operand1:Operand
     public var operand2:Operand
@@ -531,6 +535,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         self.operand1 = self.operand(kindField: Self.operand1KindField, registerField: Self.operand1RegisterField,index: 1,words: words)
         self.operand2 = self.operand(kindField: Self.operand2KindField, registerField: Self.operand2RegisterField,index: 2,words: words)
         self.result = self.operand(kindField: Self.resultKindField, registerField: Self.resultRegisterField,index: 3,words: words)
+        self.id = Int(Self.indexField.value(in: words[0]))
         }
         
     private func operand(kindField: PackedField<Word>,registerField: PackedField<Register>,index:Int,words:[Word]) -> Operand
@@ -573,6 +578,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         Self.operand2RegisterField.setValue(Word(self.operand2.registerValue),in: &word)
         Self.resultKindField.setValue(Word(self.result.rawValue),in: &word)
         Self.resultRegisterField.setValue(Word(self.result.registerValue),in: &word)
+        Self.indexField.setValue(Word(self.id),in: &word)
         pointer[0] = word
         pointer[1] = self.operand1.wordValue
         pointer[2] = self.operand2.wordValue
@@ -641,9 +647,9 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     context.ip = context.ip + Int(offset)
                     }
             case .inc:
-                try  self.result.setIntValue(self.operand1.intValue(in: context) + 1,in:context)
+                try  self.result.setIntValue(self.result.intValue(in: context) + 1,in:context)
             case .dec:
-                try  self.result.setIntValue(self.operand1.intValue(in: context) - 1,in:context)
+                try  self.result.setIntValue(self.result.intValue(in: context) - 1,in:context)
             case .scat:
                 let address1 = try self.operand1.value(in: context)
                 let address2 = try self.operand2.value(in: context)

@@ -68,22 +68,16 @@ public class InnerVectorPointer:InnerPointer,Collection
         {
         get
             {
-            return(InnerBlockPointer(address: self.slotValue(atKey:"startBlock")))
+            return(self._startBlockPointer)
             }
         set
             {
+            self._startBlockPointer = newValue
             self.setSlotValue(newValue.address,atKey:"startBlock")
             }
         }
         
-    internal var basePointer: WordPointer
-    
-    required init(address:Word)
-        {
-        self.basePointer = WordPointer(address: address + Word(Self.kArraySizeInBytes))!
-        super.init(address: address)
-        self._classPointer = nil
-        }
+    internal var _startBlockPointer: InnerBlockPointer = InnerBlockPointer(address: 1)
         
     internal override func initKeys()
         {
@@ -106,35 +100,53 @@ public class InnerVectorPointer:InnerPointer,Collection
         {
         get
             {
-            if index < self.size
-                {
-                return(self.basePointer[index])
-                }
-            fatalError("Invalid array index")
+            return(self._startBlockPointer[index])
             }
         set
             {
-            if index < self.size
-                {
-                self.basePointer[index] = newValue
-                return
-                }
-            fatalError("Invalid array index")
+            self._startBlockPointer[index] = newValue
             }
+        }
+        
+    private func grow()
+        {
+        let newSize = self.size * 5 / 2
+        let newBlock = InnerBlockPointer.allocate(arraySize: newSize, in: ManagedSegment.shared)
+        newBlock.copy(from: self._startBlockPointer,count: self.size)
+        self.startBlockPointer = newBlock
+        self.size = newSize
         }
         
     public func append(_ word:Word)
         {
-        self[self.count] = word
-        self.count += 1
+        let theCount = self.count
+        if theCount + 1 >= self.size
+            {
+            self.grow()
+            }
+        self._startBlockPointer[theCount] = word
+        self.count = theCount + 1
         }
         
     public func append(_ words:Array<Word>)
         {
         for word in words
             {
-            self[self.count] = word
-            self.count += 1
+            self.append(word)
             }
+        }
+        
+    public func contains(_ word:Word) -> Bool
+        {
+        let pointer = self._startBlockPointer.basePointer
+        let theCount = self.count
+        for index in 0..<theCount
+            {
+            if pointer[index] == word
+                {
+                return(true)
+                }
+            }
+        return(false)
         }
     }

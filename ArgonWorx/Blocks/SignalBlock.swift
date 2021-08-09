@@ -9,5 +9,12 @@ import Foundation
 
 public class SignalBlock: Block
     {
+    private let symbol:String
+    
+    public init(symbol: String)
+        {
+        self.symbol = symbol
+        super.init()
+        }
     }
 

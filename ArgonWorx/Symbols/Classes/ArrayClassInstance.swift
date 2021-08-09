@@ -9,6 +9,11 @@ import Foundation
 
 public class ArrayClassInstance: ParameterizedSystemClassInstance
     {
+    public func elementType() -> Class?
+        {
+        return(self.concreteTypes[0])
+        }
+        
     public override var typeCode:TypeCode
         {
         .array

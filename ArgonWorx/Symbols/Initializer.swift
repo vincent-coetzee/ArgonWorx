@@ -9,4 +9,8 @@ import Foundation
 
 public class Initializer:Function
     {
+    public override var typeCode:TypeCode
+        {
+        .initializer
+        }
     }

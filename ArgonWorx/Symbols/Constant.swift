@@ -9,4 +9,8 @@ import Foundation
 
 public class Constant:Symbol
     {
+    public override var typeCode:TypeCode
+        {
+        .constant
+        }
     }

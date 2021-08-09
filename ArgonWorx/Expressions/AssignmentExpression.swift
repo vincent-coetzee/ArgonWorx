@@ -18,4 +18,15 @@ public class AssignmentExpression: Expression
         self.lhs = lhs
         super.init()
         }
+        
+    public override func findType() -> Class?
+        {
+        return(self.rhs.findType())
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        self.lhs.realize(compiler)
+        self.rhs.realize(compiler)
+        }
     }

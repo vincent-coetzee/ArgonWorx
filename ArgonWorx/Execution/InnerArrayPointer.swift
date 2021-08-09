@@ -19,6 +19,7 @@ public class InnerArrayPointer:InnerPointer,Collection
         let address = segment.allocateObject(sizeInBytes: totalSize)
         let pointer = InnerArrayPointer(address: address)
         Self.allocatedArrays.insert(address)
+        pointer.headerTypeCode = .array
         pointer.setSlotValue(ArgonModule.argonModule.array.memoryAddress,atKey:"_classPointer")
         pointer.count = 0
         pointer.size = arraySize

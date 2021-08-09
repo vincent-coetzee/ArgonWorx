@@ -11,6 +11,11 @@ import SwiftUI
 
 public class Symbol:Node,ParseNode
     {
+    public func emitCode(using: CodeGenerator)
+        {
+        fatalError("Should have been overriden in \(self)")
+        }
+    
     public func newItemButton(_ binding:Binding<String?>) -> AnyView
         {
         return(AnyView(EmptyView()))
@@ -48,7 +53,7 @@ public class Symbol:Node,ParseNode
     
     public var typeCode:TypeCode
         {
-        return(.other)
+        fatalError("TypeCode being called on Symbol which is not valid")
         }
         
     public var children:Symbols?
@@ -59,6 +64,27 @@ public class Symbol:Node,ParseNode
     public var weight: Int
         {
         10
+        }
+        
+    public var subNodes: Array<ParseNode>?
+        {
+        return(nil)
+        }
+        
+    public func emitCode(into: ParseNode,using: CodeGenerator)
+        {
+        }
+        
+    public func realize(_ compiler:Compiler)
+        {
+        }
+        
+    public func realizeSuperclasses()
+        {
+        }
+        
+    public func analyzeSemantics(_ compiler:Compiler)
+        {
         }
         
     internal var memoryAddress: Word = 0

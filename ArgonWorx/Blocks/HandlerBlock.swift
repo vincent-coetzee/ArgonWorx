@@ -9,4 +9,6 @@ import Foundation
 
 public class HandlerBlock: Block
     {
+    public var symbols = Array<String>()
+    public var closure = ClosureBlock()
     }

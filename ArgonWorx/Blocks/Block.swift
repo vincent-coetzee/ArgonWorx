@@ -9,10 +9,15 @@ import Foundation
 
 public class Block:NamingContext
     {
-    private var blocks = Blocks()
-    private var localSlots = LocalSlots()
+    internal var blocks = Blocks()
+    internal var localSlots = LocalSlots()
     public private(set) var parent: Block!
     
+    public var method: MethodInstance
+        {
+        return(self.parent.method)
+        }
+        
     public var primaryContext: NamingContext
         {
         return(TopModule.topModule)
@@ -30,16 +35,41 @@ public class Block:NamingContext
     public func addBlock(_ block:Block)
         {
         self.blocks.append(block)
+        block.parent = self
         }
         
     public func addLocalSlot(_ localSlot:LocalSlot)
         {
-        self.localSlots.append(localSlot)
+        self.parent.addLocalSlot(localSlot)
         }
         
     public func setParent(_ block:Block)
         {
         self.parent = block
+        }
+        
+    public func emitCode(into: MethodInstance,using: CodeGenerator)
+        {
+        for block in self.blocks
+            {
+            block.emitCode(into: into,using: using)
+            }
+        }
+        
+    public func realize(_ compiler:Compiler)
+        {
+        for block in self.blocks
+            {
+            block.realize(compiler)
+            }
+        }
+        
+    public func analyzeSemantics(_ compiler:Compiler)
+        {
+        for block in self.blocks
+            {
+            block.analyzeSemantics(compiler)
+            }
         }
         
     public func lookup(label: String) -> Symbol?

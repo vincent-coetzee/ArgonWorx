@@ -69,6 +69,34 @@ public class ContainerSymbol:Symbol
         return(nil)
         }
         
+    public override func analyzeSemantics(_ compiler:Compiler)
+        {
+        for node in self.symbols.values
+            {
+            node.analyzeSemantics(compiler)
+            }
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        for child in self.symbols.values
+            {
+            if child is MethodInstance
+                {
+                print("junk")
+                }
+            child.realize(compiler)
+            }
+        }
+        
+    public override func realizeSuperclasses()
+        {
+        for element in self.symbols.values
+            {
+            element.realizeSuperclasses()
+            }
+        }
+        
     public override func addSymbol(_ symbol:Symbol)
         {
         self.symbols[symbol.label] = symbol

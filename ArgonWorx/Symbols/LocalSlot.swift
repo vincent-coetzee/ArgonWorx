@@ -9,6 +9,32 @@ import Foundation
 
 public class LocalSlot:Slot
     {
+    private let _typeExpression: Expression
+    
+    init(label:Label,type:Expression)
+        {
+        self._typeExpression = type
+        let aType = type.findType() ?? VoidClass.voidClass
+        super.init(label: label,type: aType)
+        }
+    
+    required init(labeled: Label, ofType: Class) {
+        fatalError("init(labeled:ofType:) has not been implemented")
+    }
+    
+    public override var typeCode:TypeCode
+        {
+        .localSlot
+        }
+        
+    public override func lookup(label: String) -> Symbol?
+        {
+        if !self.type.scalarClass
+            {
+            return(self.type.lookup(label: label))
+            }
+        return(nil)
+        }
     }
 
 public typealias LocalSlots = Array<LocalSlot>

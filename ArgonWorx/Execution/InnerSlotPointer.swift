@@ -20,6 +20,7 @@ public class InnerSlotPointer:InnerPointer
         Self.allocatedSlots.insert(address)
         pointer.setSlotValue(ArgonModule.argonModule.slot.memoryAddress,atKey:"_classPointer")
         pointer.assignSystemSlots(from: ArgonModule.argonModule.slot)
+        pointer.headerTypeCode = .slot
         return(pointer)
         }
         

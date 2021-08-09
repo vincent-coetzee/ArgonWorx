@@ -17,6 +17,7 @@ public class InnerDictionaryBucketPointer: InnerPointer
         pointer.value = value
         pointer.next = next
         pointer.assignSystemSlots(from: ArgonModule.argonModule.dictionaryBucket)
+        pointer.headerTypeCode = .dictionaryBucket
         assert(pointer.key == key,"Pointer.key != key")
         assert(pointer.value == value,"Pointer.value != value")
         assert(pointer.next == next,"Pointer.next != next")

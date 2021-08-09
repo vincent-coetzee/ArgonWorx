@@ -11,6 +11,11 @@ public class VoidClass:SystemClass
     {
     public static let voidClass = VoidClass(label:"Void")
     
+    public override var isVoidType: Bool
+        {
+        return(true)
+        }
+        
     public override func printLayout()
         {
         }

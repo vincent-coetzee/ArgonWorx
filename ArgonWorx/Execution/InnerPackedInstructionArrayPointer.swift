@@ -31,7 +31,6 @@ public class InnerPackedInstructionArrayPointer: InnerPointer,Collection
         let totalBytes = numberOfInstructions * bytesPerInstruction + extraBytes
         let address = segment.allocateObject(sizeInBytes: totalBytes)
         let pointer = InnerPackedInstructionArrayPointer(address: address)
-        pointer.instructionPointer = WordPointer(address: address + Word(InnerPointer.kArraySizeInBytes + 8 + 8))!
         pointer.count = 0
         pointer.size = numberOfInstructions
         return(pointer)
@@ -84,18 +83,56 @@ public class InnerPackedInstructionArrayPointer: InnerPointer,Collection
         return(ImmutableWordPointer(address: self.instructionPointer.address)!)
         }
         
+    required init(address: Word)
+        {
+        self.instructionPointer = WordPointer(address: address + Word(InnerPointer.kArraySizeInBytes + 8 + 8))!
+        super.init(address: address)
+        }
+        
+    public var instructions: Array<Instruction>
+        {
+        var instructions = Array<Instruction>()
+        for index in 0..<self.count
+            {
+            instructions.append(self[index])
+            }
+        return(instructions)
+        }
+        
     private var instructionPointer: WordPointer = WordPointer(address: 1)!
+    private var instructionIndex = 0
         
     public func index(after:Int) -> Int
         {
         return(after + 1)
         }
         
-    public func append(_ instruction:Instruction)
+    @discardableResult
+    public func append(_ opcode:Instruction.Opcode,operand1:Instruction.Operand = .none,operand2:Instruction.Operand = .none,result:Instruction.Operand = .none) -> Self
+        {
+        self.append(Instruction(opcode,operand1:operand1,operand2:operand2,result:result))
+        return(self)
+        }
+        
+    public func fromHere(_ with:String) -> InnerInstructionArrayPointer.InstructionLabel
+        {
+        return(InnerInstructionArrayPointer.InstructionLabel(label: with,index: self.instructionIndex))
+        }
+        
+    public func toHere(_ from: InnerInstructionArrayPointer.InstructionLabel) -> Argon.Integer
+        {
+        return(Argon.Integer(from.index - self.instructionIndex))
+        }
+        
+    @discardableResult
+    public func append(_ instruction:Instruction) -> Self
         {
         let offset = self.count * Self.kInstructionSizeInWords
+        instruction.id = self.count
         instruction.write(to: self.instructionPointer + offset)
         self.count += 1
+        self.instructionIndex += 1
+        return(self)
         }
         
     public subscript(_ index:Int) -> Instruction
@@ -108,9 +145,17 @@ public class InnerPackedInstructionArrayPointer: InnerPointer,Collection
             }
         set
             {
+            newValue.id = index
             let offset = index * Self.kInstructionSizeInWords
             let pointer = self.instructionPointer + offset
             newValue.write(to: pointer)
             }
+        }
+    
+    @discardableResult
+    public func rewind() -> Self
+        {
+        self.instructionIndex = 0
+        return(self)
         }
     }

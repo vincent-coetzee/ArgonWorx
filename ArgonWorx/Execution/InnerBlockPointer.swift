@@ -15,8 +15,9 @@ public class InnerBlockPointer: InnerPointer
         let totalSize = Self.kBlockSizeInBytes + (size * 8)
         let address = segment.allocateObject(sizeInBytes: totalSize)
         let pointer = InnerBlockPointer(address: address)
-        pointer.setSlotValue(size,atKey:"size")
-        pointer.setSlotValue(0,atKey: "count")
+        pointer.headerTypeCode = .block
+        pointer.size = size
+        pointer.count = 0
         return(pointer)
         }
     
@@ -86,5 +87,10 @@ public class InnerBlockPointer: InnerPointer
             {
             self.basePointer[index] = newValue
             }
+        }
+        
+    internal func copy(from block:InnerBlockPointer,count: Int)
+        {
+        self.basePointer.assign(from: block.basePointer,count: count)
         }
     }

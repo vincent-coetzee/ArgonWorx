@@ -8,9 +8,40 @@
 import Foundation
 import AppKit
 
+public enum AddressDescriptor
+    {
+    case register(Instruction.Register)
+    case address(Word)
+    case stack(Word)
+    }
+    
+public class AddressDescriptors
+    {
+    public var valueIsDuplicated: Bool
+        {
+        for _ in self.descriptors
+            {
+            return(true)
+            }
+        return(false)
+        }
+        
+    private var descriptors = Array<AddressDescriptor>()
+    
+    public func append(_ descriptor:AddressDescriptor)
+        {
+        self.descriptors.append(descriptor)
+        }
+    }
+    
 public class Slot:Symbol
     {
-    public override var type:Type
+    public override var typeCode:TypeCode
+        {
+        .slot
+        }
+        
+    public override var type:Class
         {
         return(self._type)
         }
@@ -67,19 +98,27 @@ public class Slot:Symbol
         return(false)
         }
         
-    private let _type:Type
+    private let _type:Class
     public private(set) var offset:Int = 0
+    public var initialValue: Expression? = nil
+    public var isClassSlot = false
+    public var addressDescriptors = AddressDescriptors()
     
-    init(label:Label,type:Type)
+    init(label:Label,type:Class)
         {
         self._type = type
         super.init(label:label)
         }
         
-    required init(labeled:Label,ofType:Type)
+    required init(labeled:Label,ofType:Class)
         {
         self._type = ofType
         super.init(label:labeled)
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        self._type.realize(compiler)
         }
         
     public func setOffset(_ integer:Int)
@@ -106,9 +145,9 @@ public class Slot:Symbol
         self.memoryAddress = pointer.address
         assert( ArgonModule.argonModule.slot.sizeInBytes == 88)
         pointer.setSlotValue(segment.allocateString(self.label),atKey:"name")
-        pointer.setSlotValue(self._type.typeClass.memoryAddress,atKey:"slotClass")
+        pointer.setSlotValue(self._type.memoryAddress,atKey:"slotClass")
         pointer.setSlotValue(self.offset,atKey:"offset")
-        pointer.setSlotValue(self._type.typeClass.typeCode.rawValue,atKey:"typeCode")
+        pointer.setSlotValue(self._type.typeCode.rawValue,atKey:"typeCode")
         self.isMemoryLayoutDone = true
         }
     }

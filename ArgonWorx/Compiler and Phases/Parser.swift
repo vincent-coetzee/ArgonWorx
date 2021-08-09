@@ -15,8 +15,11 @@ public class Parser
     private var lastToken:Token = .none
     private let compiler:Compiler
     private var namingContext: NamingContext
+    private var symbolStack = Stack<Symbol>()
+    private var currentContext:Symbol = Symbol(label:"")
+    private var node:ParseNode?
     
-    public static func parseChunk(_ source:String,in compiler:Compiler) -> ParseNode
+    public static func parseChunk(_ source:String,in compiler:Compiler) -> ParseNode?
         {
         Parser(compiler: compiler).parseChunk(source)
         }
@@ -42,20 +45,45 @@ public class Parser
         return(self.token)
         }
         
+    private func pushContext(_ symbol:Symbol)
+        {
+        var newSymbol = symbol
+        var old:Symbol? = self.currentContext
+        while old != nil
+            {
+            if old == symbol
+                {
+                newSymbol = ForwardingSymbol(label:"")
+                break
+                }
+            old = old!.parent as? Symbol
+            }
+        newSymbol.setParent(self.currentContext)
+        self.symbolStack.push(self.currentContext)
+        self.currentContext = newSymbol
+        }
+        
+    @discardableResult
+    private func popContext() -> Symbol
+        {
+        self.currentContext = self.symbolStack.pop()
+        return(self.currentContext)
+        }
+        
     private func peekToken() -> Token
         {
         return(self.tokens[self.tokenIndex])
         }
         
-    public func parseChunk(_ source:String) -> ParseNode
+    public func parseChunk(_ source:String) -> ParseNode?
         {
+        self.currentContext = TopModule.topModule
         let stream = TokenStream(source: source, context: self.reportingContext)
         self.tokens = stream.allTokens(withComments: false, context: self.reportingContext)
         self.nextToken()
-        let item = self.parsePrivacyModifier
+        let result = self.parsePrivacyModifier
             {
             (scope:PrivacyScope?) -> ParseNode in
-            var node:ParseNode = ErrorSymbol.shared
             if !self.token.isKeyword
                 {
                 self.reportingContext.dispatchError(at: self.token.location, message: "KEYWORD expected")
@@ -65,28 +93,28 @@ public class Parser
                 switch(self.token.keyword)
                     {
                     case .MAIN:
-                        node = self.parseMain()
+                        self.parseMain()
                     case .MODULE:
-                        node = self.parseModule()
+                        self.parseModule()
                     case .CLASS:
-                        node = self.parseClass()
+                        self.parseClass()
                     case .CONSTANT:
-                        node = self.parseConstant()
+                        self.parseConstant()
                     case .METHOD:
-                        node = self.parseMethod()
+                        self.parseMethod()
                     case .FUNCTION:
-                        node = self.parseFunction()
+                        self.parseFunction()
                     case .TYPE:
-                        node = self.parseTypeAlias()
+                        self.parseTypeAlias()
                     case .HANDLE:
-                        node = self.parseHandler()
+                        self.parseHandler()
                     default:
                         break
                     }
                 }
-            return(node)
+            return(self.node!)
             }
-        return(item)
+        return(result)
         }
         
     private func chompKeyword()
@@ -161,36 +189,35 @@ public class Parser
         return(result)
         }
         
-    private func parseMain() -> ParseNode
+    private func parseMain()
         {
         self.nextToken()
         if self.token.isModule
             {
-            return(self.parseMainModule())
-            }
-        else if token.isMethod
-            {
-            return(self.parseMainMethod())
+            self.parseMainModule()
             }
         else
             {
-            self.reportingContext.dispatchError(at: self.token.location, message: "MAIN must prefix either MODULE or METHOD instead of \(self.token)")
-            return(ErrorSymbol.shared)
+            self.parseMainMethod()
             }
         }
     
-    private func parseMainMethod() -> MethodInstance
+    private func parseMainMethod()
         {
-        return(self.parseMethod())
+        let method = self.parseMethod()
+        method.method.isMain = true
         }
         
-    private func parseMainModule() -> Module
+    private func parseMainModule()
         {
         self.nextToken()
         let label = self.parseLabel()
         let module = MainModule(label: label)
+        self.currentContext.addSymbol(module)
+        self.pushContext(module)
         self.parseModule(into: module)
-        return(module)
+        self.popContext()
+        self.node = module
         }
     
     private func parsePath() -> Token
@@ -204,7 +231,7 @@ public class Parser
         return(.path("",Location.zero))
         }
         
-    private func parseModule() -> Module
+    private func parseModule()
         {
         let label = self.parseLabel()
         var module:Module
@@ -217,12 +244,14 @@ public class Parser
             {
             module = Module(label: label)
             }
+        self.currentContext.addSymbol(module)
         self.parseModule(into: module)
-        return(module)
+        self.node = module
         }
         
     private func parseModule(into module:Module)
         {
+        self.pushContext(module)
         self.parseBraces
             {
             while !self.token.isRightBrace
@@ -236,26 +265,19 @@ public class Parser
                     switch(self.token.keyword)
                         {
                         case .FUNCTION:
-                            let function = self.parseFunction()
-                            module.addSymbol(function)
+                            self.parseFunction()
                         case .MAIN:
-                            let symbol = self.parseMain() as! Symbol
-                            module.addSymbol(symbol)
+                            self.parseMain()
                         case .MODULE:
-                            let inner = self.parseModule()
-                            module.addSymbol(inner)
+                            self.parseModule()
                         case .CLASS:
-                            let aClass = self.parseClass()
-                            module.addSymbol(aClass)
+                            self.parseClass()
                         case .TYPE:
-                            let type = self.parseTypeAlias()
-                            module.addSymbol(type)
+                            self.parseTypeAlias()
                         case .METHOD:
-                            let instance = self.parseMethod()
-                            module.addSymbol(instance)
+                            self.parseMethod()
                         case .CONSTANT:
-                            let constant = self.parseConstant()
-                            module.addSymbol(constant)
+                            self.parseConstant()
                         case .SCOPED:
                             let scoped = self.parseScopedSlot()
                             module.addSymbol(scoped)
@@ -267,11 +289,13 @@ public class Parser
                             module.addSymbol(interceptor)
                         default:
                             self.reportingContext.dispatchError(at: self.token.location, message: "A declaration for a module element was expected but \(self.token) was found.")
+                            self.nextToken()
                         }
                     }
                 
                 }
             }
+        self.popContext()
         }
         
     private func parseInterceptor() -> Interceptor
@@ -281,22 +305,109 @@ public class Parser
         
     private func parseScopedSlot() -> ScopedSlot
         {
-        return(ScopedSlot(label:"Slot",type:ArgonModule.argonModule.integer.type))
+        return(ScopedSlot(label:"Slot",type:ArgonModule.argonModule.integer))
         }
         
     private func parseSlot() -> Slot
         {
-        return(Slot(label:"Slot",type:ArgonModule.argonModule.integer.type))
+        self.nextToken()
+        let label = self.parseLabel()
+        var type: Class?
+        if self.token.isGluon
+            {
+            self.nextToken()
+            type = self.parseType()
+            }
+        var initialValue:Expression?
+        if self.token.isAssign
+            {
+            self.nextToken()
+            initialValue = self.parseExpression()
+            }
+        var readBlock:VirtualReadBlock?
+        var writeBlock:VirtualWriteBlock?
+        if self.token.isLeftBrace
+            {
+            self.parseBraces
+                {
+                if self.token.isRead
+                    {
+                    readBlock = VirtualReadBlock()
+                    self.parseBlock(into: readBlock!)
+                    }
+                if self.token.isWrite
+                    {
+                    writeBlock = VirtualWriteBlock()
+                    self.parseBlock(into: writeBlock!)
+                    }
+                }
+            }
+        var slot: Slot?
+        if readBlock.isNotNil
+            {
+            let aSlot = VirtualSlot(label: label,type: type ?? VoidClass.voidClass)
+            aSlot.writeBlock = writeBlock
+            aSlot.readBlock = readBlock
+            slot = aSlot
+            }
+        else
+            {
+            slot = Slot(label: label,type: type ?? VoidClass.voidClass)
+            }
+        slot!.initialValue = initialValue
+        return(slot!)
         }
         
-    private func parseClass() -> Class
+    private func parseClassSlot() -> Slot
         {
-        return(Class(label:"Class"))
+        self.nextToken()
+        let slot = self.parseSlot()
+        slot.isClassSlot = true
+        return(slot)
         }
         
-    private func parseConstant() -> Constant
+    private func parseClass()
         {
-        return(Constant(label:"$Constant"))
+        self.nextToken()
+        let label = self.parseLabel()
+        let aClass = Class(label: label)
+        self.currentContext.addSymbol(aClass)
+        self.pushContext(aClass)
+        if self.token.isGluon
+            {
+            self.nextToken()
+            repeat
+                {
+                self.parseComma()
+                let otherClass = self.parseName()
+                let holder = SymbolHolder(name: otherClass, location: self.token.location, namingContext: self.currentContext, reporter: self.reportingContext)
+                aClass.superclassHolders.append(holder)
+                }
+            while self.token.isComma
+            }
+        self.parseBraces
+            {
+            while self.token.isSlot || self.token.isClass
+                {
+                if self.token.isSlot
+                    {
+                    let slot = self.parseSlot()
+                    aClass.addSymbol(slot)
+                    }
+                else if self.token.isClass
+                    {
+                    let slot = self.parseClassSlot()
+                    aClass.addSymbol(slot)
+                    }
+                }
+            }
+        self.popContext()
+        self.node = aClass
+        }
+        
+    private func parseConstant()
+        {
+        fatalError()
         }
         
     private func dispatchError(_ message:String)
@@ -346,7 +457,7 @@ public class Parser
             }
         }
         
-    private func parseType() -> Type
+    private func parseType() -> Class
         {
         var name:Name
         if self.token.isIdentifier && self.token.isSystemClassName
@@ -382,14 +493,14 @@ public class Parser
         return(SymbolHolderType(symbolHolder: holder))
         }
         
-    private func parseTypeParameters() -> Types
+    private func parseTypeParameters() -> Classes
         {
         if self.token.isLeftBrocket
             {
             let list = self.parseBrockets
                 {
-                () -> Types in
-                var list = Types()
+                () -> Classes in
+                var list = Classes()
                 while !self.token.isRightBrocket
                     {
                     self.parseComma()
@@ -445,16 +556,28 @@ public class Parser
         self.nextToken()
         let name = self.parseLabel()
         let list = self.parseParameters()
-        var returnType: Type? = nil
+        var returnType: Class? = nil
         if self.token.isRightArrow
             {
             self.nextToken()
             returnType = self.parseType()
             }
         let instance = MethodInstance(label: name,parameters: list,returnType: returnType)
+        if let method = self.currentContext.lookup(label: name) as? Method
+            {
+            method.addInstance(instance)
+            }
+        else
+            {
+            let method = Method(label: name)
+            self.currentContext.addSymbol(method)
+            method.addInstance(instance)
+            }
         self.parseBraces
             {
+            self.pushContext(instance)
             self.parseBlock(into: instance.block)
+            self.popContext()
             }
         return(instance)
         }
@@ -471,7 +594,7 @@ public class Parser
 
     private func parseArrayExpression() -> Expression
         {
-        var lhs = self.parseArithmeticExpression()
+        var lhs = self.parseRelationalExpression()
         while self.token.isLeftBracket
             {
             self.nextToken()
@@ -482,6 +605,19 @@ public class Parser
                 }
             self.nextToken()
             lhs = lhs.index(rhs)
+            }
+        return(lhs)
+        }
+        
+    private func parseRelationalExpression() -> Expression
+        {
+        let lhs = self.parseArithmeticExpression()
+        if self.token.isLeftBrocket || self.token.isLeftBrocketEquals || self.token.isEquals || self.token.isRightBrocket || self.token.isRightBrocketEquals
+            {
+            let symbol = self.token.symbol
+            self.nextToken()
+            let rhs = self.parseExpression()
+            return(lhs.operation(symbol,rhs))
             }
         return(lhs)
         }
@@ -521,7 +657,10 @@ public class Parser
         var lhs = self.parseUnaryExpression()
         while self.token.isRightArrow
             {
-            lhs = lhs.operation(self.token.symbol,self.parseExpression())
+            self.nextToken()
+            let slotExpression = self.parseSlotMemberExpression([])
+            slotExpression.instance(lhs)
+            return(slotExpression)
             }
         return(lhs)
         }
@@ -581,23 +720,68 @@ public class Parser
                 return(self.parseExpression())
                 })
             }
+        else if self.token.isLeftBrace
+            {
+            return(self.parseClosureTerm())
+            }
         else
             {
-            fatalError("Invalid parse state")
+            fatalError("Invalid parse state \(self.lastToken) \(self.token)")
             }
+        }
+        
+    private func parseSlotMemberExpression(_ list:[String]) -> SlotMemberExpression
+        {
+        let first = self.parseLabel()
+        if self.token.isRightArrow
+            {
+            self.nextToken()
+            return(self.parseSlotMemberExpression([first]))
+            }
+        return(SlotMemberExpression(self.currentContext,list + [first]))
         }
         
     private func parseIdentifierTerm() -> Expression
         {
         let name = self.parseName()
+        if let symbol = self.currentContext.lookup(name: name),symbol is Class
+            {
+            self.parseParentheses { }
+            return(InstanciationTerm(class: symbol as! Class))
+            }
         if self.token.isLeftPar
             {
             return(self.parseInvocationTerm(name))
             }
         else
             {
-            return(SlotReadExpression(name: name,namingContext: self.namingContext, reportingContext: self.reportingContext))
+            return(LocalReadExpression(name: name, location: self.token.location,namingContext: self.currentContext, reportingContext: self.reportingContext))
             }
+        }
+        
+    private func parseClosureTerm() -> BlockExpression
+        {
+        let closure = ClosureBlock()
+        self.parseBraces
+            {
+            if self.token.isWith
+                {
+                self.nextToken()
+                closure.parameters = self.parseParentheses
+                    {
+                    self.parseParameters()
+                    }
+                if self.token.isRightArrow
+                    {
+                    closure.resultType = self.parseType()
+                    }
+                }
+            while !self.token.isRightBrace
+                {
+                self.parseBlock(into: closure)
+                }
+            }
+        return(BlockExpression(block: closure))
         }
         
     private func parseInvocationTerm(_ name:Name) -> Expression
@@ -625,7 +809,7 @@ public class Parser
                 }
             return(arguments)
             }
-        return(InvocationExpression(name: name,arguments: args,namingContext: self.namingContext, reportingContext: self.reportingContext))
+            return(InvocationExpression(name: name,arguments: args, location: self.token.location,namingContext: self.currentContext, reportingContext: self.reportingContext))
         }
         
     private func parseBlock(into block: Block)
@@ -664,6 +848,14 @@ public class Parser
                 {
                 self.parseIdentifierBlock(into: block)
                 }
+            else if self.token.isReturn
+                {
+                self.parseReturnBlock(into: block)
+                }
+            else if self.token.isLet
+                {
+                self.parseLetBlock(into: block)
+                }
             else
                 {
                 self.dispatchError("Statement expected")
@@ -674,18 +866,94 @@ public class Parser
         
     private func parseSelectBlock(into block: Block)
         {
+        self.nextToken()
+        let value = self.parseParentheses
+            {
+            return(self.parseExpression())
+            }
+        let selectBlock = SelectBlock(value: value)
+        block.addBlock(selectBlock)
+        self.parseBraces
+            {
+            while !self.token.isRightBrace
+                {
+                if !self.token.isWhen
+                    {
+                    self.dispatchError("WHEN expected after SELECT clause")
+                    self.nextToken()
+                    }
+                let inner = self.parseParentheses
+                    {
+                    self.parseExpression()
+                    }
+                let when = WhenBlock(condition: inner)
+                selectBlock.addWhen(block: when)
+                self.parseBraces
+                    {
+                    self.parseBlock(into: when)
+                    }
+                }
+            }
         }
         
     private func parseIfBlock(into block: Block)
         {
+        self.nextToken()
+        let expression = self.parseRelationalExpression()
+        let statement = IfBlock(condition: expression)
+        self.parseBlock(into: statement)
+        block.addBlock(statement)
+        }
+        
+    private func parseLetBlock(into block: Block)
+        {
+        self.nextToken()
+        let someVariable = self.parseName()
+        if !self.token.isAssign
+            {
+            self.dispatchError("'=' expected after LET clause.")
+            }
+        self.nextToken()
+        let value = self.parseExpression()
+        let aClass = value.findType()
+        print(aClass)
+        let localSlot = LocalSlot(label: someVariable.last, type: value)
+        block.addLocalSlot(localSlot)
+        block.addBlock(LetBlock(name: someVariable,slot:localSlot,location: self.token.location,namingContext: block,value: value))
+        }
+        
+    private func parseReturnBlock(into block: Block)
+        {
+        self.nextToken()
+        let value = self.parseParentheses
+            {
+            self.parseExpression()
+            }
+        let returnBlock = ReturnBlock()
+        returnBlock.value = value
+        block.addBlock(returnBlock)
         }
         
     private func parseWhileBlock(into block: Block)
+        {
+        self.nextToken()
+        let expression = self.parseRelationalExpression()
+        let statement = WhileBlock(condition: expression)
+        self.parseBlock(into: statement)
+        block.addBlock(statement)
+        }
+        
+    private func parseInductionVariable()
         {
         }
         
     private func parseForkBlock(into block: Block)
         {
+        let variableName = self.parseLabel()
+        self.parseInductionVariable()
+        let statement = ForBlock(name: variableName)
+        self.parseBlock(into: statement)
+        block.addBlock(statement)
         }
         
     private func parseLoopBlock(into block: Block)
@@ -694,8 +962,29 @@ public class Parser
         
     private func parseSignalBlock(into block: Block)
         {
+        self.nextToken()
+        self.parseParentheses
+            {
+            if self.nextToken().isHashStringLiteral
+                {
+                let symbol = self.token.hashStringLiteral
+                block.addBlock(SignalBlock(symbol: symbol))
+                self.nextToken()
+                }
+            else
+                {
+                self.dispatchError("Symbol expected but \(self.token) was found instead.")
+                }
+            }
         }
         
+    ///
+    ///
+    /// handle(#Symbol1,#Symbol2)
+    ///     {
+    ///     with(value)
+    ///     print("The signalled value was " + value)
+    ///     }
     private func parseHandleBlock(into block: Block)
         {
         }
@@ -731,7 +1020,7 @@ public class Parser
         return(parameter)
         }
         
-    private func parseFunction() -> Function
+    private func parseFunction()
         {
         self.nextToken()
         let name = self.parseLabel()
@@ -750,12 +1039,21 @@ public class Parser
             self.nextToken()
             function.returnType = self.parseType()
             }
-        return(function)
+        self.currentContext.addSymbol(function)
         }
         
-    private func parseTypeAlias() -> TypeAlias
+    private func parseTypeAlias()
         {
-        return(TypeAlias(label:"TypeAlias"))
+        self.nextToken()
+        let label = self.parseLabel()
+        if !self.token.isIs
+            {
+            self.dispatchError("IS expeected after new name for type.")
+            }
+        self.nextToken()
+        let type = self.parseType()
+        let alias = TypeAlias(label: label,type: type)
+        self.currentContext.addSymbol(alias)
         }
         
     private func parseHandler() -> Handler

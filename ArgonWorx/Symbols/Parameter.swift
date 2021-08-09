@@ -9,10 +9,20 @@ import Foundation
 
 public class Parameter:Symbol
     {
-    private let _type:Type
+    public override var typeCode:TypeCode
+        {
+        .parameter
+        }
+        
+    public override var type: Class
+        {
+        return(self._type)
+        }
+        
+    private let _type:Class
     private let isHidden:Bool
     
-    init(label:Label,type:Type,isHidden:Bool = false)
+    init(label:Label,type:Class,isHidden:Bool = false)
         {
         self.isHidden = isHidden
         self._type = type

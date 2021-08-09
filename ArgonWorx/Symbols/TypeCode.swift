@@ -34,4 +34,24 @@ public enum TypeCode:Int
     case pointer = 22
     case other = 23
     case mutableString = 24
+    case constant = 25
+    case enumerationCase = 26
+    case initializer = 27
+    case localSlot = 28
+    case argonModule = 29
+    case topModule = 30
+    case libraryModule = 31
+    case systemModule = 32
+    case mainModule = 33
+    case parameter = 34
+    case virtualSlot = 35
+    case typeAlias = 36
+    case interceptor = 37
+    case block = 38
+    case closure = 39
+    case byteArray = 40
+    case instruction = 41
+    case instructionArray = 42
+    case dictionary = 43
+    case dictionaryBucket = 44
     }

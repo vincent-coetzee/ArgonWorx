@@ -10,11 +10,21 @@ import AppKit
 
 public class Method:Symbol
     {
+    public override func emitCode(using generator: CodeGenerator)
+        {
+        for instance in self.instances
+            {
+            instance.emitCode(using: generator)
+            }
+        }
+        
     public var isSystemMethod: Bool
         {
         return(false)
         }
         
+    public var isMain: Bool = false
+    
     public private(set) var instances = MethodInstances()
     
     public class func method(label:String) -> Method
@@ -32,7 +42,23 @@ public class Method:Symbol
         .argonPink
         }
         
-    public func instance(_ types:Type...,returnType:Type = ClassType(class:VoidClass.voidClass)) -> Method
+    public override func realize(_ compiler:Compiler)
+        {
+        for instance in self.instances
+            {
+            instance.realize(compiler)
+            }
+        }
+        
+    public override func emitCode(into: ParseNode,using: CodeGenerator)
+        {
+        for instance in self.instances
+            {
+            instance.emitCode(into: instance,using: using)
+            }
+        }
+        
+    public func instance(_ types:Class...,returnType:Class = VoidClass.voidClass) -> Method
         {
         let instance = MethodInstance(label: self.label)
         var parameters = Parameters()

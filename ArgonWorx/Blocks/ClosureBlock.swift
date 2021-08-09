@@ -9,4 +9,6 @@ import Foundation
 
 public class ClosureBlock: Block
     {
+    public var parameters = Parameters()
+    public var resultType = VoidClass.voidClass.type
     }

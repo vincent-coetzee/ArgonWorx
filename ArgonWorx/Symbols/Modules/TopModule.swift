@@ -16,6 +16,11 @@ import Foundation
 ///
 public class TopModule: SystemModule
     {
+    public override var typeCode:TypeCode
+        {
+        .topModule
+        }
+        
     public static let topModule = TopModule()
     
     public override var name: Name

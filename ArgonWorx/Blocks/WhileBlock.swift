@@ -9,4 +9,11 @@ import Foundation
 
 public class WhileBlock: Block
     {
+    private let condition:Expression
+    
+    init(condition: Expression)
+        {
+        self.condition = condition
+        super.init()
+        }
     }

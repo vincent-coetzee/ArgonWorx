@@ -8,9 +8,15 @@
 import Foundation
 import AppKit
 import SwiftUI
+import FFI
 
 public class Class:ContainerSymbol,ObservableObject
     {
+    public override func emitCode(using: CodeGenerator)
+        {
+        print("NEED TO WRITE OUT CLASS \(self.label)")
+        }
+        
     public var innerClassPointer: InnerClassPointer
         {
         return(InnerClassPointer(address: self.memoryAddress))
@@ -22,8 +28,32 @@ public class Class:ContainerSymbol,ObservableObject
         let offset:Int
         }
         
+    public var scalarClass: Bool
+        {
+        return(false)
+        }
+        
+    public var metaclass: Metaclass
+        {
+        if self._metaclass.isNil
+            {
+            self._metaclass = Metaclass(label: self.label,class: self)
+            }
+        return(self._metaclass!)
+        }
+        
+    public override var subNodes: Array<ParseNode>?
+        {
+        return(self.symbols.values.map{$0 as ParseNode})
+        }
+        
     public static let number: Class = ArgonModule.argonModule.lookup(label:"Number") as! Class
     
+    public var ffiType: ffi_type
+        {
+        return(ffi_type_uint64)
+        }
+        
     public override var typeCode: TypeCode
         {
         switch(self.label)
@@ -61,9 +91,14 @@ public class Class:ContainerSymbol,ObservableObject
             }
         }
         
-    public override var type:Type
+    public var isVoidType: Bool
         {
-        return(ClassType(class:self))
+        return(false)
+        }
+        
+    public override var type:Class
+        {
+        return(self)
         }
         
     public var isClassClass: Bool
@@ -171,11 +206,29 @@ public class Class:ContainerSymbol,ObservableObject
     internal var isMemoryPreallocated = false
     internal var header = Header(0)
     internal var hasBytes = false
+    internal var _metaclass: Metaclass?
     
     public override init(label:Label)
         {
         self.magicNumber = label.polynomialRollingHash
         super.init(label: label)
+        }
+        
+    public func isSubclass(of superclass:Class) -> Bool
+        {
+        return(superclass.isSuperclass(of: self))
+        }
+        
+    public func isSuperclass(of subclass:Class) -> Bool
+        {
+        for aClass in self.subclasses
+            {
+            if aClass == subclass
+                {
+                return(true)
+                }
+            }
+        return(false)
         }
         
     public func superclass(_ string:String) -> Class
@@ -278,6 +331,18 @@ public class Class:ContainerSymbol,ObservableObject
             }
         }
         
+    public override func lookup(label: String) -> Symbol?
+        {
+        for slot in self.localAndInheritedSlots
+            {
+            if slot.label == label
+                {
+                return(slot)
+                }
+            }
+        return(super.lookup(label: label))
+        }
+        
     public func allSuperclasses() -> Array<Class>
         {
         var set = Array<Class>()
@@ -309,15 +374,15 @@ public class Class:ContainerSymbol,ObservableObject
         var offset:Int = 0
         var visitedClasses = Set<Class>()
         visitedClasses.insert(self)
-        var slot:Slot = HeaderSlot(label: "_header",type: ClassType(class:ArgonModule.argonModule.integer))
+        var slot:Slot = HeaderSlot(label: "_header",type: ArgonModule.argonModule.integer)
         slot.setOffset(offset)
         self.layoutSlots.append(slot)
         offset += slot.size
-        slot = Slot(label: "_magicNumber",type: ClassType(class:ArgonModule.argonModule.integer))
+        slot = Slot(label: "_magicNumber",type: ArgonModule.argonModule.integer)
         slot.setOffset(offset)
         self.layoutSlots.append(slot)
         offset += slot.size
-        slot = ObjectSlot(label: "_classPointer",type: ClassType(class:ArgonModule.argonModule.address))
+        slot = ObjectSlot(label: "_classPointer",type: ArgonModule.argonModule.address)
         slot.setOffset(offset)
         self.layoutSlots.append(slot)
         offset += slot.size
@@ -348,15 +413,15 @@ public class Class:ContainerSymbol,ObservableObject
             }
         visitedClasses.insert(self)
         print("LAYING OUT CLASS \(self.label) INDIRECTLY")
-        var slot:Slot = HeaderSlot(label: "_\(self.label)Header",type: ClassType(class:ArgonModule.argonModule.integer))
+        var slot:Slot = HeaderSlot(label: "_\(self.label)Header",type: ArgonModule.argonModule.integer)
         slot.setOffset(offset)
         inClass.layoutSlots.append(slot)
         offset += slot.size
-        slot = Slot(label: "_\(self.label)MagicNumber",type: ClassType(class:ArgonModule.argonModule.integer))
+        slot = Slot(label: "_\(self.label)MagicNumber",type: ArgonModule.argonModule.integer)
         slot.setOffset(offset)
         inClass.layoutSlots.append(slot)
         offset += slot.size
-        slot = ObjectSlot(label: "_\(self.label)ClassPointer",type: ClassType(class:ArgonModule.argonModule.address))
+        slot = ObjectSlot(label: "_\(self.label)ClassPointer",type: ArgonModule.argonModule.address)
         slot.setOffset(offset)
         inClass.layoutSlots.append(slot)
         offset += slot.size
@@ -412,7 +477,7 @@ public class Class:ContainerSymbol,ObservableObject
             }
         }
         
-    public func reifySuperclasses()
+    public override func realizeSuperclasses()
         {
         for reference in self.superclassHolders
             {
@@ -426,9 +491,10 @@ public class Class:ContainerSymbol,ObservableObject
                     {
                     symbol.subclasses.append(self)
                     }
-                symbol.reifySuperclasses()
+                symbol.realizeSuperclasses()
                 }
             }
+        self.superclassHolders = []
         }
         
     @discardableResult

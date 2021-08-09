@@ -23,7 +23,7 @@ public class Compiler
 
     public func compileChunk(_ source:String)
         {
-        let chunk = Parser.parseChunk(source,in:self)
+        let chunk = Parser.parseChunk(source,in:self)!
         Realizer.realize(chunk,in:self)
         SemanticAnalyzer.analyze(chunk,in:self)
         Optimizer.optimize(chunk,in:self)

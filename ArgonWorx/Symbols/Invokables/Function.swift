@@ -9,20 +9,8 @@ import Foundation
 import FFI
 import Interpreter
 
-public class Function:Symbol
-    {
-    internal var cName: String
-    internal var parameters: Parameters
-    public var returnType: Type = VoidClass.voidClass.type
-    public var library:DynamicLibrary = .emptyLibrary
-    
-    override init(label:Label)
-        {
-        self.cName = ""
-        self.parameters = Parameters()
-        super.init(label: label)
-        }
-        
+public class Function:Invokable
+    {        
     public func call(withArguments: Words) -> Word?
         {
         let argTypes:UnsafeMutablePointer<ffi_type>? = UnsafeMutablePointer<ffi_type>.allocate(capacity: self.parameters.count)

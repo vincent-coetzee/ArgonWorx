@@ -9,5 +9,12 @@ import Foundation
 
 public class WhenBlock: Block
     {
+    public let condition: Expression
+    
+    init(condition: Expression)
+        {
+        self.condition = condition
+        super.init()
+        }
     }
     

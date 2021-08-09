@@ -9,4 +9,20 @@ import Foundation
 
 public class TypeAlias:Symbol
     {
+    public override func emitCode(using: CodeGenerator)
+        {
+        }
+        
+    private let _type:Class
+    
+    init(label:Label,type:Class)
+        {
+        self._type = type
+        super.init(label: label)
+        }
+        
+    public override var typeCode:TypeCode
+        {
+        .typeAlias
+        }
     }

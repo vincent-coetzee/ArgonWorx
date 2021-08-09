@@ -9,6 +9,11 @@ import Foundation
 
 public class LibraryModule: Module
     {
+    public override var typeCode:TypeCode
+        {
+        .libraryModule
+        }
+        
     private var path: String?
     
     init(label:Label,path:String)

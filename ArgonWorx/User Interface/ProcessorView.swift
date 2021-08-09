@@ -9,16 +9,11 @@ import SwiftUI
 
 struct ProcessorView: View
     {
-    @StateObject private var context = ExecutionContext()
-    @State private var buffer = InnerInstructionArrayPointer.allocate(arraySize: 10*10, in: ManagedSegment.shared).append(InnerInstructionArrayPointer.samples.allInstructions).rewind()
+    @EnvironmentObject private var context:ExecutionContext
     @State private var color:Color = .white
-    var program = InnerInstructionArrayPointer(address:0)
+    @State private var index:Int = 0
+    @State private var program = InnerPackedInstructionArrayPointer.allocate(numberOfInstructions: 100, in: ManagedSegment.shared)
     
-    init()
-        {
-        self.initProgram()
-        }
-        
     var body: some View
         {
         VStack
@@ -37,6 +32,7 @@ struct ProcessorView: View
             do
                 {
                 try self.context.singleStep()
+                self.index += 1
                 }
             catch
                 {
@@ -45,36 +41,39 @@ struct ProcessorView: View
             {
             Text("Next")
             }
-        ForEach(InnerInstructionArrayPointer.samples.allInstructions)
+        ForEach(self.program.instructions)
             {
             instruction in
             HStack
                 {
-                Text(" \(instruction.opcode)".aligned(.right,in:10)).inspectorFont().foregroundColor(instruction.id == self.buffer.currentInstructionId ? .orange : .white)
-                Text(instruction.operandText.aligned(.left,in:33)).inspectorFont().foregroundColor(instruction.id == self.buffer.currentInstructionId ? .orange : .white)
+                Text(" \(instruction.opcode)".aligned(.right,in:10)).inspectorFont().foregroundColor(instruction.id == self.index ? .orange : .white)
+                Text(instruction.operandText.aligned(.left,in:33)).inspectorFont().foregroundColor(instruction.id == self.index ? .orange : .white)
                 Spacer()
                 }
             }
         }
         .padding(20)
+        .onAppear
+            {
+            self.$program.wrappedValue.append(.load,operand1: .integer(2021),result: .register(.r1))
+            self.$program.wrappedValue.append(.load,operand1: .integer(1965),result: .register(.r2))
+            self.$program.wrappedValue.append(.isub,operand1: .register(.r1),operand2: .register(.r2),result:.register(.r3))
+            self.$program.wrappedValue.append(.load,operand1: .integer(112000),result: .register(.r4))
+            self.$program.wrappedValue.append(.imul,operand1: .register(.r4),operand2: .integer(12),result: .register(.r5))
+            self.$program.wrappedValue.append(.imul,operand1: .register(.r5),operand2: .register(.r3),result: .register(.r6))
+            self.$program.wrappedValue.append(.load,operand1: .integer(200),result: .register(.r15))
+            let marker = self.$program.wrappedValue.append(.zero,result: .register(.r14)).fromHere("marker")
+            self.$program.wrappedValue.append(.inc,result: .register(.r14))
+            self.$program.wrappedValue.append(.dec,result: .register(.r15))
+            self.$program.wrappedValue.append(.breq,operand1: .register(.r15),operand2: .integer(0),result: .label(program.toHere(marker)))
+            self.$program.wrappedValue.rewind()
+            self.context.call(address: self.$program.wrappedValue.address)
+            }
         }
         
-    mutating func initProgram()
+    func initProgram()
         {
-        self.program = InnerInstructionArrayPointer.allocate(arraySize: 100*10, in: ManagedSegment.shared)
-        program.append(.load,operand1: .integer(2021),result: .register(.r1))
-        program.append(.load,operand1: .integer(1965),result: .register(.r2))
-        program.append(.isub,operand1: .register(.r1),operand2: .register(.r2),result:.register(.r3))
-        program.append(.load,operand1: .integer(112000),result: .register(.r4))
-        program.append(.imul,operand1: .register(.r4),operand2: .integer(12),result: .register(.r5))
-        program.append(.imul,operand1: .register(.r5),operand2: .register(.r3),result: .register(.r6))
-        program.append(.load,operand1: .integer(200),result: .register(.r15))
-        let marker = program.append(.zero,result: .register(.r14)).fromHere("marker")
-        program.append(.inc,result: .register(.r14))
-        program.append(.dec,result: .register(.r15))
-        program.append(.breq,operand1: .register(.r15),operand2: .integer(0),result: .label(program.toHere(marker)))
-        program.rewind()
-        context.call(address: self.program.address)
+
         }
     }
 

@@ -17,4 +17,26 @@ public class ArrayAccessExpression: Expression
         self.array = array
         self.index = index
         }
+        
+    public override func findType() -> Class?
+        {
+        self.annotatedType = self.lookupType()
+        return(self.annotatedType)
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        self.array.realize(compiler)
+        self.index.realize(compiler)
+        }
+
+    private func lookupType() -> Class?
+        {
+        let arrayType = self.array.findType()
+        if arrayType.isNil
+            {
+            return(nil)
+            }
+        return((arrayType as! ArrayClassInstance).elementType())
+        }
     }

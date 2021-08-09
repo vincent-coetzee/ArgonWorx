@@ -9,4 +9,8 @@ import Foundation
 
 public class MainModule: Module
     {
+    public override var typeCode:TypeCode
+        {
+        .mainModule
+        }
     }

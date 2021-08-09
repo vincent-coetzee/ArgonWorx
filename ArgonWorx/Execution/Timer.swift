@@ -18,6 +18,11 @@ public struct Timer
         let millis = time.tv_sec * 1000 + Int(time.tv_usec) / 1000
         return(millis)
         }
+     
+     public var displayString: String
+        {
+        return("\(self.stop()) milliseconds")
+        }
         
     private var startTime:Int = 0
     

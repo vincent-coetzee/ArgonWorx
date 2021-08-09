@@ -159,6 +159,21 @@ public indirect enum MemorySize
     
 public class ManagedSegment:Segment
     {
+    public override var spaceFree: MemorySize
+        {
+        return(self.fromSpace.spaceFree)
+        }
+        
+    public override var spaceUsed: MemorySize
+        {
+        return(self.fromSpace.spaceUsed)
+        }
+        
+    public override var segmentType:SegmentType
+        {
+        .managed
+        }
+        
     private struct Space
         {
         public var isFull: Bool
@@ -166,11 +181,16 @@ public class ManagedSegment:Segment
             return(self.baseAddress >= self.endAddress)
             }
             
-        public var bytesInUse: Int
+        public var spaceFree: MemorySize
             {
-            return(Int(self.nextAddress - self.baseAddress))
+            return(MemorySize.bytes(Int(self.endAddress - self.nextAddress)))
             }
-        
+            
+        public var spaceUsed: MemorySize
+            {
+            return(MemorySize.bytes(Int(self.nextAddress - self.baseAddress)))
+            }
+            
         private var basePointer: UnsafeMutableRawBufferPointer
         internal let baseAddress: Word
         internal var nextAddress: UInt64
@@ -229,12 +249,7 @@ public class ManagedSegment:Segment
         {
         return(self.fromSpace.nextAddress)
         }
-        
-    public var bytesInUse: Int
-        {
-        return(self.fromSpace.bytesInUse)
-        }
-        
+
     private var fromSpace: Space
     private var toSpace: Space
     private var middleSpace: Space

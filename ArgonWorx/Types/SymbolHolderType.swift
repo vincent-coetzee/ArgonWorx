@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class SymbolHolderType: Type
+public class SymbolHolderType: Class
     {
     private let symbolHolder:SymbolHolder
     
@@ -15,5 +15,10 @@ public class SymbolHolderType: Type
         {
         self.symbolHolder = symbolHolder
         super.init(label: symbolHolder.label)
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        self.symbolHolder.reify()
         }
     }

@@ -14,7 +14,7 @@ public class ArrayClass:ParameterizedSystemClass
         return(true)
         }
         
-    public func withElement(_ type:Type) -> ArrayClassInstance
+    public func withElement(_ type:Class) -> ArrayClassInstance
         {
         let instance = ArrayClassInstance(label: Argon.nextName("_ARRAY"), sourceClass: self, types: [type])
         return(instance)

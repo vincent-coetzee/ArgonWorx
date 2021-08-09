@@ -9,5 +9,12 @@ import Foundation
 
 public class IfBlock: Block
     {
+    private let condition:Expression
+    
+    public init(condition: Expression)
+        {
+        self.condition = condition
+        super.init()
+        }
     }
     

@@ -9,6 +9,11 @@ import Foundation
 
 public class MethodInstance:Function
     {
+    public override func emitCode(using generator: CodeGenerator)
+        {
+        block.emitCode(into: self,using: generator)
+        }
+        
     public var isSystemMethodInstance: Bool
         {
         return(false)
@@ -16,11 +21,18 @@ public class MethodInstance:Function
         
     internal private(set) var block: MethodInstanceBlock! = nil
     public var localSlots = LocalSlots()
+    private var _method:Method?
+    private var instructions = Array<Instruction>()
     
     public var method: ArgonWorx.Method
         {
+        if self._method.isNotNil
+            {
+            return(self._method!)
+            }
         let method = SystemMethod(label: self.label)
         method.addInstance(self)
+        self._method = method
         return(method)
         }
         
@@ -32,10 +44,10 @@ public class MethodInstance:Function
         
     convenience init(left:String,_ operation:Token.Symbol,right:String,out:String)
         {
-        let leftParm = Parameter(label: "left", type: TypeParameter(label: left))
-        let rightParm = Parameter(label: "right", type: TypeParameter(label: right))
+        let leftParm = Parameter(label: "left", type: Class(label: left))
+        let rightParm = Parameter(label: "right", type: Class(label: right))
         let name = "\(operation)"
-        let result = TypeParameter(label:out)
+        let result = Class(label:out)
         self.init(label: name)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -43,10 +55,10 @@ public class MethodInstance:Function
         
     convenience init(left:String,_ operation:String,right:String,out:String)
         {
-        let leftParm = Parameter(label: "left", type: TypeParameter(label: left))
-        let rightParm = Parameter(label: "right", type: TypeParameter(label: right))
+        let leftParm = Parameter(label: "left", type: Class(label: left))
+        let rightParm = Parameter(label: "right", type: Class(label: right))
         let name = "\(operation)"
-        let result = TypeParameter(label:out)
+        let result = Class(label:out)
         self.init(label: name)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -54,10 +66,10 @@ public class MethodInstance:Function
         
     convenience init(left:String,_ operation:String,right:String,out:Class)
         {
-        let leftParm = Parameter(label: "left", type: TypeParameter(label: left))
-        let rightParm = Parameter(label: "right", type: TypeParameter(label: right))
+        let leftParm = Parameter(label: "left", type: Class(label: left))
+        let rightParm = Parameter(label: "right", type: Class(label: right))
         let name = "\(operation)"
-        let result = ClassType(class: out)
+        let result = out
         self.init(label: name)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -65,10 +77,10 @@ public class MethodInstance:Function
         
     convenience init(left:Class,_ operation:Token.Symbol,right:Class,out:Class)
         {
-        let leftParm = Parameter(label: "left", type: ClassType(class:left))
-        let rightParm = Parameter(label: "right", type: ClassType(class:right))
+        let leftParm = Parameter(label: "left", type: left)
+        let rightParm = Parameter(label: "right", type: right)
         let name = "\(operation)"
-        let result = ClassType(class:out)
+        let result = out
         self.init(label: name)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -76,9 +88,9 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ op2:String,_ out:Class)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let rightParm = Parameter(label: "op2", type: TypeParameter(label:op2))
-        let result = ClassType(class:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let rightParm = Parameter(label: "op2", type: Class(label:op2))
+        let result = out
         self.init(label: label)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -86,8 +98,8 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ out:String)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let result = TypeParameter(label:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let result = Class(label:out)
         self.init(label: label)
         self.parameters = [leftParm]
         self.returnType = result
@@ -95,10 +107,10 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ op2:Class,_ op3:String,_ out:Class)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let rightParm = Parameter(label: "op2", type: ClassType(class:op2))
-        let lastParm = Parameter(label: "op3", type: TypeParameter(label:op3))
-        let result = ClassType(class:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let rightParm = Parameter(label: "op2", type: op2)
+        let lastParm = Parameter(label: "op3", type: Class(label:op3))
+        let result = out
         self.init(label: label)
         self.parameters = [leftParm,rightParm,lastParm]
         self.returnType = result
@@ -106,10 +118,10 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ op2:Class,_ op3:Class,_ out:Class)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let rightParm = Parameter(label: "op2", type: ClassType(class:op2))
-        let lastParm = Parameter(label: "op3", type: ClassType(class:op3))
-        let result = ClassType(class:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let rightParm = Parameter(label: "op2", type: op2)
+        let lastParm = Parameter(label: "op3", type: op3)
+        let result = out
         self.init(label: label)
         self.parameters = [leftParm,rightParm,lastParm]
         self.returnType = result
@@ -117,9 +129,9 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ op2:Class,_ out:String)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let rightParm = Parameter(label: "op2", type: ClassType(class:op2))
-        let result = TypeParameter(label:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let rightParm = Parameter(label: "op2", type: op2)
+        let result = Class(label:out)
         self.init(label: label)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -127,9 +139,9 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ op2:Class,_ out:Class)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let rightParm = Parameter(label: "op2", type: ClassType(class:op2))
-        let result = ClassType(class:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let rightParm = Parameter(label: "op2", type: op2)
+        let result = out
         self.init(label: label)
         self.parameters = [leftParm,rightParm]
         self.returnType = result
@@ -137,18 +149,18 @@ public class MethodInstance:Function
         
     convenience init(_ label:String,_ op1:Class,_ out:Class)
         {
-        let leftParm = Parameter(label: "op1", type: ClassType(class:op1))
-        let result = ClassType(class:out)
+        let leftParm = Parameter(label: "op1", type: op1)
+        let result = out
         self.init(label: label)
         self.parameters = [leftParm]
         self.returnType = result
         }
         
-    convenience init(label: Label,parameters: Parameters,returnType:Type? = nil)
+    convenience init(label: Label,parameters: Parameters,returnType:Class? = nil)
         {
         self.init(label: label)
         self.parameters = parameters
-        self.returnType = returnType ?? VoidClass.voidClass.type
+        self.returnType = returnType ?? VoidClass.voidClass
         }
         
     public func `where`(_ name:String,_ aClass:Class) -> MethodInstance
@@ -191,6 +203,31 @@ public class MethodInstance:Function
             slotArray.append(slot.memoryAddress)
             }
         self.isMemoryLayoutDone = true
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        for parameter in self.parameters
+            {
+            parameter.realize(compiler)
+            }
+        self.returnType.realize(compiler)
+        self.block.realize(compiler)
+        }
+        
+    public override func emitCode(into: ParseNode,using: CodeGenerator)
+        {
+        self.block.emitCode(into: self,using: using)
+        }
+
+    public override func analyzeSemantics(_ compiler:Compiler)
+        {
+        self.block.analyzeSemantics(compiler)
+        }
+        
+    public func append(_ opcode:Instruction.Opcode,_ operand1:Instruction.Operand = .none,_ operand2:Instruction.Operand = .none,_ result:Instruction.Operand = .none)
+        {
+        self.instructions.append(Instruction(opcode,operand1: operand1,operand2: operand2,result: result))
         }
     }
 

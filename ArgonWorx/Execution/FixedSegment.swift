@@ -40,7 +40,7 @@ public class FixedSegment:Segment
         self.nextAddress = baseAddress
         self.wordPointer = WordPointer(address: self.baseAddress)!
         super.init(sizeInBytes:sizeInBytes)
-        print("MANAGED SEGMENT OF SIZE \(self.sizeInBytes) ALLOCATED AT \(self.baseAddress.addressString)")
+        print("MANAGED SEGMENT OF SIZE \(sizeInBytes) ALLOCATED AT \(self.baseAddress.addressString)")
         }
 
     public override func allocateObject(sizeInBytes:Int) -> Word

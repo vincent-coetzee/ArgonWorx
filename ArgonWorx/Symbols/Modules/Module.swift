@@ -47,6 +47,28 @@ struct ModuleButtonView: View
     
 public class Module:ContainerSymbol
     {
+    public override func emitCode(using generator: CodeGenerator)
+        {
+        for symbol in self.symbols.values
+            {
+            symbol.emitCode(using: generator)
+            }
+        }
+        
+    public override var subNodes: Array<ParseNode>?
+        {
+        return(self.symbols.values.map{$0 as ParseNode})
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        }
+        
+    public override var typeCode:TypeCode
+        {
+        .module
+        }
+        
     public var classes:Classes
         {
         var classes = Array(self.symbols.values.compactMap{$0 as? Class})

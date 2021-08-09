@@ -18,4 +18,41 @@ public class UnaryExpression: Expression
         self.rhs = rhs
         super.init()
         }
+        
+    public override func findType() -> Class?
+        {
+        self.annotatedType = self.rhs.findType()
+        return(self.annotatedType)
+        }
+        
+    public override func realize(_ compiler:Compiler)
+        {
+        self.rhs.realize(compiler)
+        }
+        
+    public override func emitCode(into instance: MethodInstance, using: CodeGenerator)
+        {
+        self.rhs.emitCode(into: instance, using: using)
+        var opcode:Instruction.Opcode = .nop
+        switch(self.operation)
+            {
+            case .sub:
+                if self.annotatedType == ArgonModule.argonModule.integer
+                    {
+                    opcode = .ineg
+                    }
+                else
+                    {
+                    opcode = .fneg
+                    }
+            case .bitNot:
+                opcode = .iBitNot
+            case .not:
+                opcode = .not
+            default:
+                break
+            }
+        let register = using.registerFile.findRegister(for: nil, instance: instance)
+        instance.append(opcode,rhs.valueLocation,.none,.register(register))
+        }
     }

@@ -23,6 +23,8 @@ extension Header
     public static let kTagShift:UInt64 = 59
     public static let kOptionalBits:UInt64 = 0b1
     public static let kOptionalShift:UInt64 = 62
+    public static let kTypeBits:UInt64 = 0b1111111
+    public static let kTypeShift:UInt64 = 0
     }
     
 extension Header
@@ -70,6 +72,21 @@ extension Header
             self = (self & ~(Self.kSizeBits << Self.kSizeShift)) | value
             }
         }
+        
+    public var typeCode:Int
+        {
+        get
+            {
+            let mask = Self.kTypeBits << Self.kTypeShift
+            return(Int((self & mask) >> Self.kTypeShift))
+            }
+        set
+            {
+            let value = (UInt64(newValue) & Self.kTypeBits) << Self.kTypeShift
+            self = (self & ~(Self.kTypeBits << Self.kTypeShift)) | value
+            }
+        }
+        
         
     public var tag:Argon.Tag
         {

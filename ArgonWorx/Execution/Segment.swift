@@ -15,6 +15,7 @@ public class Segment
         case stack = 1
         case `static` = 2
         case managed = 3
+        case data = 4
         }
         
     public var segmentType:SegmentType
@@ -22,11 +23,21 @@ public class Segment
         .none
         }
         
-    public let sizeInBytes:Int
-    
+    public var spaceFree: MemorySize
+        {
+        return(MemorySize.bytes(0))
+        }
+        
+    public var spaceUsed: MemorySize
+        {
+        return(MemorySize.bytes(0))
+        }
+
+    public let size: MemorySize
+        
     public init(sizeInBytes:Int)
         {
-        self.sizeInBytes = sizeInBytes
+        self.size = MemorySize.bytes(sizeInBytes)
         }
         
     public func address(offset: Word) -> Word

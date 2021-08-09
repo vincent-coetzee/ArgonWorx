@@ -7,10 +7,20 @@
 
 import Foundation
 
+fileprivate func max(_ array:Array<Int>) -> Int
+    {
+    var theMax = array.first!
+    for element in array
+        {
+        theMax = max(theMax,element)
+        }
+    return(theMax)
+    }
+    
 public class ExecutionContext:ObservableObject
     {
-    @Published var registers = Array<Word>(repeating: 0, count: 42)
-    @Published var _allRegisters = Instruction.Register.allCases
+    @Published internal var registers = Array<Word>(repeating: 0, count: max(Instruction.Register.allCases.map{$0.rawValue}) + 1)
+    @Published private var _allRegisters = Instruction.Register.allCases
     @Published var changedRegisters = Set<Instruction.Register>()
     
     private var instructionCache = Array<Instruction>()
@@ -78,21 +88,12 @@ public class ExecutionContext:ObservableObject
         
     public func call(address:Word)
         {
-        let pointer = InnerInstructionArrayPointer(address: address)
-        pointer.rewind()
-        let instructionsPointer = pointer.instructionsPointer
+        let pointer = InnerPackedInstructionArrayPointer(address: address)
         self.setRegister(0, atIndex: .ip)
-        var instruction:Instruction? = pointer.instruction
-        repeat
+        for index in 0..<pointer.count
             {
-            if let instruction = instruction
-                {
-                self.instructionCache.append(instruction)
-                pointer.next()
-                }
-            instruction = pointer.instruction
+            self.instructionCache.append(pointer[index])
             }
-        while instruction.isNotNil
         }
         
     public func singleStep() throws

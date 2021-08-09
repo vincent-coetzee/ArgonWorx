@@ -29,6 +29,51 @@ public class InnerPointer:Addressable
         return(lhs.address == rhs.address)
         }
         
+    public var headerSizeInWords: Int
+        {
+        return(self.header.sizeInWords)
+        }
+        
+    public var headerHasBytes: Bool
+        {
+        return(self.header.hasBytes)
+        }
+        
+    public var headerTag: Argon.Tag
+        {
+        return(self.header.tag)
+        }
+        
+    public var headerFlipCount: Int
+        {
+        return(self.header.flipCount)
+        }
+        
+    public var headerTypeCode: TypeCode
+        {
+        get
+            {
+            let value = self.header.typeCode
+            if let newTypeCode = TypeCode(rawValue: value)
+                {
+                return(newTypeCode)
+                }
+            return(TypeCode.none)
+            }
+            
+        set
+            {
+            var newHeader = self.header
+            newHeader.typeCode = newValue.rawValue
+            self.header = newHeader
+            }
+        }
+        
+    public var headerIsForwarded: Bool
+        {
+        return(self.header.isForwarded)
+        }
+        
     public var classPointer:InnerClassPointer
         {
         get
@@ -56,6 +101,18 @@ public class InnerPointer:Addressable
     public var isNil: Bool
         {
         return(self.address == 0)
+        }
+        
+    private var header: Header
+        {
+        get
+            {
+            return(Header(self.wordPointer![0]))
+            }
+        set
+            {
+            self.wordPointer![0] = newValue
+            }
         }
         
     internal var sizeInBytes:Int = 0

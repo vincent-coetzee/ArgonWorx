@@ -14,6 +14,7 @@ public class InnerMethodInstancePointer: InnerPointer
         let address = segment.allocateObject(sizeInBytes: Self.kMethodInstanceSizeInBytes)
         let pointer = InnerMethodInstancePointer(address: address)
         pointer.assignSystemSlots(from: ArgonModule.argonModule.methodInstance)
+        pointer.headerTypeCode = .methodInstance
         return(pointer)
         }
 

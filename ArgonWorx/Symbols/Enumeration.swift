@@ -11,4 +11,8 @@ import Foundation
 
 public class Enumeration:Symbol
     {
+    public override var typeCode:TypeCode
+        {
+        .enumeration
+        }
     }
