@@ -19,10 +19,9 @@ public class UnaryExpression: Expression
         super.init()
         }
         
-    public override func findType() -> Class?
+    public override var resultType: TypeResult
         {
-        self.annotatedType = self.rhs.findType()
-        return(self.annotatedType)
+        return(self.rhs.resultType)
         }
         
     public override func realize(_ compiler:Compiler)
@@ -37,7 +36,7 @@ public class UnaryExpression: Expression
         switch(self.operation)
             {
             case .sub:
-                if self.annotatedType == ArgonModule.argonModule.integer
+                if self.resultType == ArgonModule.argonModule.integer
                     {
                     opcode = .ineg
                     }

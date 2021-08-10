@@ -229,6 +229,32 @@ public class MethodInstance:Function
         {
         self.instructions.append(Instruction(opcode,operand1: operand1,operand2: operand2,result: result))
         }
+        
+    public func isParameterSetCoherent(with input: Arguments) -> Bool
+        {
+        if self.parameters.count != input.count
+            {
+            return(false)
+            }
+        for (mine,yours) in zip(self.parameters,input)
+            {
+            if !yours.value.resultType.isInclusiveSubclass(of: mine.type)
+                {
+                return(false)
+                }
+            }
+        return(true)
+        }
+        
+    public func dispatchScore(for classes:Classes) -> Int
+        {
+        var answer = 0
+        for (mine,theirs) in zip(self.parameters.map{$0.type},classes)
+            {
+            answer  += theirs.depth - mine.depth
+            }
+        return(answer)
+        }
     }
 
 public typealias MethodInstances = Array<MethodInstance>

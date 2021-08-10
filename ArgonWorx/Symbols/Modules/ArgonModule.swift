@@ -22,6 +22,11 @@ public class ArgonModule: SystemModule
         .argonModule
         }
         
+    public var nilClass: Class
+        {
+        return(self.lookup(label: "Nil") as! Class)
+        }
+        
     public var number: Class
         {
         return(self.lookup(label: "Number") as! Class)

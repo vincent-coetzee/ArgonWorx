@@ -7,8 +7,7 @@
 
 import Foundation
 
-public class HandlerBlock: Block
+public class HandlerBlock: ClosureBlock
     {
     public var symbols = Array<String>()
-    public var closure = ClosureBlock()
     }

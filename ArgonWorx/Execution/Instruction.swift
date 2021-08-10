@@ -9,6 +9,8 @@ import Foundation
 import Interpreter
 import SwiftUI
     
+fileprivate var contextStack = Stack<Array<Word>>()
+
 public struct ExecutionError:Error
     {
     public let context:ExecutionContext
@@ -42,7 +44,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
     public static let operand2RegisterField = PackedField<Instruction.Register>(offset:24,width:8)
     public static let resultKindField = PackedField<Word>(offset:32,width:4)
     public static let resultRegisterField = PackedField<Instruction.Register>(offset:36,width:8)
-    public static let indexField = PackedField<Word>(offset:44,width:19)
+    public static let lineNumberField = PackedField<Word>(offset:44,width:19)
     
     public static func ==(lhs:Instruction,rhs:Instruction) -> Bool
         {
@@ -88,6 +90,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         case bp         /// the bp points to the base of the current stack frame
         case fp         /// the fp points to the next available slot in the fixed segment
         case mp         /// the mp points to the next avaialble slot in the managed segmeng
+        case ep
         case r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15
         case fr0,fr1,fr2,fr3,fr4,fr5,fr6,fr7,fr8,fr9,fr10,fr11,fr12,fr13,fr14,fr15
         
@@ -116,7 +119,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         case inc,dec
         case make
         case call,ret
-        case push,pop
+        case push,pop,enter,leave,save,restore
         case loopeq,loopneq,loopnz,loopz
         case scat,srev,scmp,scnt,scpy
         case rein
@@ -505,18 +508,24 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         return(text.joined(separator: ","))
         }
         
-    public var id:Int = 0
+    public var id:Int
+        {
+        return(self.lineNumber)
+        }
+        
     public var opcode:Opcode
     public var operand1:Operand
     public var operand2:Operand
     public var result:Operand
+    public var lineNumber:Int
     
-    public init(_ opcode:Opcode,operand1:Operand = .none,operand2:Operand = .none,result:Operand = .none)
+    public init(_ opcode:Opcode,operand1:Operand = .none,operand2:Operand = .none,result:Operand = .none,lineNumber:Int = 0)
         {
         self.opcode = opcode
         self.operand1 = operand1
         self.operand2 = operand2
         self.result = result
+        self.lineNumber = lineNumber
         }
 
     public init(from pointer:WordPointer)
@@ -532,13 +541,13 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         words.append(pointer[2])
         words.append(pointer[3])
         self.opcode = Self.opcodeField.value(in: words[0])
-        self.operand1 = self.operand(kindField: Self.operand1KindField, registerField: Self.operand1RegisterField,index: 1,words: words)
-        self.operand2 = self.operand(kindField: Self.operand2KindField, registerField: Self.operand2RegisterField,index: 2,words: words)
-        self.result = self.operand(kindField: Self.resultKindField, registerField: Self.resultRegisterField,index: 3,words: words)
-        self.id = Int(Self.indexField.value(in: words[0]))
+        self.operand1 = Self.operand(kindField: Self.operand1KindField, registerField: Self.operand1RegisterField,index: 1,words: words)
+        self.operand2 = Self.operand(kindField: Self.operand2KindField, registerField: Self.operand2RegisterField,index: 2,words: words)
+        self.result = Self.operand(kindField: Self.resultKindField, registerField: Self.resultRegisterField,index: 3,words: words)
+        self.lineNumber = Int(Self.lineNumberField.value(in: words[0]))
         }
         
-    private func operand(kindField: PackedField<Word>,registerField: PackedField<Register>,index:Int,words:[Word]) -> Operand
+    private static func operand(kindField: PackedField<Word>,registerField: PackedField<Register>,index:Int,words:[Word]) -> Operand
         {
         let kind = kindField.value(in: words[0])
         let register = registerField.value(in: words[0])
@@ -578,17 +587,22 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         Self.operand2RegisterField.setValue(Word(self.operand2.registerValue),in: &word)
         Self.resultKindField.setValue(Word(self.result.rawValue),in: &word)
         Self.resultRegisterField.setValue(Word(self.result.registerValue),in: &word)
-        Self.indexField.setValue(Word(self.id),in: &word)
+        Self.lineNumberField.setValue(Word(self.lineNumber),in: &word)
         pointer[0] = word
         pointer[1] = self.operand1.wordValue
         pointer[2] = self.operand2.wordValue
         pointer[3] = self.result.wordValue
         }
         
-    public func execute(in context:ExecutionContext) throws
+    public func execute(in context: ExecutionContext) throws
         {
         switch(self.opcode)
             {
+            ///
+            ///
+            /// INTEGER ARITHMETIC OPERATIIONS
+            ///
+            ///
             case .nop:
                 break
             case .iadd:
@@ -615,6 +629,11 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     power -= 1
                     }
                 try self.result.setIntValue(value,in: context)
+            ///
+            ///
+            /// FLOATING POINT ARITHMETIC
+            ///
+            ///
             case .fadd:
                 try self.result.setFloatValue(self.operand1.floatValue(in: context) + self.operand2.floatValue(in: context),in: context)
             case .fsub:
@@ -627,6 +646,11 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
             try self.result.setFloatValue(self.operand1.floatValue(in: context).truncatingRemainder(dividingBy: self.operand2.floatValue(in: context)),in: context)
             case .fpow:
                 try self.result.setFloatValue(pow(self.operand1.floatValue(in: context),self.operand2.floatValue(in: context)),in: context)
+            ///
+            ///
+            /// MAKE AN OBJECT FROM A CLASS
+            ///
+            ///
             case .make:
                 let targetClassPointer = InnerClassPointer(address: self.operand1.address)
                 let extraBytes = try self.operand2.intValue(in: context)
@@ -635,10 +659,23 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 pointer.classPointer = targetClassPointer
                 pointer.magicNumber = targetClassPointer.magicNumber
                 try self.result.setValue(pointer.address,in:context)
+            ///
+            ///
+            /// PUSH AND POP ITEMS ONTO/OFF THE STACK
+            ///
+            ///
             case .push:
                 context.stackSegment.push(try self.operand1.value(in: context))
             case .pop:
                 try self.result.setValue(context.stackSegment.pop(),in: context)
+            case .enter:
+                break
+            case .leave:
+                break
+            case .save:
+                contextStack.push(context.registers)
+            case .restore:
+                context.registers = contextStack.pop()
             case .loopeq:
                 let value = try self.operand1.value(in:context)
                 if value == 1
@@ -650,6 +687,11 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 try  self.result.setIntValue(self.result.intValue(in: context) + 1,in:context)
             case .dec:
                 try  self.result.setIntValue(self.result.intValue(in: context) - 1,in:context)
+            ///
+            ///
+            /// CONCATENATE TWO STRINS
+            ///
+            ///
             case .scat:
                 let address1 = try self.operand1.value(in: context)
                 let address2 = try self.operand2.value(in: context)
@@ -659,12 +701,42 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 let string2 = pointer2.string
                 let newPointer = InnerStringPointer.allocateString(string1+string2, in: context.managedSegment)
                 try self.result.setValue(newPointer.address,in: context)
+            ///
+            ///
+            /// COPY STRING1 INTO STRING2
+            ///
+            ///
             case .scpy:
                 let address1 = try self.operand1.value(in: context)
                 let pointer1 = InnerStringPointer(address: address1)
                 let string1 = pointer1.string
                 let newPointer = InnerStringPointer.allocateString(string1, in: context.managedSegment)
                 try self.result.setValue(newPointer.address,in: context)
+            ///
+            ///
+            /// COMPARE TWO STRINGS AND PUT THE RESULT OF THE COMPARISON INTO THE RESULT
+            ///
+            ///
+            case .scmp:
+                let address1 = try self.operand1.value(in: context)
+                let string1 = InnerStringPointer(address: address1).string
+                let address2 = try self.operand2.value(in: context)
+                let string2 = InnerStringPointer(address: address2).string
+                let result = string1.compare(string2)
+                try self.result.setIntValue(Int64(result.rawValue),in: context)
+            ///
+            ///
+            /// ESTABLISH A HANDLER ON THE STACK, THE EP REGISTER POINTS TO
+            /// THE TOP CURRENTLY ACTIVE HANDLER. PUSH THE NEW ONE ON AND
+            /// SET EP UP TO POINT TO THE NEW ONE
+            ///
+            ///
+            case .hnd:
+                let current = context.registers[Instruction.Register.ep.rawValue]
+                context.stackSegment.push(current)
+                context.stackSegment.push(try self.operand1.value(in: context))
+                context.stackSegment.push(try self.operand2.value(in: context))
+                context.registers[Instruction.Register.ep.rawValue] = context.stackSegment.stackPointer
             case .rein:
                 break
             case .zero:
@@ -673,13 +745,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 fatalError("Unhandled instruction opcode \(self.opcode)")
             }
         }
-        
-    public func execute(in binding: Binding<ExecutionContext>) throws
-        {
-        let context = binding.wrappedValue
-        try self.execute(in: context)
-        binding.wrappedValue = context
-        }
+
     private func encodeNilable<T>(_ value:T?,in encoder:BitEncoder)
         {
         if value.isNil

@@ -49,6 +49,18 @@ extension NSColor
     public static let argonNeonPink = NSColor(red: 255.0/255.0,green: 0/255.0,blue:153.0/255.0,alpha:1)
     public static let argonSexyPink = NSColor(red: 255.0/255.0,green: 63/255.0,blue:131/255.0,alpha:1)
         
+    public static let argonXGreen = NSColor(hex: 0x80BD04)
+    public static let argonXOrange = NSColor(hex: 0xFD8F3F)
+    public static let argonXBlue = NSColor(hex: 0x00C3AF)
+    public static let argonXPurple = NSColor(hex: 0xAA0D91)
+    public static let argonXGray = NSColor(hex: 0x738276)
+    public static let argonXCoral = NSColor(hex: 0xFC6A5D)
+    public static let argonXIvory = NSColor(hex: 0xD08F69)
+    public static let argonXWhite = NSColor(hex: 0xCCCCCC)
+    public static let argonXSmoke = NSColor(hex: 0x738276)
+    public static let argonXSeaBlue = NSColor(hex: 0x108080)
+    public static let argonXCornflower = NSColor(hex: 0x5482FF)
+    
     public var swiftUIColor: Color
         {
         var components:[CGFloat] = [0,0,0]

@@ -16,8 +16,8 @@ public class InstanciationTerm: Expression
         self.theClass = `class`
         }
         
-    public override func findType() -> Class?
+    public override var resultType: TypeResult
         {
-        return(self.theClass)
+        return(.class(theClass))
         }
     }

@@ -184,6 +184,11 @@
 		BF9EFA4526A477F1004A6FE3 /* SymbolGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9EFA4426A477F1004A6FE3 /* SymbolGroup.swift */; };
 		BFABC0BE26AAF45E00FEBB1B /* ObjectSlot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFABC0BD26AAF45E00FEBB1B /* ObjectSlot.swift */; };
 		BFABC0C026AB037E00FEBB1B /* InspectorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFABC0BF26AB037E00FEBB1B /* InspectorWindow.swift */; };
+		BFB2AD6626C2B43A00F6AA63 /* SuffixExpression.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB2AD6526C2B43A00F6AA63 /* SuffixExpression.swift */; };
+		BFB2AD6A26C2C7DB00F6AA63 /* LineAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB2AD6726C2C7DB00F6AA63 /* LineAnnotation.swift */; };
+		BFB2AD6B26C2C7DB00F6AA63 /* LineNumberTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB2AD6826C2C7DB00F6AA63 /* LineNumberTextView.swift */; };
+		BFB2AD6C26C2C7DB00F6AA63 /* LineNumberGutter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB2AD6926C2C7DB00F6AA63 /* LineNumberGutter.swift */; };
+		BFB2AD6E26C2D92C00F6AA63 /* VisualToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB2AD6D26C2D92C00F6AA63 /* VisualToken.swift */; };
 		BFD041AB26924479009C34B1 /* ProjectDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD041AA26924479009C34B1 /* ProjectDocument.swift */; };
 		BFF8CF9326A8FF8D00785ABD /* ObjectPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF8CF9226A8FF8D00785ABD /* ObjectPointer.swift */; };
 		BFFAAD4A26AB97180019B082 /* InnerClassPointer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFFAAD4926AB97180019B082 /* InnerClassPointer.swift */; };
@@ -390,6 +395,11 @@
 		BF9EFA4426A477F1004A6FE3 /* SymbolGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolGroup.swift; sourceTree = "<group>"; };
 		BFABC0BD26AAF45E00FEBB1B /* ObjectSlot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSlot.swift; sourceTree = "<group>"; };
 		BFABC0BF26AB037E00FEBB1B /* InspectorWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectorWindow.swift; sourceTree = "<group>"; };
+		BFB2AD6526C2B43A00F6AA63 /* SuffixExpression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuffixExpression.swift; sourceTree = "<group>"; };
+		BFB2AD6726C2C7DB00F6AA63 /* LineAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineAnnotation.swift; sourceTree = "<group>"; };
+		BFB2AD6826C2C7DB00F6AA63 /* LineNumberTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineNumberTextView.swift; sourceTree = "<group>"; };
+		BFB2AD6926C2C7DB00F6AA63 /* LineNumberGutter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LineNumberGutter.swift; sourceTree = "<group>"; };
+		BFB2AD6D26C2D92C00F6AA63 /* VisualToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualToken.swift; sourceTree = "<group>"; };
 		BFD041AA26924479009C34B1 /* ProjectDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectDocument.swift; sourceTree = "<group>"; };
 		BFF8CF9226A8FF8D00785ABD /* ObjectPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPointer.swift; sourceTree = "<group>"; };
 		BFFAAD4926AB97180019B082 /* InnerClassPointer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InnerClassPointer.swift; sourceTree = "<group>"; };
@@ -627,6 +637,7 @@
 				BF9197AA2690FAC300E348F6 /* TokenStream.swift */,
 				BF76E4C826C0FEE800422F8E /* Register.swift */,
 				BF76E4CE26C14DA500422F8E /* ForwardingSymbol.swift */,
+				BFB2AD6D26C2D92C00F6AA63 /* VisualToken.swift */,
 			);
 			path = "Compiler and Phases";
 			sourceTree = "<group>";
@@ -694,6 +705,7 @@
 				BF9DF9CB26BB183500B5DE6C /* LocalReadExpression.swift */,
 				BF9DF9BF26BAE48400B5DE6C /* UnaryExpression.swift */,
 				BF76E4D626C1ADF400422F8E /* SlotMemberExpression.swift */,
+				BFB2AD6526C2B43A00F6AA63 /* SuffixExpression.swift */,
 			);
 			path = Expressions;
 			sourceTree = "<group>";
@@ -782,6 +794,9 @@
 				BF6108B8269EFD860008A9A3 /* ClassEditingView.swift */,
 				BF91977D2690FA6A00E348F6 /* ContentView.swift */,
 				BFABC0BF26AB037E00FEBB1B /* InspectorWindow.swift */,
+				BFB2AD6726C2C7DB00F6AA63 /* LineAnnotation.swift */,
+				BFB2AD6926C2C7DB00F6AA63 /* LineNumberGutter.swift */,
+				BFB2AD6826C2C7DB00F6AA63 /* LineNumberTextView.swift */,
 				BF5D311326B6D916006BD3B9 /* ProcessorView.swift */,
 				BFD041AA26924479009C34B1 /* ProjectDocument.swift */,
 				BF58630226A2177300508A10 /* SymbolEditingView.swift */,
@@ -878,6 +893,7 @@
 				BF76E4D326C1851C00422F8E /* Metaclass.swift in Sources */,
 				BF9DF9BE26BAE3E900B5DE6C /* LiteralExpression.swift in Sources */,
 				BF76E4C526C0A0F600422F8E /* TypeInferencer.swift in Sources */,
+				BFB2AD6B26C2C7DB00F6AA63 /* LineNumberTextView.swift in Sources */,
 				BF82BFC626A9EEB600A96C8F /* StringSlot.swift in Sources */,
 				BF9197B12690FAC300E348F6 /* TokenStream.swift in Sources */,
 				BF3EC088269CD286000212AE /* Optional+Extensions.swift in Sources */,
@@ -928,6 +944,7 @@
 				BF1ED32026A8B517008CBB52 /* Segment.swift in Sources */,
 				BF9DF98F26BA891D00B5DE6C /* InnerDictionaryPointer.swift in Sources */,
 				BF9197C52690FB2100E348F6 /* ArgonDate.swift in Sources */,
+				BFB2AD6E26C2D92C00F6AA63 /* VisualToken.swift in Sources */,
 				BF9DFA0726BB6A9100B5DE6C /* LibraryModule.swift in Sources */,
 				BF9DF9A226BAE0D900B5DE6C /* Block.swift in Sources */,
 				BF82BFC226A9EE7200A96C8F /* IntegerSlot.swift in Sources */,
@@ -954,6 +971,7 @@
 				BF91981F2690FB7400E348F6 /* CompilerError.swift in Sources */,
 				BF9DF9C026BAE48400B5DE6C /* UnaryExpression.swift in Sources */,
 				BF9197FB2690FB4100E348F6 /* VoidClass.swift in Sources */,
+				BFB2AD6A26C2C7DB00F6AA63 /* LineAnnotation.swift in Sources */,
 				BF9197EF2690FB4100E348F6 /* Initializer.swift in Sources */,
 				BF9197B32690FAC300E348F6 /* Compiler.swift in Sources */,
 				BF9DF9CE26BB32E500B5DE6C /* AssignmentExpression.swift in Sources */,
@@ -1018,12 +1036,14 @@
 				BF17750726BD6D4000B2C0CC /* PackedField.swift in Sources */,
 				BF19B1F126B7731D004E8A2A /* InnerInstructionArrayPointer.swift in Sources */,
 				BF82BFCA26A9F6E600A96C8F /* StringPointer.swift in Sources */,
+				BFB2AD6626C2B43A00F6AA63 /* SuffixExpression.swift in Sources */,
 				BF9197F92690FB4100E348F6 /* ParameterizedClass.swift in Sources */,
 				BF9DF9AC26BAE27900B5DE6C /* WhenBlock.swift in Sources */,
 				BF76E4C126C0716E00422F8E /* VirtualReadBlock.swift in Sources */,
 				BF9DF9AA26BAE26E00B5DE6C /* SelectBlock.swift in Sources */,
 				BF9197B22690FAC300E348F6 /* Argon.swift in Sources */,
 				BF9198082690FB4100E348F6 /* SymbolAttributes.swift in Sources */,
+				BFB2AD6C26C2C7DB00F6AA63 /* LineNumberGutter.swift in Sources */,
 				BF91977A2690FA6A00E348F6 /* ArgonWorxApp.swift in Sources */,
 				BF9DF9C226BAE9B600B5DE6C /* FixedSegment.swift in Sources */,
 				BF9197F42690FB4100E348F6 /* NodeLocation.swift in Sources */,

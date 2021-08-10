@@ -12,6 +12,32 @@ import FFI
 
 public class Class:ContainerSymbol,ObservableObject
     {
+    ///
+    ///
+    /// Return the distance between this class and the
+    /// Object class in the hieararchy.
+    ///
+    ///
+    public var depth: Int
+        {
+        var depth = 0
+        var aClass = self
+        while aClass != ArgonModule.argonModule.object
+            {
+            depth += 1
+            if depth > 2500
+                {
+                fatalError("Class '\(self.label)' has a depth in excess of 2500 which is likely incorrect, probably because Object is not in it's superclass tree.")
+                }
+            if aClass.superclasses.count < 1
+                {
+                fatalError("Can not calculate depth for class '\(self.label)' probably because it (erroneously) does not have Object in it's superclass tree.")
+                }
+            aClass = aClass.superclasses.first!
+            }
+        return(depth)
+        }
+        
     public override func emitCode(using: CodeGenerator)
         {
         print("NEED TO WRITE OUT CLASS \(self.label)")
@@ -216,6 +242,15 @@ public class Class:ContainerSymbol,ObservableObject
         
     public func isSubclass(of superclass:Class) -> Bool
         {
+        return(superclass.isSuperclass(of: self))
+        }
+        
+    public func isInclusiveSubclass(of superclass:Class) -> Bool
+        {
+        if self == superclass
+            {
+            return(true)
+            }
         return(superclass.isSuperclass(of: self))
         }
         

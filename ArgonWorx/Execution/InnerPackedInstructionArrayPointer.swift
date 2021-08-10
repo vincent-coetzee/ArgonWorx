@@ -128,7 +128,7 @@ public class InnerPackedInstructionArrayPointer: InnerPointer,Collection
     public func append(_ instruction:Instruction) -> Self
         {
         let offset = self.count * Self.kInstructionSizeInWords
-        instruction.id = self.count
+        instruction.lineNumber = self.count
         instruction.write(to: self.instructionPointer + offset)
         self.count += 1
         self.instructionIndex += 1
@@ -145,7 +145,7 @@ public class InnerPackedInstructionArrayPointer: InnerPointer,Collection
             }
         set
             {
-            newValue.id = index
+            newValue.lineNumber = index
             let offset = index * Self.kInstructionSizeInWords
             let pointer = self.instructionPointer + offset
             newValue.write(to: pointer)

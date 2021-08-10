@@ -19,15 +19,23 @@ public class Parameter:Symbol
         return(self._type)
         }
         
+    public var tag: Label
+        {
+        return(self.label)
+        }
+        
     private let _type:Class
-    private let isHidden:Bool
+    public let isHidden:Bool
+    public let isVariadic: Bool
     
-    init(label:Label,type:Class,isHidden:Bool = false)
+    init(label:Label,type:Class,isHidden:Bool = false,isVariadic:Bool = false)
         {
         self.isHidden = isHidden
         self._type = type
+        self.isVariadic = isVariadic
         super.init(label: label)
         }
     }
 
 public typealias Parameters = Array<Parameter>
+

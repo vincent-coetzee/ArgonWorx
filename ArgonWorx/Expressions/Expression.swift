@@ -37,9 +37,9 @@ public class Expression
         {
         }
         
-    public func findType() -> Class?
+    public var resultType: TypeResult
         {
-        fatalError("This should have been redefined")
+        .undefined
         }
         
     public func generateConstraints(into inferencer:TypeInferencer)
@@ -47,7 +47,6 @@ public class Expression
         fatalError("This should have been overridden")
         }
         
-    public var annotatedType: Class?
     public var valueLocation: Instruction.Operand = .none
     }
     

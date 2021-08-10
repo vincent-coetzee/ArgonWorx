@@ -9,6 +9,15 @@ import Foundation
 
 public class InvocationExpression: Expression
     {
+    public override var resultType: TypeResult
+        {
+        if self.methodInstance.isNil
+            {
+            return(.undefined)
+            }
+        return(.class(self.methodInstance!.returnType))
+        }
+        
     private let name: Name
     private let namingContext: NamingContext
     private let reportingContext: ReportingContext
@@ -36,26 +45,43 @@ public class InvocationExpression: Expression
             {
             self.reportingContext.dispatchError(at: self.location, message: "Unable to resolve a method named '\(self.name).")
             }
-        }
-        
-    public override func generateConstraints(into inferencer:TypeInferencer)
-        {
-        if let instance = self.methodInstance
+        else
             {
-            let curried = instance.curried()
+            self.validate()
             }
         }
         
-    public override func findType() -> Class?
+    private func validate()
         {
-        if methodInstance.isNil
+        let instance = self.methodInstance!
+        if instance.parameters.count != self.arguments.count
             {
-            self.reportingContext.dispatchError(at: self.location, message: "\(self.name) can not be resolved.")
-            self.annotatedType = nil
-            return(nil)
+            self.reportingContext.dispatchError(at: self.location, message: "Method \(instance.label) expects \(instance.parameters.count) parameters but \(self.arguments.count) were defined.")
             }
-        self.annotatedType = methodInstance?.returnType
-        return(self.annotatedType)
+        
+        }
+        
+    public override func emitCode(into instance: MethodInstance, using: CodeGenerator)
+        {
+        
+        }
+    }
+
+public class MethodInvocationExpression: Expression
+    {
+    private let method: Method
+    private let arguments: Arguments
+
+    
+    init(method:Method,arguments:Arguments)
+        {
+        self.method = method
+        self.arguments = arguments
+        }
+
+    public override var resultType: TypeResult
+        {
+        return(.class(self.method.returnType))
         }
         
     public override func emitCode(into instance: MethodInstance, using: CodeGenerator)

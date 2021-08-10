@@ -9,6 +9,15 @@ import Foundation
 
 public class LocalReadExpression: Expression
     {
+    public override var resultType: TypeResult
+        {
+        if self.slot.isNil
+            {
+            return(.undefined)
+            }
+        return(.class(self.slot!.type))
+        }
+        
     public let name:Name
     private let namingContext: NamingContext
     private let reportingContext: ReportingContext
@@ -30,11 +39,5 @@ public class LocalReadExpression: Expression
             {
             self.reportingContext.dispatchError(at: self.location, message: "Could not resolve SLOT named \(self.name).")
             }
-        }
-        
-    public override func findType() -> Class?
-        {
-        self.annotatedType = self.slot?.type
-        return(self.annotatedType)
         }
     }

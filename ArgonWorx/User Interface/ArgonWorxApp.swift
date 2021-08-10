@@ -20,6 +20,10 @@ struct ArgonWorxApp: App {
         Thread.initThreads()
         ArgonModule.configure()
         Header.test()
+        for aClass in ArgonModule.argonModule.classes
+            {
+            print("\(aClass.label) DEPTH \(aClass.depth)")
+            }
         let segment = ManagedSegment.shared
         let classObject = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.class.sizeInBytes)
         let string1 = segment.allocateString("This is a test string to see how it is allocated.")
@@ -142,18 +146,18 @@ struct ArgonWorxApp: App {
         let stringAddress = InnerStringPointer.allocateString("Can we c this string in c ?", in: ManagedSegment.shared)
         var array = [stringAddress.address]
         CallSymbolWithArguments(symbol!.address!,&array,1)
-        var pointer1 = UnsafeMutablePointer<ffi_type>.allocate(capacity: 1)
+        let pointer1 = UnsafeMutablePointer<ffi_type>.allocate(capacity: 1)
         pointer1.pointee = ffi_type_uint64
         var args:UnsafeMutablePointer<ffi_type>? = UnsafeMutablePointer<ffi_type>.allocate(capacity: 1)
         args!.pointee = ffi_type_uint64
         var interface:ffi_cif = ffi_cif()
         ffi_prep_cif(&interface,FFI_DEFAULT_ABI,1,&ffi_type_void,&args)
-        var input:UnsafeMutablePointer<Word>? = UnsafeMutablePointer<Word>.allocate(capacity: 1)
+        let input:UnsafeMutablePointer<Word>? = UnsafeMutablePointer<Word>.allocate(capacity: 1)
         input!.pointee = stringAddress.address
         var voidValue:UnsafeMutableRawPointer? = UnsafeMutableRawPointer(input)
         ffi_call(&interface,MutateSymbol(symbol!.address!),nil,&voidValue)
         print("SIZE AND STRIDE OF Instruction: \(MemoryLayout<Instruction>.stride) \(MemoryLayout<Instruction>.size)")
-        var packedPointer = WordPointer(address: ManagedSegment.shared.allocateObject(sizeInBytes: 1000 * 32))!
+        let packedPointer = WordPointer(address: ManagedSegment.shared.allocateObject(sizeInBytes: 1000 * 32))!
         var offsetPointer = packedPointer
         for index in 0..<program.count
             {
@@ -163,7 +167,7 @@ struct ArgonWorxApp: App {
             }
         var newList = Array<Instruction>()
         offsetPointer = packedPointer
-        for index in 0..<program.count
+        for _ in 0..<program.count
             {
             let instruction = Instruction(from: offsetPointer)
             newList.append(instruction)

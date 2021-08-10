@@ -35,7 +35,7 @@ public class SingleParameterInvokable: Symbol
     public static func with(label:Label,parameters parms: Parameters,returnType: Class) -> Array<SingleParameterInvokable>
         {
         let extra = Parameter(label:"returnType",type: returnType)
-        var parameters = parms + [extra]
+        let parameters = parms + [extra]
         var invokables = Array<SingleParameterInvokable>()
         for index in stride(from: 0, through: parameters.count, by: 2)
             {

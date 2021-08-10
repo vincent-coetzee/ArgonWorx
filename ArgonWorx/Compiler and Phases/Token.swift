@@ -95,6 +95,16 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
             return(rhs.isSymbol && rhs.symbol == lhs)
             }
             
+        case bitAndEquals = "&="
+        case bitOrEquals = "|="
+        case bitNotEquals = "~="
+        case bitXorEquals = "^="
+        case bitNot = "~"
+        case bitAnd = "&"
+        case bitOr = "|"
+        case bitXor = "^"
+        case bitShiftRight = ">>"
+        case bitShiftLeft = "<<"
         case none = ""
         case doubleBackSlash = "\\\\"
         case leftParenthesis = "("
@@ -118,28 +128,24 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
         case rightBrocket = ">"
         case halfRange = ".."
         case fullRange = "..."
-        case rightBrocketEquals = "=>"
         case leftBrocketEquals = "<="
         case not = "!"
         case and = "&&"
         case or = "||"
+        case minusMinus
         case modulus = "%"
         case modulusEquals = "%="
+        case macroStart = "${"
+        case macroEnd = "}$"
+        case noteStart = "!*"
+        case noteEnd = "*!"
         case pow = "**"
-        case bitNot = "~"
-        case bitAnd = "&"
-        case bitOr = "|"
-        case bitXor = "^"
-        case bitShiftRight = ">>"
-        case bitShiftLeft = "<<"
+        case plusPlus
         case mulEquals = "*="
         case divEquals = "/="
         case addEquals = "+="
         case subEquals = "-="
-        case bitAndEquals = "&="
-        case bitOrEquals = "|="
-        case bitNotEquals = "~="
-        case bitXorEquals = "^="
+        case rightBrocketEquals = "=>"
         case shiftLeftEquals = "<<="
         case shiftRightEquals = ">>="
         case mul = "*"
@@ -151,10 +157,7 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
         case other
         case cast = "to"
         case backslash = "\\"
-        case macroStart = "${"
-        case macroEnd = "}$"
-        case noteStart = "!*"
-        case noteEnd = "*!"
+
         }
 
     public enum Keyword:String,CaseIterable,Equatable
@@ -384,32 +387,40 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
             {
             case .name(let string,_):
                 return(".name(\(string))")
+//                return(".name()")
             case .invisible(let string,_):
                 return(".invisible(\(string))")
+//                return(".invisible(...)")
             case .path(let string,_):
                 return(".path(\(string))")
             case .hashString(let string,_):
                 return(".symbolString(\(string))")
+//                return(".symbolString()")
             case .note(let string,_):
                 return(".note(\(string))")
+//                return(".note()")
             case .directive(let string,_):
                 return(".directive(\(string))")
+//                return(".directive()")
             case .comment(let string,_):
                 return(".comment(\(string))")
+//                return(".comment()")
             case .end:
                 return(".end")
             case .identifier(let string,_):
                 return(".identifier(\(string.description))")
+//                return(".identifier()")
             case .keyword(let keyword,_):
                 return(".keyword(\(keyword))")
             case .string(let string,_):
                 return(".string(\(string))")
+//                return(".string()")
             case .integer(let value,_):
                 return(".integer(\(value))")
             case .float(let value,_):
                 return(".float(\(value))")
             case .symbol(let value,_):
-                return(".symbol(\(value.rawValue))")
+                return(".symbol(\(value))")
             case .none:
                 return(".none")
             case .operator(let string,_):
@@ -501,6 +512,28 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
             {
             case .invisible:
                 return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isPlusPlus:Bool
+        {
+        switch(self)
+            {
+            case .operator(let symbol,_):
+                return(symbol == "++")
+            default:
+                return(false)
+            }
+        }
+        
+    public var isMinusMinus:Bool
+        {
+        switch(self)
+            {
+            case .operator(let symbol,_):
+                return(symbol == "--")
             default:
                 return(false)
             }

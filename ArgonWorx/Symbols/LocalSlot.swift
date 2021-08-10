@@ -14,7 +14,7 @@ public class LocalSlot:Slot
     init(label:Label,type:Expression)
         {
         self._typeExpression = type
-        let aType = type.findType() ?? VoidClass.voidClass
+        let aType = type.resultType.class ?? VoidClass.voidClass
         super.init(label: label,type: aType)
         }
     

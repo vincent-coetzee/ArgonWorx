@@ -21,31 +21,25 @@ public indirect enum Literal
 public class LiteralExpression: Expression
     {
     private let literal:Literal
-    
-    public override func findType() -> Class?
-        {
-        self.annotatedType = self.lookupType()
-        return(self.annotatedType)
-        }
-        
-    public func lookupType() -> Class?
+
+    public override var resultType: TypeResult
         {
         switch(self.literal)
             {
             case .nil:
-                return(nil)
+                return(.class(ArgonModule.argonModule.nilClass))
             case .integer:
-                return(ArgonModule.argonModule.integer)
+                return(.class(ArgonModule.argonModule.integer))
             case .float:
-                return(ArgonModule.argonModule.float)
+                return(.class(ArgonModule.argonModule.float))
             case .string:
-                return(ArgonModule.argonModule.string)
+                return(.class(ArgonModule.argonModule.string))
             case .boolean:
-                return(ArgonModule.argonModule.boolean)
+                return(.class(ArgonModule.argonModule.boolean))
             case .symbol:
-                return(ArgonModule.argonModule.symbol)
+                return(.class(ArgonModule.argonModule.symbol))
             case .array:
-                return(ArgonModule.argonModule.array)
+                return(.class(ArgonModule.argonModule.array))
             }
         }
         

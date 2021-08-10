@@ -63,6 +63,26 @@ MAIN MODULE Basics
         person->name = "Some Person or Other"
         person->identityNumber = "650103093888288288"
         person->age = 101
+        person->age++
+        HANDLE(#InvalidInvocation)
+            {
+            WITH(symbolName)
+            print("A symbol was raised")
+            print(symbolName)
+            }
         begin()
         }
+        
+    METHOD print(=thing::Corporate) -> Integer
+        {
+        LET argument = Object()
+        testingThings(argument::argument)
+        }
+        
+MODULE Secondary(/Users/vincent/Desktop/libXenon.dylib)
+    {
+    FUNCTION printString(PrintString)(string::String) -> Void
+    FUNCTION countArrayElements(CountArrayElements)(array::Array<String>) -> Integer
+    FUNCTION elementAtKey(ElementAtKey)(dictionary::Dictionary<String,Object>) -> Integer
+    }
     }

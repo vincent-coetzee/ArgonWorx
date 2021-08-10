@@ -26,7 +26,7 @@ public class ExpressionBlock: Block
     public override func analyzeSemantics(_ compiler:Compiler)
         {
         super.analyzeSemantics(compiler)
-        let type = self.expression.findType()
+        let type = self.expression.resultType
         }
         
     public override func emitCode(into: MethodInstance,using: CodeGenerator)
