@@ -16,6 +16,8 @@ public indirect enum Literal
     case boolean(Argon.Boolean)
     case symbol(Argon.Symbol)
     case array([Literal])
+    case `class`(Class)
+    case module(Module)
     }
 
 public class LiteralExpression: Expression
@@ -40,6 +42,10 @@ public class LiteralExpression: Expression
                 return(.class(ArgonModule.argonModule.symbol))
             case .array:
                 return(.class(ArgonModule.argonModule.array))
+            case .class:
+                return(.class(ArgonModule.argonModule.class))
+            case .module:
+                return(.class(ArgonModule.argonModule.module))
             }
         }
         
@@ -70,6 +76,10 @@ public class LiteralExpression: Expression
                 instance.append(.load,.address(address),.none,.register(register))
             case .array:
                 fatalError()
+            case .class(let aClass):
+                instance.append(.load,.address(aClass.memoryAddress),.none,.register(register))
+            case .module(let module):
+                instance.append(.load,.address(module.memoryAddress),.none,.register(register))
             }
         self.valueLocation = .register(register)
         }

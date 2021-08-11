@@ -11,6 +11,11 @@ public struct Location
     {
     public static let zero = Location(line:0,lineStart:0,lineStop:0,tokenStart:0,tokenStop:0)
     
+    public var range: NSRange
+        {
+        NSRange(location: self.tokenStart, length: self.tokenStop - self.tokenStart)
+        }
+        
     public let line:Int
     public let tokenStart:Int
     public let tokenStop:Int

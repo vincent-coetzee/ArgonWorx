@@ -63,7 +63,8 @@ public class Class:ContainerSymbol,ObservableObject
         {
         if self._metaclass.isNil
             {
-            self._metaclass = Metaclass(label: self.label,class: self)
+            self._metaclass = Metaclass(label: "\(self.label) metaclass",class: self)
+            self._metaclass?.superclasses = self.superclasses.map{$0.metaclass}
             }
         return(self._metaclass!)
         }
@@ -530,6 +531,10 @@ public class Class:ContainerSymbol,ObservableObject
                 }
             }
         self.superclassHolders = []
+        for aClass in self.superclasses
+            {
+            _ = aClass.metaclass
+            }
         }
         
     @discardableResult

@@ -6,6 +6,11 @@
 ///
 MAIN MODULE Basics
     {
+    SLOT basicSlot = "This is a module based slot"
+    
+    CONSTANT $NumericConstantNumber1 = 12.78876554
+    CONSTANT $NumericConstantNumber2 = 189567
+    
     MAIN METHOD begin() -> Void
         {
         doTheThing()
@@ -27,6 +32,7 @@ MAIN MODULE Basics
         SLOT name::String = "Entity Name"
         SLOT identityNumber::String = ""
         SLOT age::Integer = 47
+        SLOT isSovereign?::Boolean = false
         }
         
     CLASS LegalEntity::Entity

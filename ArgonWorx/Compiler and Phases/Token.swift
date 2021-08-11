@@ -45,10 +45,9 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
             }
         }
         
-    public var id: String
+    public var id: Int
         {
-        let string = "\(self).\(self.location)"
-        return(string)
+        self.location.tokenStart
         }
         
 //    public static func == (lhs: Token, rhs: Token) -> Bool

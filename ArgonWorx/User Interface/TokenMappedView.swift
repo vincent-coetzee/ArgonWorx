@@ -8,129 +8,17 @@
 import SwiftUI
 import Combine
 
-struct TokenView: NSViewRepresentable
-    {
-    typealias NSViewType = NSScrollView
-    
-    @Binding var text: String
-    
-    public func makeNSView(context:Context) -> NSScrollView
-        {
-        let scrollView = NSScrollView()
-        scrollView.drawsBackground = true
-        scrollView.borderType = .noBorder
-        scrollView.hasVerticalScroller = true
-        scrollView.hasHorizontalRuler = false
-        scrollView.autoresizingMask = [.width, .height]
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        let view = LineNumberTextView(frame: .zero)
-        scrollView.documentView = view
-        view.gutterBackgroundColor = NSColor.black
-        view.gutterForegroundColor = NSColor.white
-        view.initOutsideNib()
-        return(scrollView)
-        }
-        
-    func updateNSView(_ nsView: NSScrollView,context: Context)
-        {
-        (nsView.documentView as! LineNumberTextView).textStorage?.append(self.format(source:self.$text.wrappedValue))
-        }
-        
-    private func format(source:String) -> NSMutableAttributedString
-        {
-        let tokens = TokenStream(source: source,context: NullReportingContext.shared).allTokens(withComments: true, context: NullReportingContext.shared)
-        let decorator = TokenDecorator()
-        let wrapped = tokens.flatMap{decorator.decorate($0)}
-        let attributes:[NSAttributedString.Key:Any] = [.font:NSFont(name:"Menlo",size: 11)!,.foregroundColor: NSColor.argonXcodePink]
-        let mutable = NSMutableAttributedString(string: source,attributes: attributes)
-        for token in wrapped
-            {
-            mutable.setAttributes(token.attributes, range: token.range)
-            }
-        return(mutable)
-        }
-    }
-
 struct TokenView_Previews: PreviewProvider
     {
     @State static var source = Argon.sampleSource
     
     static var previews: some View
         {
-        TokenMappedViewControllerView(source: self.$source)
+        TokenMappingView(source: self.$source)
         }
     }
 
-struct WrappedToken
-    {
-    public let textColor:NSColor
-    public let font:NSFont
-    public let range:NSRange
-    public var attributes:[NSAttributedString.Key:Any]
-        {
-        let attributes:[NSAttributedString.Key:Any] = [.foregroundColor:self.textColor,.font:self.font]
-        return(attributes)
-        }
-    }
-
-struct TokenDecorator
-    {
-    private let font = NSFont(name:"Menlo",size: 11)!
-    private let color = NSColor.argonPink
-    private let systemClassNames = ArgonModule.argonModule.classes.map{$0.label}
-    
-    func decorate(_ token:Token) -> WrappedToken?
-        {
-        let range = NSRange(location: token.location.tokenStart, length: token.location.tokenStop - token.location.tokenStart)
-        switch(token)
-            {
-            case .invisible:
-                return(nil)
-            case .keyword:
-                let tokenColor = NSColor.argonXGreen
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .identifier:
-                let identifier = token.identifier
-                if self.systemClassNames.contains(identifier)
-                    {
-                    return(WrappedToken(textColor: NSColor.argonNeonOrange, font: font, range: range))
-                    }
-                let tokenColor = NSColor.argonXcodePink
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .name:
-                let tokenColor = NSColor.argonXOrange
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .comment:
-                let tokenColor = NSColor.argonXPurple
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .path:
-                let tokenColor = NSColor.argonIvory
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .symbol:
-                let tokenColor = NSColor.argonBayside
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .string:
-                let tokenColor = NSColor.argonSalmonPink
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .hashString:
-                let tokenColor = NSColor.argonNeonFuchsia
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .integer:
-                let tokenColor = NSColor.argonSeaGreen
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .float:
-                let tokenColor = NSColor.argonZomp
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            case .directive:
-                let tokenColor = NSColor.argonNamingYellow
-                return(WrappedToken(textColor: tokenColor, font: font, range: range))
-            default:
-                return(nil)
-            }
-        }
-    }
-
-class TokenMappedViewController: NSViewController
+class TokenMappingViewController: NSViewController
     {
     var textView = LineNumberTextView()
     internal var source: String = ""
@@ -163,7 +51,7 @@ class TokenMappedViewController: NSViewController
         }
     }
 
-struct TokenMappedViewControllerView: NSViewControllerRepresentable
+struct TokenMappingView: NSViewControllerRepresentable
     {
     @Binding var source: String
     
@@ -174,10 +62,10 @@ struct TokenMappedViewControllerView: NSViewControllerRepresentable
     
     class Coordinator: NSObject, NSTextStorageDelegate
         {
-        private var parent: TokenMappedViewControllerView
+        private var parent: TokenMappingView
         var shouldUpdateText = true
         
-        init(_ parent: TokenMappedViewControllerView)
+        init(_ parent: TokenMappingView)
             {
             self.parent = parent
             }
@@ -199,37 +87,31 @@ struct TokenMappedViewControllerView: NSViewControllerRepresentable
             }
         }
 
-    func makeNSViewController(context: Context) -> TokenMappedViewController
+    func makeNSViewController(context: Context) -> TokenMappingViewController
         {
-        let vc = TokenMappedViewController()
+        let vc = TokenMappingViewController()
         vc.textView.textStorage?.delegate = context.coordinator
+        vc.textView.backgroundColor = SyntaxColorPalette.backgroundColor
+        vc.textView.gutterBackgroundColor = SyntaxColorPalette.backgroundColor
+        vc.textView.gutterForegroundColor = SyntaxColorPalette.lineNumberColor
+        vc.textView.textStorage?.setAttributedString(NSAttributedString(string: self.$source.wrappedValue,attributes: [:]))
         return vc
         }
     
-    func updateNSViewController(_ nsViewController: TokenMappedViewController, context: Context)
+    func updateNSViewController(_ nsViewController: TokenMappingViewController, context: Context)
         {
         let compiler = Compiler()
         compiler.compileChunk(self.$source.wrappedValue)
-        let mutable = NSMutableAttributedString(string: self.$source.wrappedValue,attributes: [:])
         let tokens = compiler.visualTokens
+        nsViewController.textView.textStorage?.beginEditing()
         for token in tokens
             {
-            mutable.setAttributes(token.attributes,range: token.range)
+            if token.baseToken.isKeyword
+                {
+                print("KEYWORD\(token.baseToken.keyword) AT \(token.range)")
+                }
+            nsViewController.textView.textStorage?.setAttributes(token.attributes,range: token.range)
             }
-        nsViewController.textView.textStorage?.append(mutable)
+        nsViewController.textView.textStorage?.endEditing()
         }
-        
-//    private func format(source:String) -> NSMutableAttributedString
-//        {
-//        let tokens = TokenStream(source: source,context: NullReportingContext.shared).allTokens(withComments: true, context: NullReportingContext.shared)
-//        let decorator = TokenDecorator()
-//        let wrapped = tokens.flatMap{decorator.decorate($0)}
-//        let attributes:[NSAttributedString.Key:Any] = [.font:NSFont(name:"Menlo",size: 11)!,.foregroundColor: NSColor.argonXcodePink]
-//        let mutable = NSMutableAttributedString(string: source,attributes: attributes)
-//        for token in wrapped
-//            {
-//            mutable.setAttributes(token.attributes, range: token.range)
-//            }
-//        return(mutable)
-//        }
     }

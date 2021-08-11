@@ -60,6 +60,9 @@ extension NSColor
     public static let argonXSmoke = NSColor(hex: 0x738276)
     public static let argonXSeaBlue = NSColor(hex: 0x108080)
     public static let argonXCornflower = NSColor(hex: 0x5482FF)
+    public static let argonXKeyword = NSColor(hex: 0x009063)
+    public static let argonXLightBlue = NSColor(hex: 0x009586)
+    public static let argonXIdentifier = NSColor(hex: 0x80BD04)
     
     public var swiftUIColor: Color
         {
@@ -88,3 +91,4 @@ extension NSColor
         return(NSColor(red:components[0],green:components[1],blue:components[2],alpha: alpha))
         }
     }
+

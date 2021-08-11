@@ -18,8 +18,8 @@ public class Parser
     private var symbolStack = Stack<Symbol>()
     private var currentContext:Symbol = Symbol(label:"")
     private var node:ParseNode?
-    private var visualToken: VisualToken = VisualToken(token: .none)
-    private var _visualTokens = Array<VisualToken>()
+    private var visualToken = VisualToken(token: .none)
+    internal var visualTokens = Dictionary<Int,VisualToken>()
     
     public static func parseChunk(_ source:String,in compiler:Compiler) -> ParseNode?
         {
@@ -37,27 +37,22 @@ public class Parser
         return(NullReportingContext.shared)
         }
         
-    public var visualTokens: Array<VisualToken>
-        {
-        return(self._visualTokens.map{$0.mapColors(systemClassNames: Compiler.systemClassNames)})
-        }
-        
     @discardableResult
     public func nextToken() -> Token
         {
-        self._visualTokens.append(self.visualToken)
         self.lastToken = self.token
         self.token = self.tokens[self.tokenIndex]
+        self.visualToken = self.visualTokens[self.token.id]!
+        self.visualToken.remapTokenToColors()
         self.tokenIndex += 1
-        while (self.token.isComment || self.token.isInvisible) && !self.token.isEnd
+        while self.token.isComment || self.token.isInvisible
             {
-            self.visualToken = VisualToken(token: self.token)
-            self._visualTokens.append(self.visualToken)
             self.token = self.tokens[self.tokenIndex]
+            self.visualToken = self.visualTokens[self.token.id]!
+            self.visualToken.remapTokenToColors()
             self.tokenIndex += 1
             }
         print(token)
-        self.visualToken = VisualToken(token: self.token)
         return(self.token)
         }
         
@@ -91,12 +86,23 @@ public class Parser
         return(self.tokens[self.tokenIndex])
         }
         
-    public func parseChunk(_ source:String) -> ParseNode?
+    private func initParser(source:String)
         {
         self.currentContext = TopModule.topModule
         let stream = TokenStream(source: source, context: self.reportingContext)
         self.tokens = stream.allTokens(withComments: true, context: self.reportingContext)
+        for aToken in self.tokens
+            {
+            let newToken = VisualToken(token: aToken)
+            newToken.remapTokenToColors()
+            self.visualTokens[aToken.id] = newToken
+            }
         self.nextToken()
+        }
+        
+    public func parseChunk(_ source:String) -> ParseNode?
+        {
+        self.initParser(source: source)
         let result = self.parsePrivacyModifier
             {
             (scope:PrivacyScope?) -> ParseNode in
@@ -251,7 +257,7 @@ public class Parser
         self.nextToken()
         self.visualToken.kind = .module
         let label = self.parseLabel()
-        var module:Module = Module(label:"")
+        var module:Module = ModuleInstance(label:"")
         if self.token.isLeftPar
             {
             self.parseParentheses
@@ -262,7 +268,7 @@ public class Parser
             }
         else
             {
-            module = Module(label: label)
+            module = ModuleInstance(label: label)
             }
         self.currentContext.addSymbol(module)
         self.parseModule(into: module)
@@ -279,6 +285,7 @@ public class Parser
                 if !self.token.isKeyword
                     {
                     self.reportingContext.dispatchError(at: self.token.location, message: "Keyword expected but \(self.token) found")
+                    self.nextToken()
                     }
                 else
                     {
@@ -420,7 +427,7 @@ public class Parser
                 else if self.token.isClass
                     {
                     let slot = self.parseClassSlot()
-                    aClass.addSymbol(slot)
+                    aClass.metaclass.addSymbol(slot)
                     }
                 }
             }
@@ -430,7 +437,23 @@ public class Parser
         
     private func parseConstant()
         {
-        fatalError()
+        self.nextToken()
+        self.visualToken.kind = .constant
+        let label = self.parseLabel()
+        var type:Class = VoidClass.voidClass
+        if self.token.isGluon
+            {
+            self.parseGluon()
+            type = self.parseType()
+            }
+        if !self.token.isAssign
+            {
+            self.reportingContext.dispatchError(at: self.token.location, message: "'=' expected to follow the declaration of a CONSTANT.")
+            }
+        self.nextToken()
+        let value = self.parseExpression()
+        let constant = Constant(label: label,type: type,value: value)
+        self.currentContext.addSymbol(constant)
         }
         
     private func dispatchError(_ message:String)
@@ -803,10 +826,49 @@ public class Parser
     private func parseIdentifierTerm() -> Expression
         {
         let name = self.parseName()
-        if let symbol = self.currentContext.lookup(name: name),symbol is Class
+        let aSymbol = self.currentContext.lookup(name: name)
+        if let symbol = aSymbol as? Class
             {
-            self.parseParentheses { }
-            return(InstanciationTerm(class: symbol as! Class))
+            if self.token.isLeftPar
+                {
+                self.parseParentheses { }
+                return(InstanciationTerm(class: symbol))
+                }
+            else if self.token.isRightArrow
+                {
+                let operation = self.token.symbol
+                var lhs:Expression = NameExpression(name: name, location: self.token.location, context: self.currentContext, reportingContext: self.reportingContext)
+                while self.token.isRightArrow
+                    {
+                    self.nextToken()
+                    let slotExpression = self.parseExpression()
+                    lhs = lhs.operation(operation,slotExpression)
+                    }
+                return(lhs)
+                }
+            else
+                {
+                return(LiteralExpression(.class(symbol)))
+                }
+            }
+        else if let symbol = aSymbol as? Module
+            {
+            if self.token.isRightArrow
+                {
+                let operation = self.token.symbol
+                var lhs:Expression = LiteralExpression(.module(symbol))
+                while self.token.isRightArrow
+                    {
+                    self.nextToken()
+                    let slotExpression = self.parseExpression()
+                    lhs = lhs.operation(operation,slotExpression)
+                    }
+                return(lhs)
+                }
+            else
+                {
+                return(LiteralExpression(.module(symbol)))
+                }
             }
         if self.token.isLeftPar
             {
@@ -1144,6 +1206,7 @@ public class Parser
     private func parseTypeAlias()
         {
         self.nextToken()
+        self.visualToken.kind = .type
         let label = self.parseLabel()
         if !self.token.isIs
             {

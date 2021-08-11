@@ -222,6 +222,11 @@ public class ArgonModule: SystemModule
         return(self.lookup(label: "DateTime") as! Class)
         }
         
+    public var module: Class
+        {
+        return(self.lookup(label: "Module") as! Class)
+        }
+        
     public var closure: ClosureClass
         {
         return(self.lookup(label: "Closure") as! ClosureClass)

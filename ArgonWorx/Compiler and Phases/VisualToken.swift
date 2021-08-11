@@ -8,11 +8,13 @@
 import Foundation
 import AppKit
 
+fileprivate var TokenNumber:Int = 0
+
 public class VisualToken
     {
     public enum Kind
         {
-        case `default`
+        case none
         case localSlot
         case classSlot
         case `class`
@@ -43,11 +45,12 @@ public class VisualToken
         case time
         case dateTime
         case type
+        case constant
         }
         
     public var isNone: Bool
         {
-        switch(self.token)
+        switch(self.baseToken)
             {
             case .none:
                 return(true)
@@ -58,124 +61,176 @@ public class VisualToken
         
     public var attributes: [NSAttributedString.Key:Any]
         {
-        var values = [NSAttributedString.Key:Any]()
-        values[.font] = self.font
-        values[.foregroundColor] = self.color
-        return(values)
+        return(self._attributes)
         }
         
-    public let token: Token
-    internal var kind: Kind = .default
-    internal var font = NSFont(name: "Menlo",size: 11)
-    internal var color: NSColor = .white
-    internal let range: NSRange
+    public var baseToken: Token = .none
     
-    init(token theToken: Token)
+    internal var kind: Kind 
         {
-        self.range = NSRange(location: theToken.location.tokenStart, length: theToken.location.tokenStop - theToken.location.tokenStart)
-        self.token = theToken
-        switch(theToken)
+        get
             {
-            case .name:
-                self.kind = .name
-            case .invisible:
-                self.kind = .invisible
-            case .path:
-                self.kind = .path
-            case .hashString:
-                self.kind = .symbol
-            case .note:
-                self.kind = .note
-            case .directive:
-                self.kind = .directive
-            case .comment:
-                self.kind = .comment
-            case .end:
-                self.kind = .end
-            case .identifier:
-                self.kind = .identifier
-            case .keyword:
-                self.kind = .keyword
-            case .string:
-                self.kind = .string
-            case .integer:
-                self.kind = .integer
-            case .float:
-                self.kind = .float
-            case .symbol:
-                self.kind = .symbol
-            case .none:
-                self.kind = .default
-            case .operator:
-                self.kind = .operator
-            case .character:
-                self.kind = .character
-            case .boolean:
-                self.kind = .boolean
-            case .byte:
-                self.kind = .byte
-            case .keyPath:
-                self.kind = .keypath
-            case .date:
-                self.kind = .date
-            case .time:
-                self.kind = .time
-            case .dateTime:
-                self.kind = .dateTime
+            return(self._kind)
+            }
+        set
+            {
+            self._kind = newValue
+            self.mapKindToColors(kind: newValue,systemClassNames: Compiler.systemClassNames)
             }
         }
         
-    public func mapColors(systemClassNames: Array<String>) -> VisualToken
+    public var range: NSRange
         {
-        switch(self.kind)
+        self.baseToken.location.range
+        }
+        
+    private var _attributes: [NSAttributedString.Key:Any] = [.font:NSFont(name: "Menlo",size: 12)!]
+    private var _kind: Kind = .none
+    public var number:Int
+    
+    init(token: Token)
+        {
+        self.number = TokenNumber
+        TokenNumber += 1
+        self.baseToken = token
+        self.mapTokenToColors(token: token)
+        }
+        
+    public func remapTokenToColors()
+        {
+        self.mapTokenToColors(token: self.baseToken)
+        self.mapKindToColors(kind: self._kind, systemClassNames: Compiler.systemClassNames)
+        }
+        
+    public func mapTokenToColors(token: Token)
+        {
+        switch(token)
             {
+            case .name:
+                self._kind = .name
+                self._attributes[.foregroundColor] = SyntaxColorPalette.nameColor
+            case .invisible:
+                self._kind = .invisible
+            case .path:
+                self._kind = .path
+                self._attributes[.foregroundColor] = SyntaxColorPalette.pathColor
+            case .hashString:
+                self._attributes[.foregroundColor] = SyntaxColorPalette.symbolColor
+            case .note:
+                self._kind = .note
+            case .directive:
+                self._kind = .directive
+                self._attributes[.foregroundColor] = SyntaxColorPalette.directiveColor
+            case .comment:
+                self._kind = .comment
+                self._attributes[.foregroundColor] = SyntaxColorPalette.commentColor
+            case .end:
+                self._kind = .end
+            case .identifier:
+                self._kind = .identifier
+                self._attributes[.foregroundColor] = SyntaxColorPalette.identifierColor
+            case .keyword:
+                self._kind = .keyword
+                self._attributes[.foregroundColor] = SyntaxColorPalette.keywordColor
+            case .string:
+                self._kind = .string
+                self._attributes[.foregroundColor] = SyntaxColorPalette.stringColor
+            case .integer:
+                self._kind = .integer
+                self._attributes[.foregroundColor] = SyntaxColorPalette.integerColor
+            case .float:
+                self._kind = .float
+                self._attributes[.foregroundColor] = SyntaxColorPalette.floatColor
+            case .symbol:
+                self._kind = .operator
+                self._attributes[.foregroundColor] = SyntaxColorPalette.operatorColor
+            case .none:
+                self._kind = .none
+                self._attributes[.foregroundColor] = NSColor.argonNeonFuchsia
+            case .operator:
+                self._kind = .operator
+                self._attributes[.foregroundColor] = SyntaxColorPalette.operatorColor
+            case .character:
+                self._kind = .character
+                self._attributes[.foregroundColor] = SyntaxColorPalette.characterColor
+            case .boolean:
+                self._kind = .boolean
+                self._attributes[.foregroundColor] = SyntaxColorPalette.booleanColor
+            case .byte:
+                self._kind = .byte
+                self._attributes[.foregroundColor] = SyntaxColorPalette.byteColor
+            case .keyPath:
+                self._kind = .keypath
+                self._attributes[.foregroundColor] = SyntaxColorPalette.keypathColor
+            case .date:
+                self._kind = .date
+                self._attributes[.foregroundColor] = SyntaxColorPalette.textColor
+            case .time:
+                self._kind = .time
+                self._attributes[.foregroundColor] = SyntaxColorPalette.textColor
+            case .dateTime:
+                self._kind = .dateTime
+                self._attributes[.foregroundColor] = SyntaxColorPalette.textColor
+            }
+        }
+        
+    public func mapKindToColors(kind:Kind,systemClassNames: Array<String>)
+        {
+        switch(kind)
+            {
+            case .none:
+                break
             case .invisible:
                 break
             case .keyword:
-                self.color = NSColor.argonXGreen
+                self._attributes[.foregroundColor] = SyntaxColorPalette.keywordColor
             case .identifier:
-                let identifier = token.identifier
+                let identifier = self.baseToken.identifier
                 if systemClassNames.contains(identifier)
                     {
-                    self.color = NSColor.argonNeonOrange
+                    self._attributes[.foregroundColor] = SyntaxColorPalette.systemClassColor
                     }
-                self.color = NSColor.argonXcodePink
+                else
+                    {
+                    self._attributes[.foregroundColor] = SyntaxColorPalette.identifierColor
+                    }
             case .name:
-                self.color = NSColor.argonXOrange
+                self._attributes[.foregroundColor] = SyntaxColorPalette.nameColor
             case .comment:
-                self.color = NSColor.yellow
+                self._attributes[.foregroundColor] = SyntaxColorPalette.commentColor
             case .path:
-                self.color = NSColor.argonIvory
+                self._attributes[.foregroundColor] = SyntaxColorPalette.pathColor
             case .symbol:
-                self.color = NSColor.argonBayside
+                self._attributes[.foregroundColor] = SyntaxColorPalette.symbolColor
             case .string:
-                self.color = NSColor.argonSalmonPink
+                self._attributes[.foregroundColor] = SyntaxColorPalette.stringColor
             case .class:
-                self.color = NSColor.argonNeonFuchsia
+                self._attributes[.foregroundColor] = SyntaxColorPalette.classColor
             case .integer:
-                self.color = NSColor.argonSeaGreen
+                self._attributes[.foregroundColor] = SyntaxColorPalette.integerColor
             case .float:
-                self.color = NSColor.argonZomp
+                self._attributes[.foregroundColor] = SyntaxColorPalette.floatColor
             case .directive:
-                self.color = NSColor.argonNamingYellow
+                self._attributes[.foregroundColor] = SyntaxColorPalette.directiveColor
             case .methodInvocation:
-                self.color = NSColor.argonXWhite
+                self._attributes[.foregroundColor] = SyntaxColorPalette.methodColor
             case .method:
-                self.color = NSColor.argonXWhite
+                self._attributes[.foregroundColor] = SyntaxColorPalette.methodColor
             case .functionInvocation:
-                self.color = NSColor.argonXBlue
+                self._attributes[.foregroundColor] = SyntaxColorPalette.functionColor
             case .function:
-                self.color = NSColor.argonXBlue
+                self._attributes[.foregroundColor] = SyntaxColorPalette.functionColor
             case .localSlot:
-                self.color = NSColor.argonXCornflower
+                self._attributes[.foregroundColor] = SyntaxColorPalette.slotColor
             case .classSlot:
-                self.color = NSColor.argonXCoral
+                self._attributes[.foregroundColor] = SyntaxColorPalette.slotColor
             case .type:
-                self.color = NSColor.argonXSeaBlue
+                self._attributes[.foregroundColor] = SyntaxColorPalette.typeColor
+            case .constant:
+                self._attributes[.foregroundColor] = SyntaxColorPalette.constantColor
             default:
-                break
+                self._attributes[.foregroundColor] = NSColor.magenta
             }
-        return(self)
         }
     }
 
