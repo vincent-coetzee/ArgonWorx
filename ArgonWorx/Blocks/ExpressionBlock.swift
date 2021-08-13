@@ -10,28 +10,36 @@ import Foundation
 public class ExpressionBlock: Block
     {
     private let expression:Expression
-    public var valueLocation: Instruction.Operand = .none
+    public var place: Instruction.Operand = .none
+    
     init(_ expression:Expression)
         {
         self.expression = expression
         super.init()
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer:Realizer)
         {
-        super.realize(compiler)
-        self.expression.realize(compiler)
+        super.realize(using: realizer)
+        self.expression.realize(using: realizer)
         }
         
-    public override func analyzeSemantics(_ compiler:Compiler)
+    public override func analyzeSemantics(using analyzer:SemanticAnalyzer)
         {
-        super.analyzeSemantics(compiler)
+        super.analyzeSemantics(using: analyzer)
         let type = self.expression.resultType
         }
         
-    public override func emitCode(into: MethodInstance,using: CodeGenerator)
+    public override func emitCode(into: InstructionBuffer,using: CodeGenerator) throws
         {
-        self.expression.emitCode(into: into,using: using)
-        self.valueLocation = self.expression.valueLocation
+        try self.expression.emitCode(into: into,using: using)
+        self.place = self.expression.place
+        }
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)EXPRESSION BLOCK")
+        self.expression.dump(depth: depth+1)
         }
     }

@@ -23,9 +23,9 @@ public class ArrayAccessExpression: Expression
         self.array.resultType
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer:Realizer)
         {
-        self.array.realize(compiler)
-        self.index.realize(compiler)
+        self.array.realize(using: realizer)
+        self.index.realize(using: realizer)
         }
     }

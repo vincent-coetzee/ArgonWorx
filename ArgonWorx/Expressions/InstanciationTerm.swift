@@ -20,4 +20,23 @@ public class InstanciationTerm: Expression
         {
         return(.class(theClass))
         }
+        
+    public override func realize(using realizer: Realizer)
+        {
+        self.theClass.realize(using: realizer)
+        }
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)MAKE EXPRESSION()")
+        print("\(padding)\t \(self.theClass.label)")
+        }
+        
+    public override func emitCode(into instance: InstructionBuffer,using generator: CodeGenerator) throws
+        {
+        let outputRegister = generator.registerFile.findRegister(forSlot: nil, inBuffer: instance)
+        instance.append(.make,.address(theClass.memoryAddress),.integer(0),.register(outputRegister))
+        self._place = .register(outputRegister)
+        }
     }

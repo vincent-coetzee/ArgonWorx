@@ -11,3 +11,7 @@ public class ElseBlock: Block
     {
     
     }
+
+public class ElseIfBlock: IfBlock
+    {
+    }

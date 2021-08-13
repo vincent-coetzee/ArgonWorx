@@ -22,6 +22,73 @@ public indirect enum Literal
 
 public class LiteralExpression: Expression
     {
+    public var isStringLiteral: Bool
+        {
+        switch(self.literal)
+            {
+            case .string:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isIntegerLiteral: Bool
+        {
+        switch(self.literal)
+            {
+            case .integer:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isSymbolLiteral: Bool
+        {
+        switch(self.literal)
+            {
+            case .symbol:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var symbolLiteral: Argon.Symbol
+        {
+        switch(self.literal)
+            {
+            case .symbol(let symbol):
+                return(symbol)
+            default:
+                fatalError("Should not have been called")
+            }
+        }
+        
+    public var stringLiteral: String
+        {
+        switch(self.literal)
+            {
+            case .string(let symbol):
+                return(symbol)
+            default:
+                fatalError("Should not have been called")
+            }
+        }
+        
+        
+    public var integerLiteral: Argon.Integer
+        {
+        switch(self.literal)
+            {
+            case .integer(let symbol):
+                return(symbol)
+            default:
+                fatalError("Should not have been called")
+            }
+        }
+        
     private let literal:Literal
 
     public override var resultType: TypeResult
@@ -48,6 +115,7 @@ public class LiteralExpression: Expression
                 return(.class(ArgonModule.argonModule.module))
             }
         }
+
         
     init(_ literal:Literal)
         {
@@ -55,9 +123,16 @@ public class LiteralExpression: Expression
         super.init()
         }
         
-    public override func emitCode(into instance: MethodInstance,using generator: CodeGenerator)
+    public override func dump(depth: Int)
         {
-        let register = generator.registerFile.findRegister(for: nil, instance: instance)
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)LITERAL EXPRESSION()")
+        print("\(padding)\t \(self.literal)")
+        }
+        
+    public override func emitCode(into instance: InstructionBuffer,using generator: CodeGenerator) throws
+        {
+        let register = generator.registerFile.findRegister(forSlot: nil, inBuffer: instance)
         switch(self.literal)
             {
             case .nil:
@@ -81,6 +156,6 @@ public class LiteralExpression: Expression
             case .module(let module):
                 instance.append(.load,.address(module.memoryAddress),.none,.register(register))
             }
-        self.valueLocation = .register(register)
+        self._place = .register(register)
         }
     }

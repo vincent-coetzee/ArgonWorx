@@ -8,11 +8,17 @@
 import Foundation
 import SwiftUI
 
-public class Node:NSObject,NamingContext,ParseTreeNode,Identifiable
+protocol FuckSwift
     {
-    public let id: UUID
+    init(upYours:Int)
+    }
+
+public class Node:NamingContext,ParseTreeNode,Identifiable
+    {
+    public let index: UUID
     public let label: String
-    public private(set) var parent:Node? = nil
+    public private(set) var parent:NamingContext! = nil
+    
     private var locations = NodeLocations()
     
     public var declarationLocation: Location
@@ -32,45 +38,29 @@ public class Node:NSObject,NamingContext,ParseTreeNode,Identifiable
         fatalError("This should have been implemented in a class")
         }
         
+    public init(label: String)
+        {
+        self.index = UUID()
+        self.label = label
+        }
+        
     public var name: Name
         {
-        return((self.parent?.name ?? Name()) + self.label)
+        return(((self.parent as? Node)?.name ?? Name()) + self.label)
         }
         
     public static func ==(lhs:Node,rhs:Node) -> Bool
         {
         return(lhs.id == rhs.id)
         }
-        
-    ///
-    /// Primary initializer for everything
-    ///
-    init(label:String)
-        {
-        self.label = label
-        self.id = UUID()
-        super.init()
-        }
-        
-    ///
-    /// Support for encoding and decoding with an NSArchiver
-    ///
-    init?(coder:NSCoder)
-        {
-        self.label = coder.decodeObject(forKey:"label") as! String
-        self.id = coder.decodeObject(forKey:"id") as! UUID
-        super.init()
-        }
-        
-    public func encode(with coder:NSCoder)
-        {
-        coder.encode(self.label,forKey:"label")
-        coder.encode(self.id,forKey:"id")
-        }
 
-    public func setParent(_ node: Node)
+    public func setParent(_ node: NamingContext?)
         {
         self.parent = node
+        }
+        
+    public func realize(using realizer:Realizer)
+        {
         }
         
     public func visit(_ visitor:ParseTreeVisitor) throws

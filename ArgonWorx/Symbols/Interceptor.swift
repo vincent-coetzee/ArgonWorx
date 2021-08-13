@@ -16,4 +16,8 @@ public class Interceptor: Symbol
         self.parameters = parameters
         super.init(label: label)
         }
+    
+    public required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
+}

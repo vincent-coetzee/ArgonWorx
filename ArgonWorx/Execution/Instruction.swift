@@ -59,13 +59,93 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         return(true)
         }
         
-    public static func loadValue(ofSlotNamed:String,instanceType:Class,instance:Word,into:Instruction.Register) -> [Instruction]
+    public class LabelMarker
         {
-        let offset = instanceType.layoutSlot(atLabel: ofSlotNamed)!.offset
-        var array = Array<Instruction>()
-        array.append(Instruction(.load,operand1: .address(instance),result: .register(.r2)))
-        array.append(Instruction(.load,operand1: .slot(.r2,Word(offset)),result: .register(into)))
-        return(array)
+        public enum Origin
+            {
+            case to(Int)
+            case from(Int)
+            
+            public var isTo: Bool
+                {
+                switch(self)
+                    {
+                    case .to:
+                        return(true)
+                    default:
+                        return(false)
+                    }
+                }
+                
+            public var isFrom: Bool
+                {
+                switch(self)
+                    {
+                    case .from:
+                        return(true)
+                    default:
+                        return(false)
+                    }
+                }
+                
+            public var index: Int
+                {
+                switch(self)
+                    {
+                    case .to(let index):
+                        return(index)
+                    case .from(let index):
+                        return(index)
+                    }
+                }
+            }
+            
+        private let origin: Origin
+        private var trigger: LabelTrigger?
+        
+        init(to instruction: Instruction,useTrigger: Bool)
+            {
+            self.origin = .to(instruction.lineNumber)
+            if useTrigger
+                {
+                self.trigger = LabelTrigger(instruction: instruction)
+                }
+            }
+            
+        init(from instruction: Instruction,useTrigger: Bool)
+            {
+            self.origin = .from(instruction.lineNumber)
+            if useTrigger
+                {
+                self.trigger = LabelTrigger(instruction: instruction)
+                }
+            }
+            
+        public func trigger(origin: Origin) throws -> Argon.Integer
+            {
+            if self.origin.isTo && origin.isFrom
+                {
+                let delta = self.origin.index - origin.index
+                self.trigger?.trigger(delta: delta)
+                return(Argon.Integer(delta))
+                }
+            throw(NSError(domain: "argon", code: 1000, userInfo: [:]))
+            }
+        }
+        
+    public class LabelTrigger
+        {
+        private let instruction: Instruction
+        
+        init(instruction: Instruction)
+            {
+            self.instruction = instruction
+            }
+            
+        public func trigger(delta: Int)
+            {
+            instruction.result = .label(Argon.Integer(delta))
+            }
         }
         
     public enum Register:Int,Comparable,CaseIterable,Identifiable,Encodable,Decodable,Equatable
@@ -91,6 +171,7 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         case fp         /// the fp points to the next available slot in the fixed segment
         case mp         /// the mp points to the next avaialble slot in the managed segmeng
         case ep
+        case ret
         case r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15
         case fr0,fr1,fr2,fr3,fr4,fr5,fr6,fr7,fr8,fr9,fr10,fr11,fr12,fr13,fr14,fr15
         
@@ -115,30 +196,46 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
         case iBitAnd,iBitOr,iBitXor,iBitNot
         case not
         case load,store
-        case br,breq,brneq
+        case br,breq,brneq,brtrue,brf
         case inc,dec
         case make
-        case call,ret
+        case call,ret, disp, next
         case push,pop,enter,leave,save,restore
         case loopeq,loopneq,loopnz,loopz
         case scat,srev,scmp,scnt,scpy
         case rein
         case sig,hnd
         case zero
+        case cmpw, cmpo
         }
         
     public enum Operand:Encodable,Decodable,Equatable
         {
         case none
         case register(Register)
-        case slot(Register,Word)
+//        case slot(Register,Word)
         case float(Argon.Float)
         case integer(Argon.Integer)
         case address(Word)
         case stack(Register,Argon.Integer)
-        case array(Register,Word)
+//        case array(Register,Word)
         case label(Argon.Integer)
         
+        init(label: Int)
+            {
+            self = .label(Argon.Integer(label))
+            }
+            
+        init(integer: Int)
+            {
+            self = .integer(Argon.Integer(integer))
+            }
+            
+        init(stack: Register,_ offset: Int)
+            {
+            self = .stack(stack,Argon.Integer(offset))
+            }
+            
         public var wordValue:Word
             {
             switch(self)
@@ -147,8 +244,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(0)
                 case .register:
                     return(0)
-                case .slot(_,let word):
-                    return(word)
+//                case .slot(_,let word):
+//                    return(word)
                 case .float(let float):
                     return(float.bitPattern)
                 case .integer(let integer):
@@ -157,8 +254,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(word)
                 case .stack(_,let integer):
                     return(Word(bitPattern: Int64(integer)))
-                case .array(_,let word):
-                    return(word)
+//                case .array(_,let word):
+//                    return(word)
                 case .label(let integer):
                     return(Word(bitPattern: Int64(integer)))
                 }
@@ -172,8 +269,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(0)
                 case .register(let register):
                     return(register.rawValue)
-                case .slot(let register,_):
-                    return(register.rawValue)
+//                case .slot(let register,_):
+//                    return(register.rawValue)
                 case .float:
                     return(0)
                 case .integer:
@@ -182,8 +279,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(0)
                 case .stack(let register,_):
                     return(register.rawValue)
-                case .array(let register,_):
-                    return(register.rawValue)
+//                case .array(let register,_):
+//                    return(register.rawValue)
                 case .label:
                     return(0)
                 }
@@ -197,8 +294,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(0)
                 case .register:
                     return(1)
-                case .slot:
-                    return(2)
+//                case .slot:
+//                    return(2)
                 case .float:
                     return(3)
                 case .integer:
@@ -207,8 +304,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return(5)
                 case .stack:
                     return(6)
-                case .array:
-                    return(7)
+//                case .array:
+//                    return(7)
                 case .label:
                     return(8)
                 }
@@ -244,8 +341,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     return("")
                 case .register(let register):
                     return("\(register)")
-                case .slot(let register,let offset):
-                    return("[\(register) + \(offset)]")
+//                case .slot(let register,let offset):
+//                    return("[\(register) + \(offset)]")
                 case .float(let float):
                     return("\(float)")
                 case .integer(let register):
@@ -255,8 +352,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 case .stack(let register,let offset):
                     let signed = offset < 0 ? "\(offset)" : "+\(offset)"
                     return("SS:[\(register)\(signed)]")
-                case .array(let register,let offset):
-                    return("\(register)+\(offset)")
+//                case .array(let register,let offset):
+//                    return("\(register)+\(offset)")
                 case .label(let integer):
                     let label = integer >= 0 ? "+" : ""
                     return("IP \(label) \(integer)")
@@ -275,10 +372,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                         throw(ExecutionErrorType.invalidRegister)
                         }
                     return(Argon.Float(bitPattern: context.registers[register.rawValue].withoutTag))
-                case .slot(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(Argon.Float(bitPattern: pointer?.pointee.withoutTag ?? 0))
+//                case .slot(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(Argon.Float(bitPattern: pointer?.pointee.withoutTag ?? 0))
                 case .float(let float):
                     return(float)
                 case .integer:
@@ -289,10 +386,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(FloatAtAddressAtOffset(context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(Argon.Float(bitPattern: pointer?.pointee.withoutTag ?? 0))
+//                case .array(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(Argon.Float(bitPattern: pointer?.pointee.withoutTag ?? 0))
                 case .label:
                     return(0)
                 }
@@ -306,10 +403,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     throw(ExecutionErrorType.invalidFloatOperand)
                 case .register(let register):
                     return(context.registers[register.rawValue].withoutTag)
-                case .slot(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee.withoutTag ?? 0)
+//                case .slot(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee.withoutTag ?? 0)
                 case .float:
                     throw(ExecutionErrorType.invalidWordOperand)
                 case .integer(let integer):
@@ -320,10 +417,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(WordAtAddressAtOffset(context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee.withoutTag ?? 0)
+//                case .array(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee.withoutTag ?? 0)
                 case .label(let integer):
                     return(Word(bitPattern: integer))
                     
@@ -338,10 +435,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     throw(ExecutionErrorType.invalidWordOperand)
                 case .register(let register):
                     return(context.registers[register.rawValue].withoutTag)
-                case .slot(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee.withoutTag ?? 0)
+//                case .slot(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee.withoutTag ?? 0)
                 case .float(let float):
                     return(float.bitPattern.tagged(with:.float))
                 case .integer(let integer):
@@ -352,10 +449,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(WordAtAddressAtOffset(context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee.withoutTag ?? 0)
+//                case .array(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Word>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee.withoutTag ?? 0)
                 case .label(let integer):
                     return(Word(bitPattern: integer))
                 }
@@ -369,10 +466,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     throw(ExecutionErrorType.invalidFloatOperand)
                 case .register(let register):
                     return(Int64(bitPattern: UInt64(context.registers[register.rawValue])))
-                case .slot(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Int64>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee ?? 0)
+//                case .slot(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Int64>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee ?? 0)
                 case .float:
                     throw(ExecutionErrorType.invalidWordOperand)
                 case .integer(let integer):
@@ -383,10 +480,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(IntegerAtAddressAtOffset(context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let value = context.registers[object.rawValue]
-                    let pointer = UnsafePointer<Int64>(bitPattern: UInt(value + offset))
-                    return(pointer?.pointee ?? 0)
+//                case .array(let object,let offset):
+//                    let value = context.registers[object.rawValue]
+//                    let pointer = UnsafePointer<Int64>(bitPattern: UInt(value + offset))
+//                    return(pointer?.pointee ?? 0)
                 case .label(let integer):
                     return(Argon.Integer(integer))
                 }
@@ -400,10 +497,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     throw(ExecutionErrorType.invalidIntegerOperand)
                 case .register(let register):
                     context.registers[register.rawValue] = UInt64(bitPattern: value)
-                case .slot(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Int64>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value
+//                case .slot(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Int64>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value
                 case .float:
                     throw(ExecutionErrorType.invalidIntegerOperand)
                 case .integer:
@@ -414,10 +511,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(SetIntegerAtAddressAtOffset(value,context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Int64>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value
+//                case .array(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Int64>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value
                 case .label:
                     break
                 }
@@ -431,10 +528,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     throw(ExecutionErrorType.invalidWordOperand)
                 case .register(let register):
                     context.setRegister(value,atIndex: register)
-                case .slot(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value
+//                case .slot(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value
                 case .float:
                     throw(ExecutionErrorType.invalidWordOperand)
                 case .integer:
@@ -445,10 +542,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(SetWordAtAddressAtOffset(value,context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value
+//                case .array(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value
                 case .label:
                     break
                 }
@@ -466,10 +563,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                         throw(ExecutionErrorType.invalidFloatOperand)
                         }
                     context.registers[register.rawValue] = value.bitPattern
-                case .slot(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value.bitPattern.tagged(with: .float)
+//                case .slot(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value.bitPattern.tagged(with: .float)
                 case .float:
                     throw(ExecutionErrorType.invalidIntegerOperand)
                 case .integer:
@@ -480,10 +577,10 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                     let registerValue = Int64(context.register(atIndex: register))
                     let actualOffset = Word(registerValue + offset)
                     return(SetFloatAtAddressAtOffset(value,context.stackSegment.baseAddress,actualOffset))
-                case .array(let object,let offset):
-                    let inner = context.registers[object.rawValue]
-                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
-                    pointer?.pointee = value.bitPattern.tagged(with: .float)
+//                case .array(let object,let offset):
+//                    let inner = context.registers[object.rawValue]
+//                    let pointer = UnsafeMutablePointer<Word>(bitPattern: UInt(inner + offset))
+//                    pointer?.pointee = value.bitPattern.tagged(with: .float)
                 case .label:
                     break
                 }
@@ -557,8 +654,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 return(.none)
             case 1:
                 return(.register(register))
-            case 2:
-                return(.slot(register,words[index]))
+//            case 2:
+//                return(.slot(register,words[index]))
             case 3:
                 return(.float(Argon.Float(bitPattern: words[index])))
             case 4:
@@ -567,8 +664,8 @@ public class Instruction:Identifiable,Encodable,Decodable,Equatable
                 return(.address(words[index]))
             case 6:
                 return(.stack(register,Argon.Integer(bitPattern: words[index])))
-            case 7:
-                return(.array(register,words[index]))
+//            case 7:
+//                return(.array(register,words[index]))
             case 8:
                 return(.label(Argon.Integer(bitPattern: words[index])))
             default:

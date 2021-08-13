@@ -11,11 +11,7 @@ import SwiftUI
 
 public class Symbol:Node,ParseNode
     {
-    public func emitCode(using: CodeGenerator)
-        {
-        fatalError("Should have been overriden in \(self)")
-        }
-    
+        
     public func newItemButton(_ binding:Binding<String?>) -> AnyView
         {
         return(AnyView(EmptyView()))
@@ -31,7 +27,7 @@ public class Symbol:Node,ParseNode
         self.label
         }
         
-    public override var description: String
+    public var description: String
         {
         return("\(Swift.type(of:self))(\(self.label))")
         }
@@ -66,37 +62,38 @@ public class Symbol:Node,ParseNode
         10
         }
         
-    public var subNodes: Array<ParseNode>?
-        {
-        return(nil)
-        }
-        
-    public func emitCode(into: ParseNode,using: CodeGenerator)
-        {
-        }
-        
-    public func realize(_ compiler:Compiler)
-        {
-        }
-        
     public func realizeSuperclasses()
         {
         }
         
-    public func analyzeSemantics(_ compiler:Compiler)
+   public func allocateAddresses(using: AddressAllocator)
+        {
+        }
+        
+    public func emitCode(using: CodeGenerator) throws
+        {
+        }
+        
+    public func emitCode(into: InstructionBuffer,using: CodeGenerator) throws
+        {
+        fatalError("Should not have been called")
+        }
+        
+    public func analyzeSemantics(using: SemanticAnalyzer)
         {
         }
         
     internal var memoryAddress: Word = 0
     internal var isMemoryLayoutDone: Bool = false
     internal var isSlotLayoutDone: Bool = false
+    internal var locations: SourceLocations = SourceLocations()
     public var privacyScope:PrivacyScope? = nil
     
     public override init(label:Label)
         {
         super.init(label:label)
         }
-        
+    
     public var isGroup: Bool
         {
         return(false)
@@ -110,6 +107,16 @@ public class Symbol:Node,ParseNode
     public func layoutInMemory(segment:ManagedSegment)
         {
         self.isMemoryLayoutDone = true
+        }
+        
+    public func addDeclaration(_ location:Location)
+        {
+        self.locations.append(.declaration(location))
+        }
+        
+    public func addReference(_ location:Location)
+        {
+        self.locations.append(.reference(location))
         }
     }
 

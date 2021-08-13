@@ -9,16 +9,17 @@ import Foundation
 
 public class MethodInstanceBlock: Block
     {
-    private let methodInstance: MethodInstance
+    private let _methodInstance: MethodInstance
     
-    public override var method: MethodInstance
+    public override var methodInstance: MethodInstance
         {
-        return(self.methodInstance)
+        return(self._methodInstance)
         }
         
     init(methodInstance:MethodInstance)
         {
-        self.methodInstance = methodInstance
+        self._methodInstance = methodInstance
+        super.init()
         }
         
     public override func lookup(label: String) -> Symbol?
@@ -33,16 +34,42 @@ public class MethodInstanceBlock: Block
         return(self.methodInstance.lookup(label: label))
         }
         
-    public override func addLocalSlot(_ slot:LocalSlot)
+    public override func realize(using realizer:Realizer)
+        {
+        for slot in self.localSlots
+            {
+            slot.realize(using: realizer)
+            }
+        for block in self.blocks
+            {
+            block.realize(using: realizer)
+            }
+        }
+        
+    public override func addLocalSlot(_ slot:Slot)
         {
         self.methodInstance.addLocalSlot(slot)
         }
         
-    public override func emitCode(into: MethodInstance,using: CodeGenerator)
+    public override func emitCode(into: InstructionBuffer,using: CodeGenerator) throws
         {
+        for slot in self.localSlots
+            {
+            try slot.emitCode(into: into,using: using)
+            }
         for block in self.blocks
             {
-            block.emitCode(into: into,using: using)
+            try block.emitCode(into: into,using: using)
+            }
+        }
+        
+    public func dump()
+        {
+        print("METHOD INSTANCE BLOCK")
+        print("=====================")
+        for block in self.blocks
+            {
+            block.dump(depth: 4)
             }
         }
     }

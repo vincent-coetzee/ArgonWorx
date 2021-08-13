@@ -24,4 +24,67 @@ public class SelectBlock: Block
         {
         self.whenBlocks.append(block)
         }
+        
+    public func addOtherwise(block: OtherwiseBlock)
+        {
+        self.otherwiseBlock = block
+        }
+        
+    public override func realize(using realizer: Realizer)
+        {
+        self.value.realize(using: realizer)
+        for block in self.whenBlocks
+            {
+            block.realize(using: realizer)
+            }
+        self.otherwiseBlock?.realize(using: realizer)
+        }
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)SELECT")
+        value.dump(depth: depth+1)
+        for block in self.whenBlocks
+            {
+            block.dump(depth: depth + 1)
+            }
+        }
+        
+    public override func emitCode(into buffer: InstructionBuffer,using generator: CodeGenerator) throws
+        {
+        let aClass = self.value.resultType.class!
+        try self.value.emitCode(into: buffer,using: generator)
+        var linksToBottom = Array<Instruction.LabelMarker>()
+        var fromCompare:Instruction.LabelMarker?
+        for when in whenBlocks
+            {
+            let outputRegister = generator.registerFile.findRegister(forSlot: nil, inBuffer: buffer)
+            if aClass.isPrimitiveClass && !aClass.isStringClass
+                {
+                buffer.append(.cmpw,self.value.place,when.condition.place,.register(outputRegister))
+                }
+            else
+                {
+                buffer.append(.cmpo,self.value.place,when.condition.place,.register(outputRegister))
+                }
+            if fromCompare.isNotNil
+                {
+                try buffer.toHere(fromCompare!)
+                }
+            buffer.append(.brneq,.register(outputRegister),.none,.label(0))
+            fromCompare = buffer.triggerFromHere()
+            try when.emitCode(into: buffer,using: generator)
+            buffer.append(.br,.none,.none,.label(0))
+            linksToBottom.append(buffer.triggerFromHere())
+            }
+        if self.otherwiseBlock.isNotNil
+            {
+            try self.otherwiseBlock!.emitCode(into: buffer,using: generator)
+            }
+        for link in linksToBottom
+            {
+            try buffer.toHere(link)
+            }
+        }
     }

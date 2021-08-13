@@ -22,4 +22,23 @@ public class SuffixExpression: Expression
         self.operation = operation
         self.expression = expression
         }
+        
+    public override func realize(using realizer: Realizer)
+        {
+        self.expression.realize(using: realizer)
+        }
+        
+    public override func emitCode(into instance: InstructionBuffer, using: CodeGenerator) throws
+        {
+        try self.expression.emitCode(into: instance,using: using)
+        switch(self.operation.name)
+            {
+            case "++":
+                instance.append(.inc,self.expression.place,.none,self.expression.place)
+            case "--":
+                instance.append(.dec,self.expression.place,.none,self.expression.place)
+            default:
+                break
+            }
+        }
     }

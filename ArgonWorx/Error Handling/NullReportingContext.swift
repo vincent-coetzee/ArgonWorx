@@ -18,6 +18,6 @@ public struct NullReportingContext:ReportingContext
     
     public func dispatchError(at: Location, message: String)
         {
-        print("Error \(message)")
+        print("Line \(at.line): Error \(message)")
         }
     }

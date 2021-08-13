@@ -24,9 +24,17 @@ public class AssignmentExpression: Expression
         return(self.rhs.resultType)
         }
 
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer:Realizer)
         {
-        self.lhs.realize(compiler)
-        self.rhs.realize(compiler)
+        self.lhs.realize(using: realizer)
+        self.rhs.realize(using: realizer)
+        }
+        
+    public override func emitCode(into instance: InstructionBuffer,using generator: CodeGenerator) throws
+        {
+        try self.lhs.emitCode(into: instance,using: generator)
+        try self.rhs.emitCode(into: instance,using: generator)
+        instance.append(.store,self.lhs.place,.none,rhs.place)
+        self._place = rhs.place
         }
     }

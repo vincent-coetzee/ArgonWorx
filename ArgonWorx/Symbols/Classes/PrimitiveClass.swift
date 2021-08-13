@@ -9,6 +9,11 @@ import Foundation
 
 public class PrimitiveClass:Class
     {
+    public override var isPrimitiveClass: Bool
+        {
+        return(true)
+        }
+        
     public static let byteClass = PrimitiveClass(label:"Byte",primitiveType:.byte)
     public static let characterClass = PrimitiveClass(label:"Character",primitiveType:.character)
     public static let dateClass = PrimitiveClass(label:"Date",primitiveType:.date)
@@ -50,7 +55,11 @@ public class PrimitiveClass:Class
         self.primitiveType = primitiveType
         super.init(label: label)
         }
-        
+    
+    public required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override func layoutObjectSlots()
         {
         if self.primitiveType == .string

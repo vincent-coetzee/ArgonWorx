@@ -23,13 +23,6 @@ public struct Realizer
         
     private func realize(_ parseNode:ParseNode)
         {
-        for node in parseNode.subNodes!
-            {
-            node.realize(self.compiler)
-            }
-        for node in parseNode.subNodes!
-            {
-            node.realizeSuperclasses()
-            }
+        parseNode.realize(using: self)
         }
     }

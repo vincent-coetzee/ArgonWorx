@@ -20,7 +20,8 @@ extension Word:Identifiable
 extension Word
     {
     public static let nilValue:Word = Word(0).tagged(with: .nil)
-        
+    public static let kPersistentPageMask = ((Word(1) << Word(15)) - 1) << 48
+    
     public var bitString: String
         {
         var bitPattern = UInt64(1)
@@ -52,6 +53,12 @@ extension Word
         return(self == 0)
         }
         
+    public var isPersistentAddress: Bool
+        {
+        let pageNumber = (self & Self.kPersistentPageMask) >> 48
+        return(pageNumber > 0)
+        }
+        
     public var wordPointer:WordPointer
         {
         WordPointer(bitPattern: UInt(self))!
@@ -59,7 +66,7 @@ extension Word
         
     public var addressString: String
         {
-        return(String(format:"%08X",self))
+        return(String(format:"%012X",self))
         }
         
     public var isHeader: Bool
@@ -123,6 +130,14 @@ extension Word
         let extra = string.count - length
         let newString = string.dropFirst(extra)
         return(String(newString.reversed()))
+        }
+        
+    public var doesWordHaveBitsInSecondFromTopByte: Bool
+        {
+        let mask = (Word(1) << 16 - 1) << 48
+        let topBit = Word(1) << Word(63)
+        let topBits = (self & topBit) & mask
+        return(topBits > 0)
         }
         
     public init(bitPattern integer:Int)

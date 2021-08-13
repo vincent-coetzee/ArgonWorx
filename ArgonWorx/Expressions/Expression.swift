@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Expression
+public class Expression: NSObject
     {
     public func operation(_ symbol:Token.Symbol,_ rhs:Expression) -> Expression
         {
@@ -29,7 +29,12 @@ public class Expression
         return(AssignmentExpression(self,index))
         }
         
-    public func emitCode(into instance: MethodInstance,using: CodeGenerator)
+    public func slot(_ index:Expression) -> Expression
+        {
+        return(SlotExpression(self,slot: index))
+        }
+        
+    public func emitCode(into instance: InstructionBuffer,using: CodeGenerator) throws
         {
         }
         
@@ -37,17 +42,56 @@ public class Expression
         {
         }
         
+    public var declaration: Location
+        {
+        return(self.locations.declaration)
+        }
+        
     public var resultType: TypeResult
         {
         .undefined
         }
-        
-    public func generateConstraints(into inferencer:TypeInferencer)
+    
+    public var place: Instruction.Operand
         {
-        fatalError("This should have been overridden")
+        return(self._place)
+        }
+    
+    public var locations = SourceLocations()
+    public var _place: Instruction.Operand = .none
+    
+    public func addDeclaration(_ location:Location)
+        {
+        self.locations.append(.declaration(location))
         }
         
-    public var valueLocation: Instruction.Operand = .none
+    public func addReference(_ location:Location)
+        {
+        self.locations.append(.reference(location))
+        }
+        
+    public func allocateAddresses(using allocator:AddressAllocator)
+        {
+        }
+        
+    public func realize(using: Realizer)
+        {
+        }
+        
+    public func analyzeSemantics(using analyzer: SemanticAnalyzer)
+        {
+        }
+        
+    public func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)EXPRESSION()")
+        }
+        
+    public func lookupSlot(selector: String) -> Slot?
+        {
+        return(nil)
+        }
     }
     
 

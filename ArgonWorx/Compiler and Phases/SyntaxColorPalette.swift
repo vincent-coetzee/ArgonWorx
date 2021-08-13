@@ -67,7 +67,7 @@ extension SyntaxColorPalette
         palette[SyntaxColor.keypath.rawValue] = NSColor.argonXGray
         palette[SyntaxColor.slot.rawValue] = NSColor.argonCoral
         palette[SyntaxColor.directive.rawValue] = NSColor.argonRed
-        palette[SyntaxColor.lineNumbers.rawValue] = NSColor.argonXGray
+        palette[SyntaxColor.lineNumbers.rawValue] = NSColor(hex: 0xA0A0A0)
         palette[SyntaxColor.constant.rawValue] = NSColor.argonCheese
         palette[SyntaxColor.background.rawValue] = NSColor.black
         return(palette)
@@ -98,4 +98,6 @@ extension SyntaxColorPalette
     public static let typeColor = SyntaxColorPalette.shared[SyntaxColor.type.rawValue]!
     public static let lineNumberColor = SyntaxColorPalette.shared[SyntaxColor.lineNumbers.rawValue]!
     public static let backgroundColor = SyntaxColorPalette.shared[SyntaxColor.background.rawValue]!
+    
+    public static let textFont = NSFont(name:"Menlo",size:11)!
     }

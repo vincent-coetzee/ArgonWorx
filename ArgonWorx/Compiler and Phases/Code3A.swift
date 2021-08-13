@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Instruction3A
+public class Code3A
     {
     public enum Operation
         {
@@ -31,11 +31,12 @@ public class Instruction3A
         case label(Int)
         }
         
-    private let label:Int?
-    private let operation:Operation
-    private let address1:Address
-    private let address2:Address
-    private let result:Address
+    private let label: Int?
+    private let index: Int = Argon.nextSymbolIndex()
+    private let operation: Operation
+    private let address1: Address
+    private let address2: Address
+    private let result: Address
     
     init(_ label:Int? = nil,_ operation:Operation,address1:Address = .none,address2:Address = .none,result:Address = .none)
         {

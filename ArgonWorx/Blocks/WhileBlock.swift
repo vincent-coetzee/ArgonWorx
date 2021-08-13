@@ -16,4 +16,16 @@ public class WhileBlock: Block
         self.condition = condition
         super.init()
         }
+        
+    public override func emitCode(into buffer: InstructionBuffer,using generator: CodeGenerator) throws
+        {
+        let start = buffer.toHere()
+        try self.condition.emitCode(into: buffer,using: generator)
+        buffer.append(.brf,self.condition.place,.none,.label(0))
+        for block in self.blocks
+            {
+            try block.emitCode(into: buffer,using: generator)
+            }
+        buffer.append(.br,.none,.none,.label(0))
+        }
     }

@@ -81,9 +81,16 @@ struct ClassDeclarationEditor: View
             {
             Text(self.editedClass.label)
             .font(.system(size: 20, weight: .bold, design: .default)).foregroundColor(NSColor.argonXGreen.swiftUIColor)
-            Spacer()
+            Divider()
             Text("\(self.editedClass.localSlots.count) slots defined here.")
             Text("\(self.editedClass.localAndInheritedSlots.count) slots in total.")
+            Divider()
+            ForEach(self.superclassSlots(forClass: self.editedClass))
+                {
+                slot in
+                Text("\(slot.label) :: \(slot.type.label)")
+                }
+            Divider()
             ForEach(self.editedClass.localSlots)
                 {
                 slot in
@@ -120,5 +127,15 @@ struct ClassDeclarationEditor: View
         
     private func addSlot()
         {
+        }
+        
+    private func superclassSlots(forClass aClass:Class) -> Array<Slot>
+        {
+        var slots = Array<Slot>()
+        for superclass in aClass.superclasses
+            {
+            slots.append(contentsOf: superclass.localAndInheritedSlots)
+            }
+        return(slots.sorted{$0.label < $1.label})
         }
     }

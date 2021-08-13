@@ -19,11 +19,15 @@ struct ArgonWorxApp: App {
         {
         Thread.initThreads()
         ArgonModule.configure()
-        Header.test()
-        for aClass in ArgonModule.argonModule.classes
-            {
-            print("\(aClass.label) DEPTH \(aClass.depth)")
-            }
+//        let page = Page()
+//        page.allocate()
+//        Header.test()
+//        let store = ArgonPageStore()
+//        store.initializeStore(pageCount: 500)
+//        for aClass in ArgonModule.argonModule.classes
+//            {
+//            print("\(aClass.label) DEPTH \(aClass.depth)")
+//            }
         let segment = ManagedSegment.shared
         let classObject = segment.allocateObject(sizeInBytes: ArgonModule.argonModule.class.sizeInBytes)
         let string1 = segment.allocateString("This is a test string to see how it is allocated.")

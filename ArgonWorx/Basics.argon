@@ -20,6 +20,12 @@ MAIN MODULE Basics
         returnToTheMoon()
         }
         
+    PUBLIC ENUMERATION::Integer EntityClass
+        {
+        #legal(Integer,String) = 1
+        #natural(String) = 2
+        #sovereign(Person) = 3
+        }
     ///
     ///
     /// Entity is a root class because it inherits
@@ -33,6 +39,8 @@ MAIN MODULE Basics
         SLOT identityNumber::String = ""
         SLOT age::Integer = 47
         SLOT isSovereign?::Boolean = false
+        
+        CLASS SLOT overEverything = "This is some text"
         }
         
     CLASS LegalEntity::Entity
@@ -61,8 +69,22 @@ MAIN MODULE Basics
     TYPE PersonList IS Array<Person>
     TYPE Sovereign IS SovereignState
     
+    METHOD closureGenerator() -> (Integer,Integer) -> String
+        {
+        LET closure =
+            {
+            WITH(int1::Integer,int2::Integer) -> String
+            LET string1 = string(from:: int1)
+            LET string2 = string(from:: int2)
+            print(Entity->overEverything)
+            RETURN(string1 + string2)
+            }
+        RETURN(closure)
+        }
+        
     METHOD testingThings(argument::Object) -> Object
         {
+        Basics->basicSlot = $NumericConstantNumber1
         LET name = "Jones"
         LET person = Person()
         person->firstName = name
@@ -83,6 +105,41 @@ MAIN MODULE Basics
         {
         LET argument = Object()
         testingThings(argument::argument)
+        }
+        
+    METHOD selectiveSwinging(input::Integer) -> Float
+        {
+        IF input > 433 && (input < 47 || input > 19)
+            {
+            print("It floogled again")
+            }
+        ELSE IF input > 1000
+            {
+            print("So far so good")
+            }
+        ELSE
+            {
+            print("It's not looking good.")
+            }
+        SELECT(input)
+            {
+            WHEN(21)
+                {
+                RETURN(21.5)
+                }
+            WHEN(50)
+                {
+                RETURN(105.5)
+                }
+            WHEN(1000)
+                {
+                RETURN(2005.5)
+                }
+            OTHERWISE
+                {
+                RETURN(0.)
+                }
+            }
         }
         
 MODULE Secondary(/Users/vincent/Desktop/libXenon.dylib)

@@ -14,3 +14,20 @@ public class SystemMethodInstance:MethodInstance
         return(true)
         }
     }
+
+public class IntrinsicMethodInstance: SystemMethodInstance
+    {
+    }
+
+public class LibraryMethodInstance: SystemMethodInstance
+    {
+    public var rawFunctionName: String
+        {
+        var name = "M"
+        let names = self.parameters.map{$0.type.mangledCode}.joined(separator: "P")
+        name += "P" + names
+        name += self.returnType.mangledCode
+        return(name)
+        }
+    }
+    

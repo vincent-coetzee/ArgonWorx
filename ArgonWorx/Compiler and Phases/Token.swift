@@ -239,6 +239,11 @@ public enum Token:CustomStringConvertible,CustomDebugStringConvertible,Identifia
             return(lhs.operatorName == rhs.operatorName)
             }
             
+        public var name: String
+            {
+            return(self.operatorName)
+            }
+            
         private let operatorName:String
         
         init(_ string:String)

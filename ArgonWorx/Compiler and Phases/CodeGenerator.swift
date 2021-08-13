@@ -10,7 +10,7 @@ import Foundation
 
 public struct CodeGenerator
     {
-    private let compiler: Compiler
+    internal let compiler: Compiler
     public let registerFile = RegisterFile()
     
     public static func emit(into node:ParseNode,in compiler:Compiler)
@@ -27,9 +27,13 @@ public struct CodeGenerator
         
     private func emitCode(into node: ParseNode)
         {
-        for subnode in node.subNodes!
+        do
             {
-            subnode.emitCode(into: subnode,using: self)
+            try node.emitCode(using: self)
+            }
+        catch let error
+            {
+            compiler.reportingContext.dispatchError(at: .zero, message: "Code generation error: \(error)")
             }
         }
     }

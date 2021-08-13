@@ -120,12 +120,12 @@ public class InnerInstructionArrayPointer:InnerArrayPointer
         return(self)
         }
         
-    public func fromHere(_ with:String) -> InstructionLabel
+    public func fromHere(_ with:String) -> InnerInstructionArrayPointer.InstructionLabel
         {
         return(InstructionLabel(label: with,index: self.currentIndex))
         }
         
-    public func toHere(_ from: InstructionLabel) -> Argon.Integer
+    public func toHere(_ from: InnerInstructionArrayPointer.InstructionLabel) -> Argon.Integer
         {
         return(Argon.Integer(from.index - self.currentIndex))
         }

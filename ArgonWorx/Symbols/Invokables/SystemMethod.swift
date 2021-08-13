@@ -14,3 +14,11 @@ public class SystemMethod:Method
         return(true)
         }
     }
+
+public class IntrinsicMethod: SystemMethod
+    {
+    }
+
+public class LibraryMethod: SystemMethod
+    {
+    }

@@ -20,7 +20,11 @@ public class TypeAlias:Symbol
         self._type = type
         super.init(label: label)
         }
-        
+    
+    public required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     public override var typeCode:TypeCode
         {
         .typeAlias

@@ -53,7 +53,7 @@ extension NSColor
     public static let argonXOrange = NSColor(hex: 0xFD8F3F)
     public static let argonXBlue = NSColor(hex: 0x00C3AF)
     public static let argonXPurple = NSColor(hex: 0xAA0D91)
-    public static let argonXGray = NSColor(hex: 0x738276)
+    public static let argonXGray = NSColor(hex: 0x0A0A0A)
     public static let argonXCoral = NSColor(hex: 0xFC6A5D)
     public static let argonXIvory = NSColor(hex: 0xD08F69)
     public static let argonXWhite = NSColor(hex: 0xCCCCCC)

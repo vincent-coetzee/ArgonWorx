@@ -10,8 +10,22 @@ import AppKit
 import SwiftUI
 import FFI
 
-public class Class:ContainerSymbol,ObservableObject
+public class Class:ContainerSymbol,ObservableObject,Hashable,Equatable
     {
+    public static func == (lhs: Class, rhs: Class) -> Bool
+        {
+        return(lhs.name == rhs.name)
+        }
+        
+    public static func <(lhs: Class, rhs: Class) -> Bool
+        {
+        return(lhs.isSubclass(of: rhs))
+        }
+    
+    public static func <=(lhs: Class, rhs: Class) -> Bool
+        {
+        return(lhs.isInclusiveSubclass(of: rhs))
+        }
     ///
     ///
     /// Return the distance between this class and the
@@ -67,11 +81,6 @@ public class Class:ContainerSymbol,ObservableObject
             self._metaclass?.superclasses = self.superclasses.map{$0.metaclass}
             }
         return(self._metaclass!)
-        }
-        
-    public override var subNodes: Array<ParseNode>?
-        {
-        return(self.symbols.values.map{$0 as ParseNode})
         }
         
     public static let number: Class = ArgonModule.argonModule.lookup(label:"Number") as! Class
@@ -139,6 +148,11 @@ public class Class:ContainerSymbol,ObservableObject
         }
         
     public var isArrayClass: Bool
+        {
+        return(false)
+        }
+        
+    public var isPrimitiveClass: Bool
         {
         return(false)
         }
@@ -234,11 +248,20 @@ public class Class:ContainerSymbol,ObservableObject
     internal var header = Header(0)
     internal var hasBytes = false
     internal var _metaclass: Metaclass?
+    internal var mangledCode: Label
     
     public override init(label:Label)
         {
         self.magicNumber = label.polynomialRollingHash
+        self.mangledCode = label
         super.init(label: label)
+        }
+        
+    public func hash(into hasher:inout Hasher)
+        {
+        hasher.combine(self.index)
+        hasher.combine(self.name)
+        hasher.combine(self.label)
         }
         
     public func isSubclass(of superclass:Class) -> Bool
@@ -253,6 +276,12 @@ public class Class:ContainerSymbol,ObservableObject
             return(true)
             }
         return(superclass.isSuperclass(of: self))
+        }
+        
+    public func mcode(_ code:String) -> Class
+        {
+        self.mangledCode = code
+        return(self)
         }
         
     public func isSuperclass(of subclass:Class) -> Bool
@@ -585,3 +614,38 @@ public class Class:ContainerSymbol,ObservableObject
     }
 
 public typealias Classes = Array<Class>
+
+extension Classes
+    {
+    public static func <=(lhs:Classes,rhs:Classes) -> Bool
+        {
+        if lhs.count != rhs.count
+            {
+            return(false)
+            }
+        for (left,right) in zip(lhs,rhs)
+            {
+            if !(left <= right)
+                {
+                return(false)
+                }
+            }
+        return(true)
+        }
+        
+    public static func <(lhs:Classes,rhs:Classes) -> Bool
+        {
+        if lhs.count != rhs.count
+            {
+            return(false)
+            }
+        for (left,right) in zip(lhs,rhs)
+            {
+            if !(left < right)
+                {
+                return(false)
+                }
+            }
+        return(true)
+        }
+    }

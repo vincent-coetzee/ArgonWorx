@@ -7,18 +7,20 @@
 
 import Foundation
 
-public class Constant:Symbol
+public class Constant:Slot
     {
-    private let _type: Class
     private let value: Expression
     
     init(label:Label,type:Class,value:Expression)
         {
-        self._type = type
         self.value = value
-        super.init(label: label)
+        super.init(label: label,type: type)
         }
-        
+    
+    required init(labeled: Label, ofType: Class) {
+        fatalError("init(labeled:ofType:) has not been implemented")
+    }
+    
     public override var typeCode:TypeCode
         {
         .constant

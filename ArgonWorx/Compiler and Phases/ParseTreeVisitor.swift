@@ -62,12 +62,12 @@ public protocol ParseTreeVisitor
 //    func finish(_ symbolReference:SymbolReference) throws
     func start(_ typeAlias:TypeAlias) throws
     func finish(_ typeAlias:TypeAlias) throws
-    func start(_ genericParameter:TypeParameter) throws
-    func finish(_ genericParameter:TypeParameter) throws
+//    func start(_ genericParameter:TypeParameter) throws
+//    func finish(_ genericParameter:TypeParameter) throws
 //    func start(_ typeReference:DeferredSymbol) throws
 //    func finish(_ typeReference:DeferredSymbol) throws
-    func start(_ type:Type) throws
-    func finish(_ type:Type) throws
+//    func start(_ type:Type) throws
+//    func finish(_ type:Type) throws
     func start(_ type:TypeConstraint) throws
     func finish(_ type:TypeConstraint) throws
 //    func start(_ unloadedBlock:UnloadedBlock) throws
@@ -163,7 +163,7 @@ public protocol ParseTreeVisitor
     
 public protocol ParseTreeNode
     {
-    var id:UUID { get }
+    var index:UUID { get }
     func visit(_ visitor:ParseTreeVisitor) throws
     }
 

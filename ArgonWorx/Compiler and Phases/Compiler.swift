@@ -19,10 +19,9 @@ public class Compiler
 //        return(newSubject)
 //        }
 
-    public var visualTokens: Array<VisualToken>
+    public var tokenRenderer: TokenRenderer
         {
-        let values = self.parser?.visualTokens.values
-        return(values.isNil ? [] : Array(values!))
+        return(self.parser?.visualToken ?? TokenRenderer())
         }
         
     internal private(set) var namingContext: NamingContext
@@ -52,7 +51,9 @@ public class Compiler
             Realizer.realize(chunk,in:self)
             SemanticAnalyzer.analyze(chunk,in:self)
             Optimizer.optimize(chunk,in:self)
+            AddressAllocator.allocateAddresses(chunk,in: self)
             CodeGenerator.emit(into: chunk,in:self)
+            let module = TopModule.topModule.dumpMethods()
             }
         }
 

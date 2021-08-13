@@ -9,11 +9,12 @@ import Foundation
 
 public protocol ParseNode
     {
-    var subNodes: Array<ParseNode>? { get }
+//    var subNodes: Array<ParseNode>? { get }
     var type: Class { get }
     var privacyScope: PrivacyScope? { get set }
-    func emitCode(into: ParseNode,using: CodeGenerator)
-    func realize(_ compiler:Compiler)
+    func emitCode(using: CodeGenerator) throws
+    func realize(using: Realizer)
     func realizeSuperclasses()
-    func analyzeSemantics(_ compiler:Compiler)
+    func analyzeSemantics(using: SemanticAnalyzer)
+    func allocateAddresses(using: AddressAllocator)
     }

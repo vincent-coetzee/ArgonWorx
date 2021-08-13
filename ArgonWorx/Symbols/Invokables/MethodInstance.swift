@@ -9,9 +9,9 @@ import Foundation
 
 public class MethodInstance:Function
     {
-    public override func emitCode(using generator: CodeGenerator)
+    public override func emitCode(using generator: CodeGenerator) throws
         {
-        block.emitCode(into: self,using: generator)
+        try block.emitCode(into: self.buffer,using: generator)
         }
         
     public var isSystemMethodInstance: Bool
@@ -20,9 +20,15 @@ public class MethodInstance:Function
         }
         
     internal private(set) var block: MethodInstanceBlock! = nil
-    public var localSlots = LocalSlots()
+    public var localSlots = Slots()
+        {
+        didSet
+            {
+            self.buffer.localSlots = self.localSlots
+            }
+        }
     private var _method:Method?
-    private var instructions = Array<Instruction>()
+    public let buffer = InstructionBuffer()
     
     public var method: ArgonWorx.Method
         {
@@ -83,6 +89,27 @@ public class MethodInstance:Function
         let result = out
         self.init(label: name)
         self.parameters = [leftParm,rightParm]
+        self.returnType = result
+        }
+        
+   convenience init(left:Class,_ operation: String,right:Class,out:Class)
+        {
+        let leftParm = Parameter(label: "left", type: left)
+        let rightParm = Parameter(label: "right", type: right)
+        let name = "\(operation)"
+        let result = out
+        self.init(label: name)
+        self.parameters = [leftParm,rightParm]
+        self.returnType = result
+        }
+        
+   convenience init(_ operation: String,arg:Class,out:Class)
+        {
+        let rightParm = Parameter(label: "arg", type: arg)
+        let name = "\(operation)"
+        let result = out
+        self.init(label: name)
+        self.parameters = [rightParm]
         self.returnType = result
         }
         
@@ -161,6 +188,10 @@ public class MethodInstance:Function
         self.init(label: label)
         self.parameters = parameters
         self.returnType = returnType ?? VoidClass.voidClass
+        for parameter in parameters
+            {
+            self.addLocalSlot(parameter)
+            }
         }
         
     public func `where`(_ name:String,_ aClass:Class) -> MethodInstance
@@ -168,7 +199,22 @@ public class MethodInstance:Function
         return(self)
         }
         
-    public func addLocalSlot(_ localSlot:LocalSlot)
+    public func dump()
+        {
+        print("NAME: \(self.label)")
+        print("===============================")
+        for slot in self.localSlots
+            {
+            print("LOCAL SLOT \(slot.label) :: \(slot.type.label)")
+            }
+        self.block.dump()
+        for instruction in self.buffer
+            {
+            print("\(instruction.opcode) \(instruction.operandText)")
+            }
+        }
+        
+    public func addLocalSlot(_ localSlot:Slot)
         {
         self.localSlots.append(localSlot)
         self.localSlots.sort(by: {$0.offset < $1.offset})
@@ -205,30 +251,21 @@ public class MethodInstance:Function
         self.isMemoryLayoutDone = true
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer: Realizer)
         {
         for parameter in self.parameters
             {
-            parameter.realize(compiler)
+            parameter.realize(using: realizer)
             }
-        self.returnType.realize(compiler)
-        self.block.realize(compiler)
-        }
-        
-    public override func emitCode(into: ParseNode,using: CodeGenerator)
-        {
-        self.block.emitCode(into: self,using: using)
+        self.returnType.realize(using: realizer)
+        self.block.realize(using: realizer)
         }
 
-    public override func analyzeSemantics(_ compiler:Compiler)
+    public override func analyzeSemantics(using analyzer:SemanticAnalyzer)
         {
-        self.block.analyzeSemantics(compiler)
+        self.block.analyzeSemantics(using: analyzer)
         }
-        
-    public func append(_ opcode:Instruction.Opcode,_ operand1:Instruction.Operand = .none,_ operand2:Instruction.Operand = .none,_ result:Instruction.Operand = .none)
-        {
-        self.instructions.append(Instruction(opcode,operand1: operand1,operand2: operand2,result: result))
-        }
+    
         
     public func isParameterSetCoherent(with input: Arguments) -> Bool
         {

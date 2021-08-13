@@ -21,7 +21,7 @@ public class InnerPointer:Addressable
     public static let kClosureSizeInBytes = 192
     public static let kEnumerationSizeInBytes = 112
     public static let kDictionaryBucketSizeInBytes = 80
-    public static let kEnumerationCaseSizeInBytes = 88
+    public static let kEnumerationCaseSizeInBytes = 104
     public static let kFunctionSizeInBytes = 168
     
     public static func ==(lhs:InnerPointer,rhs:InnerPointer) -> Bool
@@ -53,19 +53,11 @@ public class InnerPointer:Addressable
         {
         get
             {
-            let value = self.header.typeCode
-            if let newTypeCode = TypeCode(rawValue: value)
-                {
-                return(newTypeCode)
-                }
-            return(TypeCode.none)
+            return(self.header.typeCode)
             }
-            
         set
             {
-            var newHeader = self.header
-            newHeader.typeCode = newValue.rawValue
-            self.header = newHeader
+            self.header.typeCode = newValue
             }
         }
         
@@ -139,6 +131,30 @@ public class InnerPointer:Addressable
             self._keys[name] = Key(name:name,offset:offset)
             offset += 8
             }
+        }
+        
+    public func setEnumeration(_ enumeration:InnerEnumerationPointer,`case`:InnerEnumerationCasePointer,atKey: String)
+        {
+        let eAddress = enumeration.address
+        let intValue = `case`.index
+        let addressMask = (Word(1) << Word(16) - 1) << Word(48)
+        if eAddress != (eAddress & addressMask)
+            {
+            fatalError("Address for enumeration exceeds 48 bits in length")
+            }
+        let intMask = (Word(1) << Word(14)) - 1
+        let newValue = (Word(intValue) & intMask) << 48 | eAddress
+        self.setSlotValue(newValue,atKey: atKey)
+        }
+        
+    public func enumerationCase(atKey: String) -> (InnerEnumerationPointer,Int)
+        {
+        let value = self.slotValue(atKey: atKey)
+        let addressMask = (Word(1) << Word(16) - 1) << Word(48)
+        let address = value & ~addressMask
+        let pointer = InnerEnumerationPointer(address: address)
+        let index = (value & addressMask) >> 48 & (Word(1) << Word(14) - 1)
+        return((pointer,Int(index)))
         }
         
     public func hasSlot(atKey:String) -> Bool

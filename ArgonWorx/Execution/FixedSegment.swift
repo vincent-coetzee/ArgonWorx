@@ -37,6 +37,10 @@ public class FixedSegment:Segment
         self.basePointer = UnsafeMutableRawBufferPointer.allocate(byteCount: sizeInBytes, alignment: MemoryLayout<UInt64>.alignment)
         self.baseAddress = unsafeBitCast(self.basePointer.baseAddress,to: Word.self)
         self.endAddress = baseAddress + UInt64(sizeInBytes)
+        if self.endAddress.doesWordHaveBitsInSecondFromTopByte
+            {
+            fatalError("This address has bits in the top two bytes of it which means it can't be used for enumerations etc.")
+            }
         self.nextAddress = baseAddress
         self.wordPointer = WordPointer(address: self.baseAddress)!
         super.init(sizeInBytes:sizeInBytes)

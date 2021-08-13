@@ -14,14 +14,14 @@ public class ParameterizedClass:Class
         _typeCode
         }
         
-    private var parameters = TypeParameters()
+//    private var parameters = TypeParameters()
     private let _typeCode:TypeCode
     
     init(label:Label,superclasses:Array<Label>,parameters:Array<Label>,typeCode:TypeCode = .other)
         {
         self._typeCode = typeCode
         super.init(label:label)
-        self.parameters = parameters.map{TypeParameter(label:$0)}
+//        self.parameters = parameters.map{TypeParameter(label:$0)}
         self.superclassHolders = superclasses.map{SymbolHolder(name:Name($0),location:.zero,namingContext:nil,reporter:NullReportingContext.shared)}
         }
         

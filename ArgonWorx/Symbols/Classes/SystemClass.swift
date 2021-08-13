@@ -26,4 +26,4 @@ public class SystemClass:Class
         self._typeCode = typeCode
         super.init(label: label)
         }
-    }
+}

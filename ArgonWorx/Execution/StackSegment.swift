@@ -36,6 +36,10 @@ public class StackSegment: Segment
         self.base = malloc(sizeInBytes)
         self.baseAddress = Word(bitPattern: Int64(Int(bitPattern: self.base)))
         self.stackTop = self.baseAddress + Word(sizeInBytes)
+        if self.stackTop.doesWordHaveBitsInSecondFromTopByte
+            {
+            fatalError("This address has bits in the top two bytes of it which means it can't be used for enumerations etc.")
+            }
         self.stackPointer = self.stackTop - Word(MemoryLayout<Word>.size)
         super.init(sizeInBytes: sizeInBytes)
         }

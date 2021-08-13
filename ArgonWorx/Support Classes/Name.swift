@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Name:CustomStringConvertible,Comparable
+public struct Name:CustomStringConvertible,Comparable,Hashable
     {
     public static func ==(lhs:Name,rhs:Name) -> Bool
         {
@@ -147,5 +147,13 @@ public struct Name:CustomStringConvertible,Comparable
             bits.removeFirst(2)
             }
         self.components = (first.isNil ? [] : [first!]) + bits.map{Component.piece($0)}
+        }
+        
+    public func hash(into hasher:inout Hasher)
+        {
+        for component in self.components
+            {
+            hasher.combine(component.string)
+            }
         }
     }

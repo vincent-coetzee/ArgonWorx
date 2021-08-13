@@ -52,6 +52,7 @@ public class ContainerSymbol:Symbol
             }
         return(classes)
         }
+        
     ///
     ///
     /// Support for naming context
@@ -69,15 +70,15 @@ public class ContainerSymbol:Symbol
         return(nil)
         }
         
-    public override func analyzeSemantics(_ compiler:Compiler)
+    public override func analyzeSemantics(using analyzer:SemanticAnalyzer)
         {
         for node in self.symbols.values
             {
-            node.analyzeSemantics(compiler)
+            node.analyzeSemantics(using: analyzer)
             }
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer: Realizer)
         {
         for child in self.symbols.values
             {
@@ -85,7 +86,15 @@ public class ContainerSymbol:Symbol
                 {
                 print("junk")
                 }
-            child.realize(compiler)
+            child.realize(using: realizer)
+            }
+        }
+        
+    public override func emitCode(using generator: CodeGenerator) throws
+        {
+        for symbol in self.symbols.values
+            {
+            try symbol.emitCode(using: generator)
             }
         }
         

@@ -10,11 +10,41 @@ import Foundation
 public class ClosureBlock: Block
     {
     public var parameters = Parameters()
-    public var resultType:Class = VoidClass.voidClass
+    public var returnType:Class = VoidClass.voidClass
     
     public func addParameter(label:String,type: Class)
         {
         let parameter = Parameter(label: label,type: type)
-        self.parameters.append(parameter)
+        self.addLocalSlot(parameter)
+        }
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)CLOSURE")
+        for block in self.blocks
+            {
+            block.dump(depth: depth + 1)
+            }
+        }
+        
+    public override func emitCode(into: InstructionBuffer,using: CodeGenerator) throws
+        {
+        var stackOffset = MemoryLayout<Word>.size
+        for parameter in self.parameters
+            {
+            parameter.stackOffset = stackOffset
+            stackOffset += MemoryLayout<Word>.size
+            }
+        stackOffset = -8
+        for slot in self.localSlots
+            {
+            slot.stackOffset = stackOffset
+            stackOffset -= MemoryLayout<Word>.size
+            }
+        for block in self.blocks
+            {
+            try block.emitCode(into: into,using: using)
+            }
         }
     }

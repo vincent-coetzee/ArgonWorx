@@ -21,4 +21,4 @@ public class Metaclass: Class
         self.theClass = `class`
         super.init(label: label)
         }
-    }
+}

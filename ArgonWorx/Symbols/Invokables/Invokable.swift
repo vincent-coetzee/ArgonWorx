@@ -20,7 +20,7 @@ public class Invokable: Symbol
         self.parameters = Parameters()
         super.init(label: label)
         }
-        
+
     public func curried() -> Array<SingleParameterInvokable>
         {
         return(SingleParameterInvokable.with(label: self.label, parameters: self.parameters, returnType: self.returnType))

@@ -9,7 +9,7 @@ import Foundation
 
 public struct SemanticAnalyzer
     {
-    private let compiler:Compiler
+    internal let compiler:Compiler
     
     public static func analyze(_ node:ParseNode,in compiler:Compiler)
         {
@@ -24,7 +24,7 @@ public struct SemanticAnalyzer
         
     private func analyze(_ node:ParseNode)
         {
-        node.analyzeSemantics(self.compiler)
+        node.analyzeSemantics(using: self)
         }
     }
 
@@ -32,22 +32,31 @@ public class TypeInferencer
     {
     public class Environment
         {
-        private var types:[String:TypeConstraint] = [:]
+        private var types:[String:LocalType] = [:]
         }
         
-    public indirect enum TypeConstraint
+    public indirect enum LocalType
         {
         case named(Class)
         case variable(String)
-        case function(String,TypeConstraint,TypeConstraint)
+        case function(String,LocalType,LocalType)
         }
         
     private var nextVariable = 0
     
-    private var constraints = Array<TypeConstraint>()
-    
-    public func addConstraint(_ constraint:TypeConstraint)
+    public func infer(expression: Expression) -> LocalType
         {
-        self.constraints.append(constraint)
+        if expression is LiteralExpression
+            {
+            let literal = expression as! LiteralExpression
+            return(.named(literal.resultType.class!))
+            }
+        else if expression is LocalAccessExpression
+            {
+            let local = expression as! LocalAccessExpression
+            let localSlot = local.localSlot
+            return(.named(localSlot.type))
+            }
+        return(.named(ArgonModule.argonModule.void))
         }
     }

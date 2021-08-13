@@ -10,14 +10,6 @@ import AppKit
 
 public class Method:Symbol
     {
-    public override func emitCode(using generator: CodeGenerator)
-        {
-        for instance in self.instances
-            {
-            instance.emitCode(using: generator)
-            }
-        }
-        
     public var isSystemMethod: Bool
         {
         return(false)
@@ -44,19 +36,19 @@ public class Method:Symbol
         .argonPink
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer: Realizer)
         {
         for instance in self.instances
             {
-            instance.realize(compiler)
+            instance.realize(using: realizer)
             }
         }
         
-    public override func emitCode(into: ParseNode,using: CodeGenerator)
+    public override func emitCode(using generator: CodeGenerator) throws
         {
         for instance in self.instances
             {
-            instance.emitCode(into: instance,using: using)
+            try instance.emitCode(using: generator)
             }
         }
         
@@ -90,7 +82,7 @@ public class Method:Symbol
             }
         if parameterSetMatchCount == 0
             {
-            reportingContext.dispatchError(at: location,message: "A specific instanfe of the multimethod '\(self.label)' can not be found, therefore this invocation can not be dispatched.")
+            reportingContext.dispatchError(at: location,message: "A specific instance of the multimethod '\(self.label)' can not be found, therefore this invocation can not be dispatched.")
             return(false)
             }
         return(true)
@@ -135,6 +127,14 @@ public class Method:Symbol
                 }
             }
         return(selectedInstance)
+        }
+        
+    public func dump()
+        {
+        for instance in self.instances
+            {
+            instance.dump()
+            }
         }
     }
 

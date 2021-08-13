@@ -56,9 +56,9 @@ public class RegisterFile
         self.available = file
         }
         
-    public func findRegister(for slot:Slot?,instance: MethodInstance) -> Instruction.Register
+    public func findRegister(forSlot slot:Slot?,inBuffer: InstructionBuffer) -> Instruction.Register
         {
-        if !slot.isNil
+        if slot.isNotNil
             {
             for register in self.file
                 {
@@ -90,10 +90,10 @@ public class RegisterFile
                 return(register.register)
                 }
             }
-        return(self.spillRegister(self.unavailable.first!,instance: instance))
+        return(self.spillRegister(self.unavailable.first!,instance: inBuffer))
         }
         
-    private func spillRegister(_ register:Register,instance: MethodInstance) -> Instruction.Register
+    private func spillRegister(_ register:Register,instance: InstructionBuffer) -> Instruction.Register
         {
         let address = DataSegment.shared.allocateObject(sizeInBytes: 8)
         for slot in register.slots

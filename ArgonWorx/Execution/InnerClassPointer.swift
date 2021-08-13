@@ -34,6 +34,14 @@ public class InnerClassPointer:InnerPointer
             }
         }
         
+    public var instanceSizeInWords: Int
+        {
+        get
+            {
+            return(Int(self.slotValue(atKey:"instanceSizeInBytes")) / 8)
+            }
+        }
+        
     public var magicNumber: Int
         {
         get
@@ -55,6 +63,19 @@ public class InnerClassPointer:InnerPointer
         set
             {
             self.setSlotValue(Word(newValue),atKey:"extraSizeInBytes")
+            }
+        }
+        
+    public var typeCode: TypeCode
+        {
+        get
+            {
+            let word = self.slotValue(atKey:"typeCode")
+            return(TypeCode(rawValue: Int(word))!)
+            }
+        set
+            {
+            self.setSlotValue(newValue.rawValue,atKey:"typeCode")
             }
         }
         

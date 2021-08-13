@@ -204,13 +204,13 @@ public class AbstractParseTreeVisitor:ParseTreeVisitor,ReportingContext
         
     }
     
-    public func start(_ typeParameter: TypeParameter) throws {
-        
-    }
-    
-    public func finish(_ typeParameter: TypeParameter) throws {
-        
-    }
+//    public func start(_ typeParameter: TypeParameter) throws {
+//        
+//    }
+//    
+//    public func finish(_ typeParameter: TypeParameter) throws {
+//        
+//    }
     
 //    public func start(_ unloadedBlock: UnloadedBlock) throws {
 //
@@ -220,13 +220,13 @@ public class AbstractParseTreeVisitor:ParseTreeVisitor,ReportingContext
 //
 //    }
     
-    public func start(_ type: Type) throws {
-        
-    }
-    
-    public func finish(_ type: Type) throws {
-        
-    }
+//    public func start(_ type: Type) throws {
+//        
+//    }
+//    
+//    public func finish(_ type: Type) throws {
+//        
+//    }
     
     public func start(_ type: TypeConstraint) throws {
         
@@ -583,12 +583,12 @@ public class AbstractParseTreeVisitor:ParseTreeVisitor,ReportingContext
         
     public func hasVisited(node:ParseTreeNode) -> Bool
         {
-        return(self.visitedNodes[node.id] != nil)
+        return(self.visitedNodes[node.index] != nil)
         }
         
     public func remember(node:ParseTreeNode)
         {
-        self.visitedNodes[node.id] = node
+        self.visitedNodes[node.index] = node
         }
         
     public init(compiler:Compiler)

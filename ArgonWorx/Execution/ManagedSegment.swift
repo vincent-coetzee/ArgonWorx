@@ -205,9 +205,13 @@ public class ManagedSegment:Segment
             self.basePointer = UnsafeMutableRawBufferPointer.allocate(byteCount: sizeInBytes, alignment: MemoryLayout<UInt64>.alignment)
             self.baseAddress = unsafeBitCast(self.basePointer.baseAddress,to: Word.self)
             self.endAddress = baseAddress + UInt64(sizeInBytes)
+            if self.endAddress.doesWordHaveBitsInSecondFromTopByte
+                {
+                fatalError("This address has bits in the top two bytes of it which means it can't be used for enumerations etc.")
+                }
             self.nextAddress = baseAddress
             self.wordPointer = WordPointer(address: self.baseAddress)!
-            print("MANAGED SEGMENT SPACE OF SIZE \(self.sizeInBytes) ALLOCATED AT \(self.baseAddress.addressString)")
+            print("MANAGED SEGMENT SPACE OF SIZE \(self.sizeInBytes) ALLOCATED AT 0x\(self.baseAddress.addressString)")
             }
             
         public mutating func allocateObject(sizeInBytes:Int) -> Word
@@ -238,7 +242,7 @@ public class ManagedSegment:Segment
             }
         }
         
-    public static let shared = ManagedSegment(sizeInBytes: 1024*1024*100)
+    public static let shared = ManagedSegment(sizeInBytes: 1024*1024*1024)
     
     public var startOffset: Word
         {

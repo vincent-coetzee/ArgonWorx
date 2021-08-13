@@ -73,16 +73,16 @@ extension Header
             }
         }
         
-    public var typeCode:Int
+    public var typeCode:TypeCode
         {
         get
             {
             let mask = Self.kTypeBits << Self.kTypeShift
-            return(Int((self & mask) >> Self.kTypeShift))
+            return(TypeCode(rawValue: Int((self & mask) >> Self.kTypeShift))!)
             }
         set
             {
-            let value = (UInt64(newValue) & Self.kTypeBits) << Self.kTypeShift
+            let value = (UInt64(newValue.rawValue) & Self.kTypeBits) << Self.kTypeShift
             self = (self & ~(Self.kTypeBits << Self.kTypeShift)) | value
             }
         }

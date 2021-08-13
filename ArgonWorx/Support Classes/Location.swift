@@ -33,3 +33,29 @@ public struct Location
     }
 
 public typealias Locations = Array<Location>
+
+public enum SourceLocation
+    {
+    case declaration(Location)
+    case reference(Location)
+    }
+    
+public typealias SourceLocations = Array<SourceLocation>
+
+extension SourceLocations
+    {
+    public var declaration: Location
+        {
+        for location in self
+            {
+            switch(location)
+                {
+                case .declaration(let position):
+                    return(position)
+                default:
+                    break;
+                }
+            }
+        fatalError("Called on something that does not have a declaration")
+        }
+    }

@@ -7,16 +7,11 @@
 
 import Foundation
 
-public class Parameter:Symbol
+public class Parameter:Slot
     {
     public override var typeCode:TypeCode
         {
         .parameter
-        }
-        
-    public override var type: Class
-        {
-        return(self._type)
         }
         
     public var tag: Label
@@ -24,18 +19,19 @@ public class Parameter:Symbol
         return(self.label)
         }
         
-    private let _type:Class
-    public let isHidden:Bool
+    public let isVisible:Bool
     public let isVariadic: Bool
     
-    init(label:Label,type:Class,isHidden:Bool = false,isVariadic:Bool = false)
+    init(label:Label,type:Class,isVisible:Bool = false,isVariadic:Bool = false)
         {
-        self.isHidden = isHidden
-        self._type = type
+        self.isVisible = isVisible
         self.isVariadic = isVariadic
-        super.init(label: label)
+        super.init(label: label,type: type)
         }
+    
+    required init(labeled: Label, ofType: Class) {
+        fatalError("init(labeled:ofType:) has not been implemented")
     }
+}
 
 public typealias Parameters = Array<Parameter>
-

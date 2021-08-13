@@ -32,9 +32,9 @@ class TokenMappingViewController: NSViewController
         textView.allowsUndo = true
         textView.font = NSFont(name:"Menlo",size:11)!
         scrollView.documentView = textView
-        textView.gutterBackgroundColor = NSColor.black
-        textView.gutterForegroundColor = NSColor.white
-        textView.backgroundColor = NSColor.black
+        textView.backgroundColor = SyntaxColorPalette.backgroundColor
+        textView.gutterBackgroundColor = SyntaxColorPalette.backgroundColor
+        textView.gutterForegroundColor = SyntaxColorPalette.lineNumberColor
         textView.initOutsideNib()
         self.view = scrollView
         }
@@ -91,9 +91,6 @@ struct TokenMappingView: NSViewControllerRepresentable
         {
         let vc = TokenMappingViewController()
         vc.textView.textStorage?.delegate = context.coordinator
-        vc.textView.backgroundColor = SyntaxColorPalette.backgroundColor
-        vc.textView.gutterBackgroundColor = SyntaxColorPalette.backgroundColor
-        vc.textView.gutterForegroundColor = SyntaxColorPalette.lineNumberColor
         vc.textView.textStorage?.setAttributedString(NSAttributedString(string: self.$source.wrappedValue,attributes: [:]))
         return vc
         }
@@ -102,15 +99,11 @@ struct TokenMappingView: NSViewControllerRepresentable
         {
         let compiler = Compiler()
         compiler.compileChunk(self.$source.wrappedValue)
-        let tokens = compiler.visualTokens
+        let token = compiler.tokenRenderer
         nsViewController.textView.textStorage?.beginEditing()
-        for token in tokens
+        for (range,attributes) in token.mappings
             {
-            if token.baseToken.isKeyword
-                {
-                print("KEYWORD\(token.baseToken.keyword) AT \(token.range)")
-                }
-            nsViewController.textView.textStorage?.setAttributes(token.attributes,range: token.range)
+            nsViewController.textView.textStorage?.setAttributes(attributes,range: range)
             }
         nsViewController.textView.textStorage?.endEditing()
         }

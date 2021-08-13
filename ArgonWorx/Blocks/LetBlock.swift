@@ -22,19 +22,20 @@ public class LetBlock: Block
         self.value = value
         self.location = location
         self.namingContext = namingContext
+        super.init()
         }
         
-    public override func analyzeSemantics(_ compiler:Compiler)
+    public override func analyzeSemantics(using analyzer:SemanticAnalyzer)
         {
         let valueType = self.value.resultType
         let slotType = slot.type
         if !valueType.isSubclass(of: slotType)
             {
-            compiler.reportingContext.dispatchError(at: self.location, message: "An instance of class \(valueType) can not be assigned to an instance of \(slotType).")
+            analyzer.compiler.reportingContext.dispatchError(at: self.location, message: "An instance of class \(valueType) can not be assigned to an instance of \(slotType).")
             }
         }
         
-    public override func emitCode(into: MethodInstance,using: CodeGenerator)
+    public override func emitCode(into: InstructionBuffer,using: CodeGenerator) throws
         {
         }
     }

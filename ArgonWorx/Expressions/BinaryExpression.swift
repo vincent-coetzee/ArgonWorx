@@ -9,6 +9,39 @@ import Foundation
 
 public enum TypeResult
     {
+    public var isMismatch: Bool
+        {
+        switch(self)
+            {
+            case .mismatch:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isUndefined: Bool
+        {
+        switch(self)
+            {
+            case .undefined:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
+    public var isClass: Bool
+        {
+        switch(self)
+            {
+            case .class:
+                return(true)
+            default:
+                return(false)
+            }
+        }
+        
     case `class`(Class)
     case mismatch(Class,Class)
     case undefined
@@ -103,13 +136,37 @@ public class BinaryExpression: Expression
         return(left + right)
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer:Realizer)
         {
-        self.lhs.realize(compiler)
-        self.rhs.realize(compiler)
+        self.lhs.realize(using: realizer)
+        self.rhs.realize(using: realizer)
         }
         
-    public override func emitCode(into instance: MethodInstance,using generator: CodeGenerator)
+    init(coder: NSCoder)
+        {
+        self.operation = coder.decodeObject(forKey: "operation") as! Token.Symbol
+        self.lhs = coder.decodeObject(forKey:"lhs") as! Expression
+        self.rhs = coder.decodeObject(forKey:"rhs") as! Expression
+        }
+        
+    public func encode(with coder: NSCoder)
+        {
+        coder.encode(self.operation,forKey: "operation")
+        coder.encode(self.lhs,forKey: "lhs")
+        coder.encode(self.rhs,forKey: "rhs")
+        }
+        
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)BINARY EXPRESSION()")
+        print("\(padding)\t\(self.operation)")
+        lhs.dump(depth: depth + 1)
+        rhs.dump(depth: depth + 1)
+        }
+        
+    public override func emitCode(into instance: InstructionBuffer,using generator: CodeGenerator) throws
         {
         var opcode:Instruction.Opcode = .nop
         switch(self.operation)
@@ -162,12 +219,10 @@ public class BinaryExpression: Expression
             default:
                 break
             }
-        self.lhs.emitCode(into: instance, using: generator)
-        let lhsLocation = lhs.valueLocation
-        self.rhs.emitCode(into: instance, using: generator)
-        let rhsLocation = rhs.valueLocation
-        let outputRegister = generator.registerFile.findRegister(for: nil, instance: instance)
-        instance.append(opcode,lhsLocation,rhsLocation,.register(outputRegister))
-        self.valueLocation = .register(outputRegister)
+        try self.lhs.emitCode(into: instance, using: generator)
+        try self.rhs.emitCode(into: instance, using: generator)
+        let outputRegister = generator.registerFile.findRegister(forSlot: nil, inBuffer: instance)
+        instance.append(opcode,lhs.place,rhs.place,.register(outputRegister))
+        self._place = .register(outputRegister)
         }
     }

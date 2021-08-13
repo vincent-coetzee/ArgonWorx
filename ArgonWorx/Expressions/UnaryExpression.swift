@@ -24,14 +24,14 @@ public class UnaryExpression: Expression
         return(self.rhs.resultType)
         }
         
-    public override func realize(_ compiler:Compiler)
+    public override func realize(using realizer:Realizer)
         {
-        self.rhs.realize(compiler)
+        self.rhs.realize(using: realizer)
         }
         
-    public override func emitCode(into instance: MethodInstance, using: CodeGenerator)
+    public override func emitCode(into instance: InstructionBuffer, using: CodeGenerator) throws
         {
-        self.rhs.emitCode(into: instance, using: using)
+        try self.rhs.emitCode(into: instance, using: using)
         var opcode:Instruction.Opcode = .nop
         switch(self.operation)
             {
@@ -51,7 +51,16 @@ public class UnaryExpression: Expression
             default:
                 break
             }
-        let register = using.registerFile.findRegister(for: nil, instance: instance)
-        instance.append(opcode,rhs.valueLocation,.none,.register(register))
+        let register = using.registerFile.findRegister(forSlot: nil, inBuffer: instance)
+        instance.append(opcode,rhs.place,.none,.register(register))
+        self._place = .register(register)
+        }
+        
+    public override func dump(depth: Int)
+        {
+        let padding = String(repeating: "\t", count: depth)
+        print("\(padding)UNARY EXPRESSION()")
+        print("\(padding)\t\(self.operation)")
+        self.rhs.dump(depth: depth + 1)
         }
     }

@@ -10,9 +10,25 @@ import AppKit
 
 public enum AddressDescriptor
     {
+    case none
     case register(Instruction.Register)
     case address(Word)
-    case stack(Word)
+    case stack(Instruction.Register,Int)
+    
+    public var operand: Instruction.Operand
+        {
+        switch(self)
+            {
+            case .none:
+                fatalError()
+            case .register(let register):
+                return(.register(register))
+            case .address(let address):
+                return(.address(address))
+            case .stack(let register,let offset):
+                return(.stack(register,Argon.Integer(offset)))
+            }
+        }
     }
     
 public class AddressDescriptors
@@ -34,8 +50,13 @@ public class AddressDescriptors
         }
     }
     
-public class Slot:Symbol
+public class Slot:Symbol,Equatable
     {
+    public static func ==(lhs:Slot,rhs:Slot) -> Bool
+        {
+        return(lhs.index == rhs.index)
+        }
+        
     public override var typeCode:TypeCode
         {
         .slot
@@ -103,6 +124,7 @@ public class Slot:Symbol
     public var initialValue: Expression? = nil
     public var isClassSlot = false
     public var addressDescriptors = AddressDescriptors()
+    public var stackOffset: Int = 0
     
     init(label:Label,type:Class)
         {
@@ -115,10 +137,10 @@ public class Slot:Symbol
         self._type = ofType
         super.init(label:labeled)
         }
-        
-    public override func realize(_ compiler:Compiler)
+
+    public override func realize(using realizer: Realizer)
         {
-        self._type.realize(compiler)
+        self._type.realize(using: realizer)
         }
         
     public func setOffset(_ integer:Int)

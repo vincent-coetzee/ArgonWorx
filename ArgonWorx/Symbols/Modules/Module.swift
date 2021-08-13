@@ -47,21 +47,20 @@ struct ModuleButtonView: View
     
 public class Module:ContainerSymbol
     {
-    public override func emitCode(using generator: CodeGenerator)
+    public override func emitCode(using generator: CodeGenerator) throws
         {
         for symbol in self.symbols.values
             {
-            symbol.emitCode(using: generator)
+            try symbol.emitCode(using: generator)
             }
         }
-        
-    public override var subNodes: Array<ParseNode>?
+
+    public override func realize(using realizer: Realizer)
         {
-        return(self.symbols.values.map{$0 as ParseNode})
-        }
-        
-    public override func realize(_ compiler:Compiler)
-        {
+        for symbol in self.symbols.values
+            {
+            symbol.realize(using: realizer)
+            }
         }
         
     public override var typeCode:TypeCode
@@ -111,6 +110,18 @@ public class Module:ContainerSymbol
     public override var symbolColor: NSColor
         {
         .argonNeonOrange
+        }
+        
+    public func dumpMethods()
+        {
+        for method in self.symbols.values.flatMap{$0 as? Method}
+            {
+            method.dump()
+            }
+        for module in self.symbols.values.compactMap{$0 as? Module}
+            {
+            module.dumpMethods()
+            }
         }
         
     public override func visit(_ visitor:ParseTreeVisitor) throws

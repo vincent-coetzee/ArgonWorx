@@ -18,4 +18,4 @@ public class ParameterizedClassInstance:Class
         self.concreteTypes = types
         super.init(label:label)
         }
-    }
+}
